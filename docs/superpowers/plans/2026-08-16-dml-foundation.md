@@ -815,7 +815,7 @@ export function usePrefersReducedMotion(): boolean {
 - [ ] **Step 4: Jalankan tes untuk memastikan lolos**
 
 Run: `cd dml-web && bun run test src/lib/motion/use-prefers-reduced-motion.test.tsx`
-Expected: PASS, empat assertion hijau. Tes keempat adalah yang penting: kebocoran listener di hook ini akan terulang di setiap komponen motion.
+Expected: PASS, lima tes hijau. Tes terakhir yang penting: kebocoran listener di hook ini akan terulang di setiap komponen motion.
 
 - [ ] **Step 5: Commit**
 
@@ -1629,7 +1629,11 @@ Create `dml-web/src/lib/seo/json-ld.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { breadcrumbJsonLd, organizationJsonLd } from "./json-ld";
+import {
+  breadcrumbJsonLd,
+  organizationJsonLd,
+  safeJsonLdString,
+} from "./json-ld";
 
 describe("organizationJsonLd", () => {
   const data = organizationJsonLd() as Record<string, unknown>;
@@ -1673,6 +1677,21 @@ describe("breadcrumbJsonLd", () => {
     // membuat items[1] bertipe T | undefined, dan kalau memang undefined tes
     // ini gagal wajar lewat toMatch, bukan lewat klaim ke compiler.
     expect(String(items[1]?.item)).toMatch(/^https?:\/\/.+\/bisnis$/);
+  });
+});
+
+describe("safeJsonLdString", () => {
+  it("tidak meloloskan tanda kurung siku buka mentah sehingga tag script tidak bisa ditutup paksa", () => {
+    const out = safeJsonLdString({
+      evil: "</script><script>alert(1)</script>",
+    });
+    expect(out).not.toContain("</script>");
+    expect(out).not.toContain("<");
+  });
+
+  it("hasilnya tetap JSON valid dan identik setelah dibaca balik lewat JSON.parse", () => {
+    const payload = { evil: "</script>" };
+    expect(JSON.parse(safeJsonLdString(payload))).toEqual(payload);
   });
 });
 ```
@@ -1766,12 +1785,32 @@ export function breadcrumbJsonLd(
     })),
   };
 }
+
+/**
+ * JSON.stringify biasa tidak meng-escape "<", jadi field string apa pun yang
+ * kebetulan memuat "</script>" bisa menutup tag lebih awal dan menyuntik
+ * markup. COMPANY sekarang statis dan aman, tapi Plan 4 akan memakai fungsi
+ * ini juga untuk JSON-LD artikel yang datang dari input admin di Payload,
+ * jadi escape-nya dipasang di sini, sekali, bukan di titik pemakaian.
+ *
+ * Backslash-nya dobel dengan sengaja. "<" di dalam string literal JS
+ * adalah escape sequence yang langsung didekode compiler jadi karakter "<"
+ * itu sendiri saat parse time, sehingga replace-nya jadi no-op sempurna:
+ * "<" diganti "<". "\\u003c" adalah backslash yang di-escape diikuti lima
+ * karakter biasa, menghasilkan string runtime berisi enam karakter literal
+ * <, yang baru didekode balik jadi "<" nanti oleh JSON.parse di
+ * browser. Dibuktikan lewat od -c di berkas nyata: versi satu backslash
+ * membiarkan "</script>" mentah lolos ke output JSON-LD.
+ */
+export function safeJsonLdString(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
 ```
 
 - [ ] **Step 5: Jalankan tes untuk memastikan lolos**
 
 Run: `cd dml-web && bun run test src/lib/seo/json-ld.test.ts`
-Expected: PASS, tujuh tes hijau (delapan titik `expect()`).
+Expected: PASS, sembilan tes hijau (sebelas titik `expect()`).
 
 - [ ] **Step 6: Sitemap dan robots**
 
@@ -1826,20 +1865,8 @@ NEXT_PUBLIC_SITE_URL=https://dutabaharimenaraline.co.id
 
 - [ ] **Step 7: Sisipkan JSON-LD di root layout**
 
-Tambahkan helper escape di `dml-web/src/lib/seo/json-ld.ts`, di akhir berkas:
-
-```ts
-/**
- * JSON.stringify biasa tidak meng-escape "<", jadi field string apa pun yang
- * kebetulan memuat "</script>" bisa menutup tag lebih awal dan menyuntik
- * markup. COMPANY sekarang statis dan aman, tapi Plan 4 akan memakai fungsi
- * ini juga untuk JSON-LD artikel yang datang dari input admin di Payload,
- * jadi escape-nya dipasang di sini, sekali, bukan di titik pemakaian.
- */
-export function safeJsonLdString(data: unknown): string {
-  return JSON.stringify(data).replace(/</g, "\u003c");
-}
-```
+`safeJsonLdString` sudah ada di `json-ld.ts` sejak Step 4 dan sudah teruji
+sejak Step 1. Tinggal dipakai di sini, tidak perlu ditulis ulang.
 
 Modify `dml-web/src/app/layout.tsx`, tambahkan tepat sebelum `</body>`:
 
