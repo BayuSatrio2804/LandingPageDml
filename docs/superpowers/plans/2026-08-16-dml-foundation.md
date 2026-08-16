@@ -28,6 +28,7 @@ Setiap task secara implisit tunduk pada seluruh isi bagian ini.
 - **Tidak ada library animasi selain GSAP dan Lenis.** Jangan menambahkan `motion` atau `framer-motion`.
 - **Konten teks dan link selalu render di server.** Client leaf hanya boleh mengubah transform dan opacity elemen yang sudah ada di HTML.
 - **Semua angka perusahaan berasal dari sumber publik** dan wajib ditandai `{/* unverified: <sumber> */}` sampai klien mengonfirmasi.
+- **Setiap task wajib lolos `bun run lint`,** bukan cuma `bun run test`, `bunx tsc --noEmit`, dan `bun run build`. Konfigurasi eslint Next 16 memuat aturan react-hooks generasi compiler yang menangkap kelas kesalahan yang tidak terlihat oleh typechecker maupun test runner.
 - **`noUncheckedIndexedAccess` aktif.** Setiap akses indeks ke array, ke hasil `.match()` atau `.exec()`, dan ke `Record` menghasilkan `T | undefined`. Blok kode di rencana ini belum tentu lolos `bunx tsc --noEmit`; kalau bentrok, perbaiki dengan guard eksplisit, bukan dengan non-null assertion (`!`) atau `as`, lalu laporkan agar rencananya diperbaiki.
 
 ---
@@ -776,27 +777,38 @@ Create `dml-web/src/lib/motion/use-prefers-reduced-motion.ts`:
 ```ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
 
+function subscribe(onStoreChange: () => void): () => void {
+  const mql = window.matchMedia(QUERY);
+  mql.addEventListener("change", onStoreChange);
+  return () => mql.removeEventListener("change", onStoreChange);
+}
+
+function getSnapshot(): boolean {
+  return window.matchMedia(QUERY).matches;
+}
+
 /**
- * Default-nya true. Sebelum hidrasi kita belum tahu preferensi pengguna,
- * dan pilihan yang aman adalah tidak menganimasikan apa pun.
+ * Di server dan selama hidrasi kita belum tahu preferensi pengguna, dan pilihan
+ * yang aman adalah tidak menganimasikan apa pun. React memakai snapshot server
+ * ini untuk render pertama, lalu beralih ke nilai asli setelah hidrasi selesai,
+ * jadi tidak ada mismatch.
+ */
+function getServerSnapshot(): boolean {
+  return true;
+}
+
+/**
+ * matchMedia adalah external store, jadi useSyncExternalStore adalah API React
+ * yang memang untuk ini. Versi useState plus useEffect memanggil setState
+ * sinkron di dalam efek, yang memicu render bertingkat dan ditolak aturan
+ * react-hooks/set-state-in-effect.
  */
 export function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(true);
-
-  useEffect(() => {
-    const mql = window.matchMedia(QUERY);
-    setReduced(mql.matches);
-
-    const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-
-  return reduced;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 ```
 
