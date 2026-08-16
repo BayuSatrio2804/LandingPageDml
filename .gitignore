@@ -1,0 +1,22 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+test-results/
+playwright-report/
+.turbo/
+
+# project lama, diabaikan
+dml-corporate-old-1/
+dml-corporate-old-2/
+reference-jeskojets/
+
+# arsip foto drone mentah, jangan di-commit
+assets/*.zip
+assets/_raw/
