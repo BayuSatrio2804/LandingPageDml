@@ -522,9 +522,14 @@ git commit -m "feat: token Deep Water dengan tes kontras yang menjaga aturan on-
 ### Task 4: Font self-hosted
 
 **Files:**
-- Create: `dml-web/public/fonts/` (file font)
+- Create: `dml-web/src/fonts/` (berkas font)
 - Create: `dml-web/src/lib/fonts.ts`
 - Modify: `dml-web/src/app/layout.tsx`
+
+Font tidak ditaruh di `public/`. `next/font/local` sudah menyalin berkasnya ke
+`.next/static/media/` dengan nama ber-hash dan header cache abadi. Menaruh sumbernya
+di `public/` berarti ikut mengirim salinan kedua yang tidak pernah dirujuk siapa pun,
+dengan header cache yang lebih buruk.
 
 **Interfaces:**
 - Consumes: variabel `--font-cabinet-grotesk`, `--font-satoshi`, `--font-geist-mono` yang sudah dirujuk `globals.css` di Task 3
@@ -537,14 +542,14 @@ Keduanya memuat berkas variable `.woff2`, jadi gunakan itu, bukan bobot statis.
 
 ```bash
 cd /home/waxarsatia/test/company-profile
-mkdir -p dml-web/public/fonts
+mkdir -p dml-web/src/fonts
 unzip -o -j fonts/CabinetGrotesk_Complete.zip \
   "CabinetGrotesk_Complete/Fonts/WEB/fonts/CabinetGrotesk-Variable.woff2" \
-  -d dml-web/public/fonts
+  -d dml-web/src/fonts
 unzip -o -j fonts/Satoshi_Complete.zip \
   "Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Variable.woff2" \
-  -d dml-web/public/fonts
-ls -la dml-web/public/fonts
+  -d dml-web/src/fonts
+ls -la dml-web/src/fonts
 ```
 
 Expected: dua berkas, `CabinetGrotesk-Variable.woff2` sekitar 41 kB dan
@@ -573,14 +578,14 @@ import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 
 export const cabinetGrotesk = localFont({
-  src: "../../public/fonts/CabinetGrotesk-Variable.woff2",
+  src: "../fonts/CabinetGrotesk-Variable.woff2",
   variable: "--font-cabinet-grotesk",
   display: "swap",
   weight: "100 900",
 });
 
 export const satoshi = localFont({
-  src: "../../public/fonts/Satoshi-Variable.woff2",
+  src: "../fonts/Satoshi-Variable.woff2",
   variable: "--font-satoshi",
   display: "swap",
   weight: "300 900",
@@ -626,21 +631,47 @@ export default function RootLayout({
 }
 ```
 
-- [ ] **Step 5: Verifikasi font termuat**
+- [ ] **Step 5: Verifikasi font termuat, otomatis**
 
-Run: `cd dml-web && bun run dev`
+Langkah ini wajib dijalankan lewat browser headless, bukan lewat DevTools manual.
+Instruksi manual tidak menghasilkan bukti apa pun di dalam laporan.
 
-Buka `http://localhost:3000`, buka DevTools tab Network, filter `font`. Expected:
-berkas woff2 termuat dengan status 200 dari origin sendiri, dan **tidak ada permintaan
-ke `fonts.googleapis.com` maupun `fonts.gstatic.com`**.
+Jalankan `bun run build` lalu `bun run start`, kemudian jalankan skrip Playwright
+sekali pakai terhadap `http://localhost:3000`. Skrip itu harus menegaskan tiga hal:
 
-Periksa juga di tab Elements bahwa `<html>` membawa tiga class variabel font sekaligus.
+1. **Self-hosted.** Setiap respons woff2 berstatus 200 dan berasal dari origin yang
+   sama. **Tidak ada** permintaan ke `fonts.googleapis.com` maupun `fonts.gstatic.com`.
+2. **Variabel terpasang.** Elemen `<html>` membawa ketiga class variabel font sekaligus.
+3. **Sumbu bobot benar-benar tergerak.** Ini yang paling penting dan paling mudah
+   terlewat.
+
+Soal nomor 3: kedua berkas ini punya instance default `wght = 900` dan
+`usWeightClass = 900`, tidak lazim untuk font Fontshare yang biasanya default 400.
+Artinya kalau rentang `weight` gagal sampai ke `@font-face`, seluruh situs akan
+dirender dengan bobot Black tanpa ada yang error.
+
+`getComputedStyle(el).fontWeight` **tidak bisa** mendeteksi ini. Nilai itu melaporkan
+angka CSS yang mengalir dari cascade, bukan bobot yang benar-benar dirender font.
+Yang membedakan adalah metrik: render string yang sama di dua span dengan bobot
+berbeda, lalu bandingkan `getBoundingClientRect().width`.
+
+- Cabinet Grotesk: bandingkan bobot 100 lawan 900
+- Satoshi: bandingkan bobot 300 lawan 900
+
+Lebar yang berbeda berarti sumbunya tergerak. Lebar yang identik berarti semuanya
+dirender di default 900 dan deklarasi `weight` tidak sampai ke font.
+
+Tempel keluaran skrip itu apa adanya ke dalam laporan. Rentang sumbu sudah
+diverifikasi dari tabel `fvar` sebelum task ini didispatch: Cabinet Grotesk
+`wght 100..900`, Satoshi `wght 300..900`.
+
+Matikan server setelah selesai. Skrip verifikasi ini tidak ikut dikomit.
 
 - [ ] **Step 6: Commit**
 
 ```bash
 cd /home/waxarsatia/test/company-profile
-git add dml-web/public/fonts dml-web/src/lib/fonts.ts dml-web/src/app/layout.tsx \
+git add dml-web/src/fonts dml-web/src/lib/fonts.ts dml-web/src/app/layout.tsx \
   dml-web/package.json dml-web/bun.lock
 git commit -m "feat: font self-hosted Cabinet Grotesk, Satoshi, dan Geist Mono via paket geist"
 ```
