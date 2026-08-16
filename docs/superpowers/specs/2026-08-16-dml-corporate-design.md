@@ -234,9 +234,9 @@ Ini keputusan brand yang disetujui klien, bukan default.
 
 | Kombinasi | Rasio | Status |
 |---|---|---|
-| `--color-ink` di atas `--color-surface` | 16,5:1 | Lolos AAA |
-| `--color-accent` di atas `--color-surface` | 6,06:1 | Lolos AA, teks oranye di latar gelap aman |
-| `--color-on-accent` di atas `--color-accent` | 6,06:1 | Lolos AA, ini satu-satunya teks yang boleh di atas tombol oranye |
+| `--color-ink` di atas `--color-surface` | 16,25:1 | Lolos AAA |
+| `--color-accent` di atas `--color-surface` | 5,98:1 | Lolos AA, teks oranye di latar gelap aman |
+| `--color-on-accent` di atas `--color-accent` | 5,98:1 | Lolos AA, ini satu-satunya teks yang boleh di atas tombol oranye |
 | `--color-ink` di atas `--color-accent` | **2,72:1** | **Gagal. Dilarang.** |
 
 Tombol oranye terisi **selalu** memakai `--color-on-accent`, tidak pernah `--color-ink`.
