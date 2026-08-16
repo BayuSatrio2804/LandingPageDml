@@ -726,6 +726,14 @@ describe("usePrefersReducedMotion", () => {
     vi.unstubAllGlobals();
   });
 
+  it("menanyakan media query yang tepat", () => {
+    mockMatchMedia(false);
+    renderHook(() => usePrefersReducedMotion());
+    expect(window.matchMedia).toHaveBeenCalledWith(
+      "(prefers-reduced-motion: reduce)",
+    );
+  });
+
   it("mengembalikan false ketika pengguna tidak meminta reduced motion", () => {
     mockMatchMedia(false);
     const { result } = renderHook(() => usePrefersReducedMotion());
