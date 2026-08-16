@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider";
+import { SkipLink } from "@/components/layout/skip-link";
+import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/site-footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +15,26 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" className={`${fontVariables} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+      {/*
+        min-h-dvh, bukan min-h-full. Task 6 mengeset "html.lenis, html.lenis
+        body { height: auto }" (globals.css) begitu Lenis aktif. Aturan itu
+        selektornya lebih spesifik dari utility h-full milik <html>, jadi
+        tinggi <html> jatuh ke auto begitu Lenis mount, dan min-height
+        berbasis persentase (min-h-full) pada body kehilangan containing
+        block yang definit untuk dihitung. Satuan viewport (dvh) langsung
+        merujuk ke viewport, tidak lewat rantai tinggi <html>, jadi tidak
+        kena efek itu. Footer terbukti tidak terkunci ke dasar viewport
+        dengan min-h-full begitu class "lenis" nempel di <html>.
+      */}
+      <body className="min-h-dvh flex flex-col">
+        <SkipLink />
+        <SmoothScrollProvider>
+          <SiteHeader />
+          <main id="konten-utama" tabIndex={-1} className="flex-1">
+            {children}
+          </main>
+          <SiteFooter />
+        </SmoothScrollProvider>
       </body>
     </html>
   );
