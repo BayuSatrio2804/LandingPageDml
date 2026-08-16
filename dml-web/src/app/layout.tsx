@@ -1,16 +1,18 @@
-import type { Metadata } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider";
 import { SkipLink } from "@/components/layout/skip-link";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
+import { buildMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: "PT Dutabahari Menara Line",
   description:
     "Perusahaan pelayaran Banjarmasin sejak 1985. Transportasi BBM, penyeberangan ro-ro, dan galangan kapal.",
-};
+  path: "/",
+});
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -35,6 +37,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <SiteFooter />
         </SmoothScrollProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: safeJsonLdString(organizationJsonLd()),
+          }}
+        />
       </body>
     </html>
   );
