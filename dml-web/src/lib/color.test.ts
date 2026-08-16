@@ -13,6 +13,14 @@ describe("relativeLuminance", () => {
   it("menerima notasi tiga digit", () => {
     expect(relativeLuminance("#fff")).toBeCloseTo(1, 5);
   });
+
+  it("menolak digit yang bukan heksadesimal", () => {
+    expect(() => relativeLuminance("#GGGGGG")).toThrow(/tidak sah/);
+  });
+
+  it("menolak panjang digit yang tidak sah", () => {
+    expect(() => relativeLuminance("#12345")).toThrow(/tidak sah/);
+  });
 });
 
 describe("contrastRatio", () => {
