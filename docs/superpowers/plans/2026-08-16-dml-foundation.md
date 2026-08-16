@@ -303,7 +303,10 @@ export function contrastRatio(a: string, b: string): number {
 - [ ] **Step 5: Jalankan tes untuk memastikan lolos**
 
 Run: `cd dml-web && bun run test src/lib/color.test.ts`
-Expected: PASS, sembilan assertion hijau.
+Expected: PASS, enam assertion hijau.
+
+Tes kontras untuk token warna tidak berada di berkas ini. Token belum ada sampai
+Task 3, dan Task 3 membawa berkas tesnya sendiri, `src/lib/tokens.test.ts`.
 
 - [ ] **Step 6: Commit**
 
