@@ -28,6 +28,7 @@ Setiap task secara implisit tunduk pada seluruh isi bagian ini.
 - **Tidak ada library animasi selain GSAP dan Lenis.** Jangan menambahkan `motion` atau `framer-motion`.
 - **Konten teks dan link selalu render di server.** Client leaf hanya boleh mengubah transform dan opacity elemen yang sudah ada di HTML.
 - **Semua angka perusahaan berasal dari sumber publik** dan wajib ditandai `{/* unverified: <sumber> */}` sampai klien mengonfirmasi.
+- **`noUncheckedIndexedAccess` aktif.** Setiap akses indeks ke array, ke hasil `.match()` atau `.exec()`, dan ke `Record` menghasilkan `T | undefined`. Blok kode di rencana ini belum tentu lolos `bunx tsc --noEmit`; kalau bentrok, perbaiki dengan guard eksplisit, bukan dengan non-null assertion (`!`) atau `as`, lalu laporkan agar rencananya diperbaiki.
 
 ---
 
@@ -279,11 +280,10 @@ const HEX_PATTERN = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
  * diam akan membuat pemeriksaan kontras lolos tanpa pernah benar benar diuji.
  */
 function parseHex(hex: string): [number, number, number] {
-  const match = HEX_PATTERN.exec(hex.trim());
-  if (!match) {
+  const [, digits] = HEX_PATTERN.exec(hex.trim()) ?? [];
+  if (digits === undefined) {
     throw new Error(`Nilai hex tidak sah: ${JSON.stringify(hex)}`);
   }
-  const digits = match[1];
   const raw =
     digits.length === 3
       ? digits
