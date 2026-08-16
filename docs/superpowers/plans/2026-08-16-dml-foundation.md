@@ -1912,11 +1912,15 @@ export function Reveal({
   const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (reduced || !root.current) return;
+    // Ditangkap ke const, bukan root.current! di dalam closure. Guard di
+    // baris berikutnya menyempitkan tipenya sekali di sini, dan penyempitan
+    // itu bertahan lewat closure karena container tidak pernah berubah.
+    const container = root.current;
+    if (reduced || !container) return;
     registerGsap();
 
     const ctx = gsap.context(() => {
-      const targets = gsap.utils.toArray<HTMLElement>(root.current!.children);
+      const targets = gsap.utils.toArray<HTMLElement>(container.children);
       gsap.from(targets, {
         opacity: 0,
         y: 24,
@@ -1924,7 +1928,7 @@ export function Reveal({
         ease: "power3.out",
         stagger,
         scrollTrigger: {
-          trigger: root.current,
+          trigger: container,
           start: "top 82%",
           once: true,
         },
@@ -1944,7 +1948,7 @@ export function Reveal({
 
 `gsap.from` dipilih, bukan `gsap.set` lalu `gsap.to`, supaya state akhir adalah keadaan alami HTML. Jika JavaScript gagal dimuat, konten tetap terlihat penuh tanpa perlu style pemulihan.
 
-- [ ] **Step 2: Verifikasi manual**
+- [ ] **Step 2: Verifikasi otomatis**
 
 Sisipkan sementara di `src/app/page.tsx`:
 
@@ -1960,13 +1964,24 @@ import { Reveal } from "@/components/motion/reveal";
 </Reveal>
 ```
 
-Run: `cd dml-web && bun run dev`
+Wajib lewat browser headless. Jalankan `bun run build` lalu `bun run start`,
+kemudian skrip Playwright sekali pakai yang menegaskan:
 
-1. Scroll ke bawah. Expected: tiga baris muncul berurutan dengan jeda pendek.
-2. Aktifkan emulasi reduced motion, reload, scroll. Expected: ketiga baris langsung terlihat tanpa animasi.
-3. Matikan JavaScript di DevTools, reload. Expected: ketiga baris tetap terlihat.
+1. **Tanpa JavaScript, konten tetap penuh.** Dengan
+   `javaScriptEnabled: false`, ketiga `<p>` terlihat (`toBeVisible()`) begitu
+   halaman dimuat, tanpa perlu scroll.
+2. **Reduced motion, konten langsung penuh.** Dengan
+   `page.emulateMedia({ reducedMotion: "reduce" })`, scroll ke area Reveal,
+   ketiga `<p>` sudah `toBeVisible()` seketika, karena efeknya `return` lebih
+   awal dan GSAP tidak pernah menyentuh elemen sama sekali.
+3. **Motion aktif, animasi benar benar berjalan.** Tanpa emulasi apa pun, catat
+   `opacity` komputasi elemen pertama sesaat setelah scroll ke area Reveal
+   (harus mendekati 0), lalu tunggu durasi animasi selesai dan catat lagi
+   (harus 1). Dua angka yang berbeda adalah bukti `gsap.from` benar benar
+   berjalan, bukan sekadar tidak error.
 
-Hapus blok sementara setelah verifikasi.
+Tempel keluaran skrip apa adanya ke dalam laporan. Hapus blok sementara dan
+matikan server setelah selesai. Skrip verifikasinya tidak ikut dikomit.
 
 - [ ] **Step 3: Commit**
 
