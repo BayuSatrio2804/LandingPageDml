@@ -2,6 +2,7 @@ import Link from "next/link";
 import { NAV_ITEMS } from "@/content/navigation";
 import { COMPANY } from "@/content/company";
 import { ExternalLink } from "./external-link";
+import { MobileMenu } from "./mobile-menu";
 
 export function SiteHeader() {
   return (
@@ -37,7 +38,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        {/* Menu mobile dibangun di Task 9 sebagai satu-satunya client leaf di header. */}
+        <MobileMenu items={NAV_ITEMS} />
       </div>
     </header>
   );
