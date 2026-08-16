@@ -861,6 +861,13 @@ import { registerGsap, ScrollTrigger, gsap } from "@/lib/motion/gsap";
 /**
  * Tidak merender elemen apa pun. Membungkus aplikasi tanpa mengubah DOM,
  * sehingga seluruh konten tetap berada di Server Component.
+ *
+ * Provider ini TIDAK BOLEH memanggil ScrollTrigger.getAll().kill(). Dia tidak
+ * membuat satu pun ScrollTrigger, jadi dia tidak berhak membunuh milik siapa
+ * pun. Trigger yang tidak ikut bergantung pada reduced, misalnya yang tugasnya
+ * cuma onEnter untuk memuat kanvas 3D, tidak akan pernah dibuat ulang kalau
+ * dibunuh dari sini. Pembersihan trigger adalah tanggung jawab masing masing
+ * komponen lewat ctx.revert(), sesuai Global Constraints.
  */
 export function SmoothScrollProvider({
   children,
@@ -880,12 +887,16 @@ export function SmoothScrollProvider({
     const onTick = (time: number) => lenis.raf(time * 1000);
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(onTick);
+
+    // lagSmoothing global. Dimatikan supaya Lenis yang memegang kendali waktu,
+    // lalu WAJIB dikembalikan ke default di cleanup. Nilai 500 dan 33 itu
+    // default GSAP yang sebenarnya, terbaca di gsap-core.js.
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       gsap.ticker.remove(onTick);
+      gsap.ticker.lagSmoothing(500, 33);
       lenis.destroy();
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, [reduced]);
 
@@ -907,17 +918,30 @@ import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider
       </body>
 ```
 
-- [ ] **Step 4: Verifikasi manual**
+- [ ] **Step 4: Verifikasi otomatis**
 
-Run: `cd dml-web && bun run dev`
+Wajib lewat browser headless, bukan DevTools manual. Yang menjalankan rencana ini
+adalah subagent, dan langkah manual hanya menghasilkan klaim tanpa bukti.
 
-Tambahkan sementara konten tinggi di `src/app/page.tsx`, misalnya `<div style={{height: "300vh"}} />`, lalu:
+Tambahkan sementara `<div style={{ height: "300vh" }} />` di `src/app/page.tsx`
+supaya halaman punya tinggi untuk di-scroll, jalankan `bun run build` lalu
+`bun run start`, kemudian jalankan skrip Playwright sekali pakai yang menegaskan:
 
-1. Scroll halaman. Expected: gerakan terasa halus dan sedikit tertinggal dari roda mouse, itu tanda Lenis aktif.
-2. Buka DevTools, Rendering, aktifkan emulasi `prefers-reduced-motion: reduce`, reload. Expected: scroll kembali ke perilaku native instan.
-3. Buka Console. Expected: tidak ada warning tentang plugin GSAP yang belum terdaftar.
+1. **Lenis aktif secara default.** Tanpa emulasi apa pun, elemen `<html>` membawa
+   class `lenis`. Lenis memasang class itu sendiri saat konstruksi.
+2. **Gerbang reduced motion benar benar menutup.** Dengan
+   `page.emulateMedia({ reducedMotion: "reduce" })` lalu reload, `<html>` **tidak**
+   membawa class `lenis`. Ini yang membuktikan hook Task 5 benar benar mengendalikan
+   provider, bukan sekadar terpasang.
+3. **Console bersih.** Tidak ada warning GSAP soal plugin yang belum terdaftar, dan
+   tidak ada error apa pun, di kedua kondisi.
 
-Hapus kembali div sementara setelah verifikasi.
+Tempel keluaran skrip apa adanya ke dalam laporan. Hapus kembali div sementara dan
+matikan server setelah selesai. Skrip verifikasinya tidak ikut dikomit.
+
+Perhatikan bahwa poin 2 adalah satu satunya cara memastikan gerbang aksesibilitas
+situs ini bekerja. Kalau gerbangnya bocor, seluruh situs tetap beranimasi untuk
+pengguna yang secara eksplisit meminta sebaliknya, tanpa error apa pun.
 
 - [ ] **Step 5: Commit**
 
