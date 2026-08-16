@@ -27,7 +27,7 @@ Setiap task secara implisit tunduk pada seluruh isi bagian ini.
 - **Tidak ada em dash (`—`) atau en dash (`–`)** di teks yang terlihat pengguna maupun di komentar kode. Gunakan tanda hubung biasa.
 - **Tidak ada library animasi selain GSAP dan Lenis.** Jangan menambahkan `motion` atau `framer-motion`.
 - **Konten teks dan link selalu render di server.** Client leaf hanya boleh mengubah transform dan opacity elemen yang sudah ada di HTML.
-- **Semua angka perusahaan berasal dari sumber publik** dan wajib ditandai `{/* unverified: <sumber> */}` sampai klien mengonfirmasi.
+- **Semua angka perusahaan berasal dari sumber publik** dan wajib ditandai sampai klien mengonfirmasi: `// unverified: <sumber>` di berkas data seperti `src/content/company.ts` (sintaks `{/* */}` tidak sah di luar JSX), dan `{/* unverified: <sumber> */}` di titik render JSX kalau angkanya dicetak langsung di markup Plan 3 atau Plan 5.
 - **Setiap task wajib lolos `bun run lint`,** bukan cuma `bun run test`, `bunx tsc --noEmit`, dan `bun run build`. Konfigurasi eslint Next 16 memuat aturan react-hooks generasi compiler yang menangkap kelas kesalahan yang tidak terlihat oleh typechecker maupun test runner.
 - **`noUncheckedIndexedAccess` aktif.** Setiap akses indeks ke array, ke hasil `.match()` atau `.exec()`, dan ke `Record` menghasilkan `T | undefined`. Blok kode di rencana ini belum tentu lolos `bunx tsc --noEmit`; kalau bentrok, perbaiki dengan guard eksplisit, bukan dengan non-null assertion (`!`) atau `as`, lalu laporkan agar rencananya diperbaiki.
 
@@ -1173,7 +1173,7 @@ export const FOOTER_GROUPS: FooterGroup[] = [
 - [ ] **Step 6: Jalankan tes untuk memastikan lolos**
 
 Run: `cd dml-web && bun run test src/content/company.test.ts`
-Expected: PASS, delapan assertion hijau.
+Expected: PASS, tujuh tes hijau (sembilan titik `expect()`).
 
 - [ ] **Step 7: Commit**
 
