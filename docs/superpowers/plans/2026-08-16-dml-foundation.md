@@ -1376,20 +1376,29 @@ export function SiteFooter() {
 
 - [ ] **Step 5: Rakit di root layout**
 
-Modify `dml-web/src/app/layout.tsx`, ganti isi `<body>`:
+Modify `dml-web/src/app/layout.tsx`, ganti isi `<body>`. **Pertahankan
+`className="min-h-full flex flex-col"` yang sudah ada di tag `<body>`** dan
+tambahkan `flex-1` di `<main>`:
 
 ```tsx
-      <body>
+      <body className="min-h-full flex flex-col">
         <SkipLink />
         <SmoothScrollProvider>
           <SiteHeader />
-          <main id="konten-utama">{children}</main>
+          <main id="konten-utama" className="flex-1">
+            {children}
+          </main>
           <SiteFooter />
         </SmoothScrollProvider>
       </body>
 ```
 
 Tambahkan import `SkipLink`, `SiteHeader`, `SiteFooter` dari `@/components/layout/...`.
+
+`flex-1` di `<main>` bukan kosmetik. `body` sudah `flex flex-col` sejak scaffold,
+tapi tanpa elemen yang tumbuh, deklarasi itu tidak berbuat apa apa dan footer
+jatuh tepat di bawah konten alih alih terkunci ke dasar viewport pada halaman
+pendek, misalnya Karier sebelum isinya ditulis.
 
 - [ ] **Step 6: Beranda placeholder**
 
@@ -1411,13 +1420,28 @@ export default function HomePage() {
 }
 ```
 
-- [ ] **Step 7: Verifikasi**
+- [ ] **Step 7: Verifikasi otomatis**
 
-Run: `cd dml-web && bun run build && bun run dev`
+Wajib lewat browser headless. Jalankan `bun run build` lalu `bun run start`,
+kemudian skrip Playwright sekali pakai terhadap `http://localhost:3000` pada
+viewport 1024 lebar yang menegaskan:
 
-1. Buka `http://localhost:3000` pada lebar 1024px. Expected: nav muat satu baris, tinggi header 72px.
-2. Tekan Tab dari awal halaman. Expected: skip link muncul lebih dulu, dan menekan Enter memindahkan fokus ke `<main>`.
-3. Klik BookJambo. Expected: membuka `dutabahari.id` di tab baru.
+1. **Header satu baris di desktop.** `nav[aria-label="Navigasi utama"]` terlihat
+   (bukan `hidden`), dan tinggi elemen `header` sama dengan 72 piksel.
+2. **Skip link berfungsi.** Tab pertama dari `body` memindahkan fokus ke elemen
+   dengan teks "Lompat ke konten utama", elemen itu terlihat saat fokus
+   (`focus:not-sr-only`), dan menekan Enter memindahkan fokus ke elemen dengan
+   id `konten-utama`.
+3. **BookJambo eksternal.** Tautan dengan teks "BookJambo" membawa
+   `target="_blank"`, `rel` memuat `noopener` dan `noreferrer`, dan `href`
+   persis `https://dutabahari.id`.
+4. **Footer terkunci ke dasar pada halaman pendek.** Pada viewport tinggi 900px,
+   batas bawah elemen `footer` berada pada atau melewati batas bawah viewport.
+   Ini yang membuktikan `flex-1` di `<main>` benar benar bekerja, bukan sekadar
+   terpasang.
+
+Tempel keluaran skrip apa adanya ke dalam laporan. Matikan server setelah
+selesai. Skrip verifikasinya tidak ikut dikomit.
 
 - [ ] **Step 8: Commit**
 
