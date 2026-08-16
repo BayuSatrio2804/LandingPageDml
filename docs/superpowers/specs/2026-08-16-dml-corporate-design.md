@@ -84,6 +84,7 @@ sebelum situs live. Tandai setiap angka yang belum diverifikasi dengan komentar
 | Test unit | Vitest, Testing Library | 4.x |
 | Test e2e | Playwright | 1.62 |
 | Audit | Lighthouse CI, axe-core | |
+| Audit React | react-doctor | 0.9.12 |
 | Deploy | Docker output standalone di Coolify | |
 
 **Next 16.2.0 adalah lantai keras.** Payload 3 tidak mendukung Next 15.5 sampai 16.1.x
@@ -618,9 +619,17 @@ supaya tidak ada pergeseran saat konten masuk.
 - **Playwright dengan JavaScript dimatikan** untuk membuktikan aturan arsitektur nomor
   satu: semua teks dan link hadir.
 - **axe-core** di setiap route.
+- **react-doctor** sebagai gerbang kualitas React. `bun run doctor` menjalankan
+  `react-doctor . -y --blocking warning --no-score`, dan `bun run doctor:design`
+  menjalankan audit design. Dijalankan setelah tiap milestone implementasi, bukan
+  hanya sekali di akhir, karena tujuannya menangkap pola React yang buruk sebelum pola
+  itu menyebar ke seksi berikutnya. Situs ini punya banyak client leaf dengan `useEffect`
+  yang memegang ScrollTrigger dan `useFrame`, dan di sanalah kebocoran cleanup serta
+  re-render yang tidak perlu paling mungkin muncul.
 - **Lighthouse CI** dengan ambang: LCP di bawah 2,5 detik, CLS di bawah 0,1, skor SEO
   minimal 95. Beranda diuji dengan throttling mobile.
-- `bun run check` menjalankan lint, typecheck, test, build, dan lighthouse berurutan.
+- `bun run check` menjalankan lint, typecheck, test, build, doctor, dan lighthouse
+  berurutan. Ini gerbang tunggal sebelum deploy.
 
 ## 15. Deployment
 
