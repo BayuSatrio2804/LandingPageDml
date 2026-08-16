@@ -605,7 +605,7 @@ sudah dirujuk `globals.css` di Task 3, jadi tidak ada yang perlu diubah di sana.
 
 - [ ] **Step 4: Pasang di root layout**
 
-Replace `dml-web/src/app/layout.tsx`:
+Sunting `dml-web/src/app/layout.tsx` sampai isinya menjadi:
 
 ```tsx
 import type { Metadata } from "next";
@@ -618,18 +618,19 @@ export const metadata: Metadata = {
     "Perusahaan pelayaran Banjarmasin sejak 1985. Transportasi BBM, penyeberangan ro-ro, dan galangan kapal.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={fontVariables}>
-      <body>{children}</body>
+    <html lang="id" className={`${fontVariables} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
 ```
+
+Ganti **hanya bagian fontnya**. `LayoutProps<"/">` adalah tipe global bawaan
+typed routes Next 16, lebih tepat daripada menulis ulang `React.ReactNode` sendiri.
+Class `h-full antialiased` dan `min-h-full flex flex-col` sudah ada sejak scaffold
+dan menopang layout kolom penuh yang dipakai Task 8, jadi keduanya dipertahankan.
 
 - [ ] **Step 5: Verifikasi font termuat, otomatis**
 
