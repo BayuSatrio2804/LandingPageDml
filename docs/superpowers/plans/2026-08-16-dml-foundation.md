@@ -491,31 +491,53 @@ git commit -m "feat: token Deep Water dengan tes kontras yang menjaga aturan on-
 - Consumes: variabel `--font-cabinet-grotesk`, `--font-satoshi`, `--font-geist-mono` yang sudah dirujuk `globals.css` di Task 3
 - Produces: `fontVariables: string` untuk dipasang di `<html className>`
 
-- [ ] **Step 1: Unduh font**
+- [ ] **Step 1: Ekstrak Cabinet Grotesk dan Satoshi**
 
-Cabinet Grotesk dan Satoshi tersedia gratis di Fontshare, Geist Mono di Vercel. Unduh berkas `.woff2` dan taruh di `dml-web/public/fonts/`:
+Arsip Fontshare sudah tersedia di `/home/waxarsatia/test/company-profile/fonts/`.
+Keduanya memuat berkas variable `.woff2`, jadi gunakan itu, bukan bobot statis.
 
+```bash
+cd /home/waxarsatia/test/company-profile
+mkdir -p dml-web/public/fonts
+unzip -o -j fonts/CabinetGrotesk_Complete.zip \
+  "CabinetGrotesk_Complete/Fonts/WEB/fonts/CabinetGrotesk-Variable.woff2" \
+  -d dml-web/public/fonts
+unzip -o -j fonts/Satoshi_Complete.zip \
+  "Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Variable.woff2" \
+  -d dml-web/public/fonts
+ls -la dml-web/public/fonts
 ```
-public/fonts/
-  CabinetGrotesk-Variable.woff2
-  Satoshi-Variable.woff2
-  GeistMono-Variable.woff2
+
+Expected: dua berkas, `CabinetGrotesk-Variable.woff2` sekitar 41 kB dan
+`Satoshi-Variable.woff2` sekitar 42 kB.
+
+Varian italic sengaja tidak diambil. Spec tidak memakai italic di mana pun, dan
+menambahkannya berarti membayar 44 kB untuk berkas yang tidak pernah dirender.
+
+- [ ] **Step 2: Pasang Geist Mono lewat paket resmi**
+
+Geist Mono tidak diunduh manual. Vercel menerbitkannya sebagai paket npm yang sudah
+terintegrasi dengan `next/font`, jadi berkasnya di-host sendiri secara otomatis tanpa
+perlu masuk ke `public/`.
+
+```bash
+cd /home/waxarsatia/test/company-profile/dml-web
+bun add geist
 ```
 
-Jika berkas variable tidak tersedia, gunakan bobot statis 400 dan 700 untuk Satoshi, serta 700 dan 800 untuk Cabinet Grotesk, lalu sesuaikan deklarasi di langkah berikutnya.
-
-- [ ] **Step 2: Deklarasikan font**
+- [ ] **Step 3: Deklarasikan font**
 
 Create `dml-web/src/lib/fonts.ts`:
 
 ```ts
 import localFont from "next/font/local";
+import { GeistMono } from "geist/font/mono";
 
 export const cabinetGrotesk = localFont({
   src: "../../public/fonts/CabinetGrotesk-Variable.woff2",
   variable: "--font-cabinet-grotesk",
   display: "swap",
-  weight: "300 900",
+  weight: "100 900",
 });
 
 export const satoshi = localFont({
@@ -525,12 +547,7 @@ export const satoshi = localFont({
   weight: "300 900",
 });
 
-export const geistMono = localFont({
-  src: "../../public/fonts/GeistMono-Variable.woff2",
-  variable: "--font-geist-mono",
-  display: "swap",
-  weight: "100 900",
-});
+export const geistMono = GeistMono;
 
 export const fontVariables = [
   cabinetGrotesk.variable,
@@ -539,7 +556,10 @@ export const fontVariables = [
 ].join(" ");
 ```
 
-- [ ] **Step 3: Pasang di root layout**
+`GeistMono.variable` menghasilkan `--font-geist-mono`, nama yang sama dengan yang
+sudah dirujuk `globals.css` di Task 3, jadi tidak ada yang perlu diubah di sana.
+
+- [ ] **Step 4: Pasang di root layout**
 
 Replace `dml-web/src/app/layout.tsx`:
 
@@ -567,17 +587,23 @@ export default function RootLayout({
 }
 ```
 
-- [ ] **Step 4: Verifikasi font termuat**
+- [ ] **Step 5: Verifikasi font termuat**
 
 Run: `cd dml-web && bun run dev`
-Buka `http://localhost:3000`, buka DevTools tab Network, filter `font`. Expected: tiga berkas woff2 termuat dengan status 200, dan tidak ada permintaan ke `fonts.googleapis.com`.
 
-- [ ] **Step 5: Commit**
+Buka `http://localhost:3000`, buka DevTools tab Network, filter `font`. Expected:
+berkas woff2 termuat dengan status 200 dari origin sendiri, dan **tidak ada permintaan
+ke `fonts.googleapis.com` maupun `fonts.gstatic.com`**.
+
+Periksa juga di tab Elements bahwa `<html>` membawa tiga class variabel font sekaligus.
+
+- [ ] **Step 6: Commit**
 
 ```bash
 cd /home/waxarsatia/test/company-profile
-git add dml-web/public/fonts dml-web/src/lib/fonts.ts dml-web/src/app/layout.tsx
-git commit -m "feat: font self-hosted Cabinet Grotesk, Satoshi, Geist Mono"
+git add dml-web/public/fonts dml-web/src/lib/fonts.ts dml-web/src/app/layout.tsx \
+  dml-web/package.json dml-web/bun.lock
+git commit -m "feat: font self-hosted Cabinet Grotesk, Satoshi, dan Geist Mono via paket geist"
 ```
 
 ---

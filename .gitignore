@@ -20,3 +20,6 @@ reference-jeskojets/
 # arsip foto drone mentah, jangan di-commit
 assets/*.zip
 assets/_raw/
+
+# arsip font mentah, hanya turunannya yang dipakai
+fonts/*.zip
