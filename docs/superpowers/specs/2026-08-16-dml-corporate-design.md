@@ -217,15 +217,31 @@ Ini keputusan brand yang disetujui klien, bukan default.
 
 ```css
 @theme {
-  --color-surface:     #0A1418;  /* petrol near-black, latar utama   */
-  --color-surface-2:   #111E24;  /* seksi bertingkat                 */
-  --color-surface-3:   #18292F;  /* border, garis pemisah            */
-  --color-ink:         #F2EFE9;  /* bone, teks utama                 */
-  --color-ink-muted:   #8FA1A8;  /* teks sekunder                    */
-  --color-accent:      #FF5A1F;  /* signal orange                    */
-  --color-accent-dim:  #C44416;  /* hover, state tertekan            */
+  --color-surface:       #0A1418;  /* petrol near-black, latar utama  */
+  --color-surface-2:     #111E24;  /* seksi bertingkat                */
+  --color-surface-3:     #18292F;  /* border, garis pemisah           */
+  --color-ink:           #F2EFE9;  /* bone, teks utama                */
+  --color-ink-muted:     #8FA1A8;  /* teks sekunder                   */
+  --color-accent:        #FF5A1F;  /* signal orange                   */
+  --color-accent-hover:  #FF7A45;  /* hover, lebih terang             */
+  --color-accent-press:  #E04A12;  /* state tertekan                  */
+  --color-on-accent:     #0A1418;  /* teks di atas permukaan oranye   */
 }
 ```
+
+**Aturan token yang wajib dipatuhi, bukan sekadar dicek belakangan:**
+
+| Kombinasi | Rasio | Status |
+|---|---|---|
+| `--color-ink` di atas `--color-surface` | 16,5:1 | Lolos AAA |
+| `--color-accent` di atas `--color-surface` | 6,06:1 | Lolos AA, teks oranye di latar gelap aman |
+| `--color-on-accent` di atas `--color-accent` | 6,06:1 | Lolos AA, ini satu-satunya teks yang boleh di atas tombol oranye |
+| `--color-ink` di atas `--color-accent` | **2,72:1** | **Gagal. Dilarang.** |
+
+Tombol oranye terisi **selalu** memakai `--color-on-accent`, tidak pernah `--color-ink`.
+Ini kesalahan default yang paling mudah terjadi: teks bone di atas tombol oranye
+terlihat wajar tapi gagal AA. Hover menaikkan terang ke `--color-accent-hover`, bukan
+menurunkannya, karena halaman ini gelap.
 
 Oranye dipilih karena itu warna keselamatan maritim asli: life raft, hi-vis kru,
 marker buoy. Jujur terhadap industrinya, dan bukan navy korporat yang dipakai hampir
@@ -267,14 +283,30 @@ lambung berputar mantap di dalam frame dengan pergeseran heading progresif. Lata
 hitam pekat dengan lampu deck menyala, artinya kapal bisa mengambang langsung di atas
 `--color-surface` tanpa tepi foto yang terlihat.
 
-Perilaku:
+**Sepuluh frame bukan kerapatan video, dan spec ini tidak berpura-pura begitu.**
+Jarak antar frame sekitar 12 detik dengan pergeseran heading yang cukup besar. Sekuens
+scrub baru terbaca sebagai gerakan kamera pada 60 sampai 150 frame. Sepuluh frame yang
+diregangkan sepanjang 2,5 layar akan terbaca sebagai langkah diskret, bukan gerakan.
+
+Perilaku yang dipakai:
 - Poster frame tengah (`DJI_0815`) render sebagai LCP dengan `priority`. Tidak ada
   WebGL dan tidak ada sekuens di atas fold.
-- Setelah LCP selesai, sisa sembilan frame dimuat di belakang layar.
+- Setelah LCP selesai, sembilan frame sisanya dimuat di belakang layar.
 - Seksi dipin oleh ScrollTrigger, `start: "top top"`, `pin: true`, `scrub: 1`,
-  panjang scroll sekitar 2,5 layar. Progress scroll memilih frame terdekat yang
-  sudah siap. Frame yang belum termuat tidak pernah menyebabkan flash.
-- Headline mask-reveal dengan SplitText, berganti tiap beat.
+  panjang pin **sekitar 1,2 layar**, bukan 2,5.
+- Transisi antar frame memakai **crossfade**, bukan pergantian keras: dua elemen
+  bertumpuk dengan opacity yang diinterpolasi dari progress scroll, ditambah drift
+  scale halus. Dissolve menyembunyikan lompatan heading dan membuat sepuluh frame
+  terbaca sebagai satu gerakan lambat.
+- Progress scroll memilih pasangan frame terdekat yang sudah siap. Frame yang belum
+  termuat tidak pernah menyebabkan flash.
+- Tiga beat headline mask-reveal dengan SplitText sepanjang pin.
+
+**Checkpoint implementasi:** setelah seksi ini jadi, lihat langsung di browser. Kalau
+crossfade masih terbaca melangkah, turunkan ke lima still dengan potongan keras per
+beat headline. Potongan keras adalah bahasa sinema yang sah; sekuens yang tersendat
+tidak. Jangan menambah frame untuk menutupi masalah ini, karena frame di luar cluster
+rapat berasal dari penerbangan berbeda.
 
 Alasan: menyampaikan skala operasi sebelum satu kata pun dibaca.
 
@@ -326,6 +358,21 @@ Implementasi:
 - Garis ukur dengan angka menempel: panjang, kapasitas, DWT, kapasitas penumpang.
   Semua dalam Geist Mono.
 
+**Serah terima scroll ke canvas.** Aturan 4.2 melarang R3F dan GSAP berada di tree
+komponen yang sama, dan morph yang digerakkan scroll tetap butuh progress scroll masuk
+ke dalam canvas. Caranya: ScrollTrigger menulis progress ke sebuah `ref` objek biasa
+yang mutable, lalu `useFrame` di dalam canvas membacanya tiap frame. **Tidak ada React
+state, dan tidak ada tween GSAP yang menyentuh objek milik canvas.** GSAP hanya
+memegang pin dan progress; R3F memegang seluruh isi canvas.
+
+**Tiga representasi data armada, semuanya pekerjaan nyata yang harus diestimasi:**
+1. Geometri R3F untuk desktop
+2. Lima blueprint SVG statis untuk di bawah 768px, ditulis tangan
+3. Tabel spesifikasi teks untuk screen reader, lihat bagian 13
+
+Ketiganya membaca sumber data yang sama di `src/content/`, jadi angkanya tidak pernah
+bisa berbeda antar representasi.
+
 Alasan rotasi: geometri kapalnya sendiri yang menuntut dilihat dari beberapa sudut,
 bukan rotasi yang ditempel supaya terlihat 3D.
 
@@ -376,7 +423,7 @@ foto, caption kredit foto palsu, label versi.
 | LCP | Poster AVIF 1600w, `priority`, target di bawah 2,5 detik |
 | CLS | Di bawah 0,1. Semua gambar dan canvas punya ruang yang direservasi |
 | INP | Di bawah 200 ms |
-| Sekuens malam desktop | 10 frame AVIF, target total di bawah 700 kB. Latar hitam membuat AVIF sangat efisien |
+| Sekuens malam desktop | 10 frame AVIF, crossfade sepanjang pin 1,2 layar, target total di bawah 700 kB. Latar hitam membuat AVIF sangat efisien |
 | Sekuens malam mobile | 6 frame pada 1080w, target di bawah 300 kB |
 | R3F | `next/dynamic` dengan `ssr: false`, dipicu IntersectionObserver saat seksi 4 mendekat |
 | 3D di bawah 768px | Diganti blueprint SVG statis. Bukan WebGL yang diturunkan kualitasnya |
@@ -397,7 +444,8 @@ scroll atau posisi pointer di React state.
 Sumber: tiga arsip di `assets/`, total 842 MB, 202 foto DJI 4000x2250.
 
 - `KAPAL KAPAL.zip`, 53 file, armada termasuk ro-ro di ramp pelabuhan
-- `STS 06 JULI 2025.zip`, 36 file, operasi STS siang
+- `STS 06 JULI 2025.zip`, 36 file, operasi STS siang. Dipakai untuk studi kasus di
+  `/bisnis/transportasi-bbm` dan sebagai cadangan galeri. Tidak dipakai di beranda
 - `STS SRI YULIANI.zip`, 113 file, operasi STS 27 sampai 28 Februari 2025, enam jam
   dalam tiga penerbangan terpisah
 
@@ -456,6 +504,34 @@ Field: `name`, `company`, `phone`, `email`, `service`, `message`, `createdAt`,
 
 Halaman korporat tidak berada di CMS. Editor hanya menyentuh artikel.
 
+### 10.1 Caching dan revalidasi
+
+Ini alur yang menjadi alasan keberadaan CMS. Kalau admin menekan publish dan halaman
+tidak berubah, seluruh CMS jadi percuma. Jadi jalurnya ditulis eksplisit, bukan
+diasumsikan.
+
+| Route | Strategi |
+|---|---|
+| `/artikel` | Static, di-tag `posts` |
+| `/artikel/[slug]` | `generateStaticParams` dari slug published, di-tag `posts` dan `post:<slug>` |
+| `/` seksi artikel terbaru | Di-tag `posts` |
+| `sitemap.ts` | Di-tag `posts` |
+| Route korporat | Fully static, tidak pernah di-revalidate oleh CMS |
+
+Mekanisme: hook `afterChange` dan `afterDelete` pada collection `posts` memanggil
+`revalidateTag('posts')` dan `revalidateTag('post:' + slug)`. Perubahan status draft
+ke published dan sebaliknya sama-sama memicu hook.
+
+`cacheComponents` **dimatikan** untuk rilis pertama. Dukungan Payload untuk fitur ini
+baru parsial; blocker yang membuat admin panel gagal saat `cacheComponents` aktif
+memang sudah diatasi, tapi kompatibilitas penuh belum dijamin di seluruh permukaan
+Payload. Tidak ada alasan menanggung risiko itu untuk situs seukuran ini. Catat sebagai
+kandidat peningkatan setelah live dan stabil.
+
+Verifikasi wajib, lihat bagian 14: satu spec Playwright yang login ke admin, publish
+artikel, lalu memastikan artikel itu muncul di `/artikel` dan di seksi artikel terbaru
+beranda tanpa perlu rebuild.
+
 ## 11. Form dan lead
 
 **Permintaan Informasi Bisnis** di `/bisnis/transportasi-bbm/permintaan-informasi`.
@@ -478,6 +554,22 @@ Rate limit per IP di server action. Honeypot field, bukan CAPTCHA.
 
 **Kontras form wajib lolos WCAG AA** untuk input, placeholder, focus ring, label,
 helper text, dan error text terhadap latar seksi yang gelap.
+
+### 11.1 State yang wajib ada
+
+Bukan hanya jalur sukses. Setiap permukaan berikut punya keempat state yang dinyatakan
+di komponennya sendiri:
+
+| Permukaan | Loading | Empty | Error |
+|---|---|---|---|
+| Form inquiry dan kontak | Tombol submit disabled dengan label berubah, bukan spinner bulat | Tidak berlaku | Error inline per field, ditambah error tingkat form kalau server action gagal atau rate limit kena |
+| `/artikel` | Skeleton yang bentuknya mengikuti kartu artikel final | Pesan "belum ada artikel" yang tersusun rapi | Pesan gagal muat dengan tombol coba lagi |
+| `/artikel/[slug]` | Skeleton artikel | Tidak berlaku | `not-found.tsx` untuk slug tidak dikenal |
+| `/karier` | Tidak berlaku | Empty state yang digarap serius, menjelaskan cara mengirim lamaran spontan | Tidak berlaku |
+| Canvas 3D | Poster blueprint statis selama chunk R3F diunduh | Tidak berlaku | Kalau WebGL tidak tersedia, jatuh ke blueprint SVG yang sama seperti mobile |
+
+Skeleton tidak pernah memakai spinner bulat generik. Bentuknya mengikuti layout akhir
+supaya tidak ada pergeseran saat konten masuk.
 
 ## 12. SEO
 
@@ -516,6 +608,13 @@ helper text, dan error text terhadap latar seksi yang gelap.
 - **Playwright** untuk: navigasi tiap route, submit form termasuk jalur gagal, empty
   state karier, paginasi artikel, dan satu spec khusus yang menjalankan beranda dengan
   `prefers-reduced-motion: reduce` untuk memastikan seluruh konten tetap tampil.
+- **Playwright, alur publish artikel.** Login ke `/admin`, buat artikel, ubah status ke
+  published, lalu pastikan artikel itu muncul di `/artikel` dan di seksi artikel
+  terbaru beranda tanpa rebuild. Ini tes yang membuktikan revalidasi di bagian 10.1
+  benar-benar bekerja, dan tanpanya CMS bisa terlihat berfungsi padahal tidak.
+- **Playwright, kontras token.** Assert bahwa tidak ada elemen dengan latar
+  `--color-accent` yang memakai `--color-ink` sebagai warna teks. Kombinasi itu gagal
+  AA di 2,72:1 dan merupakan kesalahan default yang paling mudah lolos review mata.
 - **Playwright dengan JavaScript dimatikan** untuk membuktikan aturan arsitektur nomor
   satu: semua teks dan link hadir.
 - **axe-core** di setiap route.
