@@ -2090,7 +2090,11 @@ test("kelas lenis terpasang di html saat motion normal", async ({ page }) => {
 });
 
 test.describe("dengan reduced motion aktif", () => {
-  test.use({ reducedMotion: "reduce" });
+  // reducedMotion bukan properti langsung di PlaywrightTestOptions versi
+  // 1.62 yang terinstal, hanya disebut di contoh dokumentasi. Properti nyata
+  // yang typecheck adalah contextOptions, diverifikasi langsung dari
+  // node_modules/playwright/types/test.d.ts sebelum task ini didispatch.
+  test.use({ contextOptions: { reducedMotion: "reduce" } });
 
   test("konten tetap tampil penuh dan Lenis tidak pernah aktif", async ({
     page,
