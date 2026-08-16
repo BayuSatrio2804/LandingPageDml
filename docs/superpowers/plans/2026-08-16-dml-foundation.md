@@ -1470,18 +1470,25 @@ Create `dml-web/src/components/layout/mobile-menu.tsx`:
 ```tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { List, X } from "@phosphor-icons/react";
 import type { NavItem } from "@/content/types";
 
 export function MobileMenu({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        // Fokus kembali ke tombol pemicu. Tanpa ini, pengguna keyboard yang
+        // sedang berada di dalam menu kehilangan fokus sepenuhnya begitu
+        // Escape membuat nav-nya hidden.
+        buttonRef.current?.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -1490,6 +1497,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
   return (
     <div className="md:hidden">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -1549,13 +1557,24 @@ Modify `dml-web/src/components/layout/site-header.tsx`, ganti komentar placehold
 
 Tambahkan `import { MobileMenu } from "./mobile-menu";`.
 
-- [ ] **Step 3: Verifikasi**
+- [ ] **Step 3: Verifikasi otomatis**
 
-Run: `cd dml-web && bun run dev`
+Wajib lewat browser headless. Jalankan `bun run build` lalu `bun run start`,
+kemudian skrip Playwright sekali pakai pada viewport 390 lebar yang menegaskan:
 
-1. Perkecil viewport ke 390px. Expected: tombol menu muncul, nav desktop hilang.
-2. Buka menu, tekan Escape. Expected: menu tertutup.
-3. Lihat View Source pada 390px. Expected: seluruh label nav tetap ada di HTML meski menu tertutup.
+1. **Toggle responsif.** Tombol menu terlihat, `nav[aria-label="Navigasi utama"]`
+   (nav desktop dari Task 8) tidak terlihat.
+2. **Escape menutup DAN mengembalikan fokus.** Klik tombol untuk membuka menu,
+   pastikan `aria-expanded="true"`, tekan Escape, lalu tegaskan dua hal:
+   `aria-expanded` kembali `"false"`, dan elemen yang sedang fokus adalah tombol
+   pemicu itu sendiri, bukan `body` atau elemen lain.
+3. **Tautan tetap ada di HTML server saat menu tertutup.** Ambil HTML mentah
+   lewat `page.content()` sebelum interaksi apa pun, dan tegaskan setiap label
+   `NAV_ITEMS` muncul sebagai teks di dalamnya. Ini yang membuktikan `hidden`
+   dipakai, bukan render kondisional yang membuang tautan dari DOM.
+
+Tempel keluaran skrip apa adanya ke dalam laporan. Matikan server setelah
+selesai. Skrip verifikasinya tidak ikut dikomit.
 
 - [ ] **Step 4: Commit**
 
