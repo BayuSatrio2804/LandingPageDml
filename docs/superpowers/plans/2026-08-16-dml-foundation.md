@@ -1603,8 +1603,9 @@ git commit -m "feat: menu mobile yang tetap merender tautan di HTML server"
   - `buildMetadata(input: { title: string; description: string; path: string }): Metadata`
   - `organizationJsonLd(): object`
   - `breadcrumbJsonLd(trail: Array<{ name: string; path: string }>): object`
+  - `safeJsonLdString(data: unknown): string`
   - `SITE_URL: string`
-  - Plan 3, 4, 5 memanggil `buildMetadata` di setiap `generateMetadata` dan tidak pernah merakit objek `Metadata` sendiri.
+  - Plan 3, 4, 5 memanggil `buildMetadata` di setiap `generateMetadata` dan tidak pernah merakit objek `Metadata` sendiri. Setiap `dangerouslySetInnerHTML` yang menyisipkan JSON-LD wajib lewat `safeJsonLdString`, tidak pernah `JSON.stringify` langsung, karena Plan 4 mengisi JSON-LD artikel dari input admin.
 
 - [ ] **Step 1: Tulis tes yang gagal**
 
@@ -1652,7 +1653,10 @@ describe("breadcrumbJsonLd", () => {
 
   it("mengubah path relatif jadi URL absolut", () => {
     const items = data.itemListElement as Array<Record<string, unknown>>;
-    expect(String(items[1]!.item)).toMatch(/^https?:\/\/.+\/bisnis$/);
+    // Optional chaining, bukan non-null assertion: noUncheckedIndexedAccess
+    // membuat items[1] bertipe T | undefined, dan kalau memang undefined tes
+    // ini gagal wajar lewat toMatch, bukan lewat klaim ke compiler.
+    expect(String(items[1]?.item)).toMatch(/^https?:\/\/.+\/bisnis$/);
   });
 });
 ```
@@ -1751,7 +1755,7 @@ export function breadcrumbJsonLd(
 - [ ] **Step 5: Jalankan tes untuk memastikan lolos**
 
 Run: `cd dml-web && bun run test src/lib/seo/json-ld.test.ts`
-Expected: PASS, tujuh assertion hijau.
+Expected: PASS, tujuh tes hijau (delapan titik `expect()`).
 
 - [ ] **Step 6: Sitemap dan robots**
 
@@ -1806,18 +1810,33 @@ NEXT_PUBLIC_SITE_URL=https://dutabaharimenaraline.co.id
 
 - [ ] **Step 7: Sisipkan JSON-LD di root layout**
 
+Tambahkan helper escape di `dml-web/src/lib/seo/json-ld.ts`, di akhir berkas:
+
+```ts
+/**
+ * JSON.stringify biasa tidak meng-escape "<", jadi field string apa pun yang
+ * kebetulan memuat "</script>" bisa menutup tag lebih awal dan menyuntik
+ * markup. COMPANY sekarang statis dan aman, tapi Plan 4 akan memakai fungsi
+ * ini juga untuk JSON-LD artikel yang datang dari input admin di Payload,
+ * jadi escape-nya dipasang di sini, sekali, bukan di titik pemakaian.
+ */
+export function safeJsonLdString(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\u003c");
+}
+```
+
 Modify `dml-web/src/app/layout.tsx`, tambahkan tepat sebelum `</body>`:
 
 ```tsx
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd()),
+            __html: safeJsonLdString(organizationJsonLd()),
           }}
         />
 ```
 
-Tambahkan `import { organizationJsonLd } from "@/lib/seo/json-ld";`.
+Tambahkan `import { organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";`.
 
 Ganti juga `export const metadata` yang ditulis di Task 4 dengan:
 
@@ -1830,13 +1849,24 @@ export const metadata = buildMetadata({
 });
 ```
 
-- [ ] **Step 8: Verifikasi**
+- [ ] **Step 8: Verifikasi otomatis**
 
-Run: `cd dml-web && bun run build && bun run start`
+Wajib lewat browser headless dan `fetch`, bukan buka tab manual. Jalankan
+`bun run build` lalu `bun run start`, kemudian skrip sekali pakai yang
+menegaskan:
 
-1. Buka `http://localhost:3000/sitemap.xml`. Expected: sembilan URL.
-2. Buka `http://localhost:3000/robots.txt`. Expected: memuat baris `Sitemap:`.
-3. Buka View Source di beranda. Expected: satu blok `application/ld+json` berisi `Organization`, dan satu tag canonical.
+1. **Sitemap.** `fetch("http://localhost:3000/sitemap.xml")` mengembalikan 200,
+   dan parsing XML-nya menghasilkan tepat sembilan elemen `<url>`.
+2. **Robots.** `fetch("http://localhost:3000/robots.txt")` mengembalikan 200 dan
+   isinya memuat baris yang diawali `Sitemap:`.
+3. **JSON-LD valid dan aman.** Ambil HTML beranda lewat Playwright, cari elemen
+   `script[type="application/ld+json"]`, `JSON.parse()` isi teksnya (harus
+   berhasil parse, membuktikan escaping tidak merusak JSON), dan tegaskan
+   `"@type"` sama dengan `"Organization"`.
+4. **Canonical.** Elemen `link[rel="canonical"]` ada persis satu di `<head>`.
+
+Tempel keluaran skrip apa adanya ke dalam laporan. Matikan server setelah
+selesai. Skrip verifikasinya tidak ikut dikomit.
 
 - [ ] **Step 9: Commit**
 
