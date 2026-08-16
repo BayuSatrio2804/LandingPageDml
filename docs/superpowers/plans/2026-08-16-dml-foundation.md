@@ -2084,14 +2084,34 @@ Create `dml-web/tests/e2e/reduced-motion.spec.ts`:
 ```ts
 import { test, expect } from "@playwright/test";
 
-test.use({ reducedMotion: "reduce" });
-
-test("konten tetap tampil penuh saat reduced motion aktif", async ({ page }) => {
+test("kelas lenis terpasang di html saat motion normal", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByRole("contentinfo")).toBeVisible();
+  await expect(page.locator("html")).toHaveClass(/lenis/);
+});
+
+test.describe("dengan reduced motion aktif", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("konten tetap tampil penuh dan Lenis tidak pernah aktif", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toBeVisible();
+    // Ini gerbang aksesibilitas yang sebenarnya. Kedua assertion di atas
+    // cuma membuktikan halaman tidak rusak; ini yang membuktikan
+    // SmoothScrollProvider (Task 6) benar benar tidak menginisialisasi
+    // Lenis, bukan menginisialisasi lalu menyembunyikannya secara visual.
+    await expect(page.locator("html")).not.toHaveClass(/lenis/);
+  });
 });
 ```
+
+Dua tes ini permanen menutup celah yang tercatat sejak Task 5: cabang
+`getServerSnapshot` pada `usePrefersReducedMotion` dan gerbang di
+`SmoothScrollProvider` sebelumnya hanya diverifikasi lewat skrip Playwright
+sekali pakai yang tidak ikut dikomit. Sekarang keduanya diuji setiap kali
+`bun run test:e2e` berjalan.
 
 - [ ] **Step 4: Tes kontras token**
 
@@ -2110,10 +2130,24 @@ test("tidak ada elemen dengan latar aksen yang memakai teks ink", async ({
 
   const violations = await page.evaluate(
     ({ accent, ink }) => {
+      // background-color tidak diwariskan di CSS. Elemen berlatar transparan
+      // di dalam kontainer beraksen tetap tampil di atas aksen secara visual,
+      // jadi latar "efektif" ditelusuri lewat rantai leluhur, bukan cuma
+      // dibaca dari elemen itu sendiri.
+      function effectiveBackgroundColor(start: Element): string {
+        let node: Element | null = start;
+        while (node) {
+          const bg = getComputedStyle(node).backgroundColor;
+          if (bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+          node = node.parentElement;
+        }
+        return "rgba(0, 0, 0, 0)";
+      }
+
       const bad: string[] = [];
       for (const el of Array.from(document.querySelectorAll("*"))) {
         const style = getComputedStyle(el);
-        if (style.backgroundColor === accent && style.color === ink) {
+        if (style.color === ink && effectiveBackgroundColor(el) === accent) {
           bad.push(el.tagName + "." + String(el.className));
         }
       }
