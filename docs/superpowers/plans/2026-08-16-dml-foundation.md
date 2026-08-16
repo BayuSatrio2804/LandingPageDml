@@ -1376,16 +1376,16 @@ export function SiteFooter() {
 
 - [ ] **Step 5: Rakit di root layout**
 
-Modify `dml-web/src/app/layout.tsx`, ganti isi `<body>`. **Pertahankan
-`className="min-h-full flex flex-col"` yang sudah ada di tag `<body>`** dan
-tambahkan `flex-1` di `<main>`:
+Modify `dml-web/src/app/layout.tsx`, ganti isi `<body>`. Pakai
+`className="min-h-dvh flex flex-col"`, **bukan** `min-h-full` yang ada di
+scaffold, dan tambahkan `flex-1` di `<main>` beserta `tabIndex={-1}`:
 
 ```tsx
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-dvh flex flex-col">
         <SkipLink />
         <SmoothScrollProvider>
           <SiteHeader />
-          <main id="konten-utama" className="flex-1">
+          <main id="konten-utama" tabIndex={-1} className="flex-1">
             {children}
           </main>
           <SiteFooter />
@@ -1395,10 +1395,26 @@ tambahkan `flex-1` di `<main>`:
 
 Tambahkan import `SkipLink`, `SiteHeader`, `SiteFooter` dari `@/components/layout/...`.
 
-`flex-1` di `<main>` bukan kosmetik. `body` sudah `flex flex-col` sejak scaffold,
-tapi tanpa elemen yang tumbuh, deklarasi itu tidak berbuat apa apa dan footer
-jatuh tepat di bawah konten alih alih terkunci ke dasar viewport pada halaman
-pendek, misalnya Karier sebelum isinya ditulis.
+Dua detail di sini tidak kosmetik.
+
+`min-h-dvh`, bukan `min-h-full`: Task 6 menetapkan `html.lenis, html.lenis
+body { height: auto }` di `globals.css`. Selektor itu (elemen plus kelas)
+lebih spesifik daripada `.h-full` (kelas saja) yang dipasang di `<html>` sejak
+scaffold, jadi begitu Lenis mount dan menempelkan kelas `lenis` ke `<html>`,
+tinggi `<html>` jatuh ke `auto` dan `min-h-full` pada `body` kehilangan
+containing block persentase untuk dihitung. `min-h-dvh` merujuk langsung ke
+viewport, tidak lewat rantai tinggi `<html>`, jadi tidak kena efek itu.
+
+`flex-1` di `<main>`: `body` sudah `flex flex-col` sejak scaffold, tapi tanpa
+elemen yang tumbuh, deklarasi itu tidak berbuat apa apa dan footer jatuh tepat
+di bawah konten alih alih terkunci ke dasar viewport pada halaman pendek,
+misalnya Karier sebelum isinya ditulis.
+
+`tabIndex={-1}` di `<main>`: elemen non-interaktif tidak bisa menerima fokus
+lewat navigasi fragmen `#konten-utama` di Chromium tanpa `tabindex`. Tanpa
+ini, skip link hanya men-scroll ke `<main>`, tidak benar benar memindahkan
+fokus keyboard ke sana. `-1` mengecualikannya dari urutan Tab normal, hanya
+bisa dituju terprogram lewat fragmen atau `.focus()`.
 
 - [ ] **Step 6: Beranda placeholder**
 
@@ -2138,10 +2154,25 @@ Modify `dml-web/package.json`, bagian `scripts`:
 Run: `cd dml-web && bun run check`
 Expected: lima langkah lolos berurutan.
 
+**Temuan yang sudah diketahui sebelum kamu menjalankannya:** `bun run doctor`
+kemungkinan besar melaporkan `deslop/unused-dependency` untuk `zod` di
+`package.json`. Dependensi itu dipasang mendahului kebutuhannya untuk form
+Permintaan Informasi Bisnis di Plan 3, dan sampai akhir Plan 1 belum ada satu
+pun kode yang mengimpornya. Dengan `--blocking warning`, temuan ini
+menghentikan `bun run check` dengan kode keluar bukan nol.
+
+Jika itu satu satunya temuan `doctor`, jalankan `bun remove zod` (memperbarui
+`package.json` dan `bun.lock` sekaligus), lalu jalankan ulang `bun run check`
+dari awal untuk membuktikan gerbangnya benar benar bersih, bukan cuma
+membuang cache. Plan 3 memasang `zod` kembali lewat `bun add zod` tepat saat
+form itu ditulis, bukan sebelumnya.
+
+Jika `bun run doctor` melaporkan temuan lain di luar itu, perbaiki juga
+sebelum commit. Itulah gunanya react-doctor dipasang sejak sekarang, bukan
+setelah lima plan menumpuk.
+
 Run: `cd dml-web && bun run test:e2e`
 Expected: tiga spec lolos.
-
-Jika `bun run doctor` melaporkan warning yang memblokir, perbaiki sebelum commit. Itulah gunanya react-doctor dipasang sejak sekarang, bukan setelah lima plan menumpuk.
 
 - [ ] **Step 7: Commit**
 
