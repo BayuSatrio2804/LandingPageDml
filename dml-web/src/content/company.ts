@@ -12,6 +12,7 @@ export const COMPANY: Company = {
   founder: "Herman Chandra", // unverified: SinarAlam Corporation
   parent: "SinarAlam Corporation",
   phone: "+625113268280", // unverified: SinarAlam Corporation
+  whatsapp: "625113268280", // unverified: SinarAlam Corporation, format E.164 tanpa tanda plus untuk wa.me
   offices: [
     {
       label: "Kantor Pusat",
