@@ -42,7 +42,7 @@ test("beranda terbaca penuh tanpa JavaScript", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Perbandingan Armada" })).toBeVisible();
   await expect(page.getByRole("table")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Rute Penyeberangan Ro-Ro" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Sejak 1985" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Sejak 1985" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Lihat silsilah lengkap" })).toHaveAttribute(
     "href",
     "/tentang-kami#silsilah",
