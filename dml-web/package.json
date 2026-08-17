@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "prepare-assets": "bun scripts/prepare-assets.ts",
+    "prepare-map": "bun scripts/prepare-map.ts",
     "doctor": "react-doctor . -y --blocking warning --no-score",
     "doctor:design": "react-doctor design",
     "lighthouse": "lhci autorun",
