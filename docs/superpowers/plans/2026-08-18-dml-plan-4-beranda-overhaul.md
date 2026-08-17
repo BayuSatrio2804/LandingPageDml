@@ -1049,170 +1049,7 @@ git commit -m "feat: ganti seksi silsilah horizontal-pan dengan pernyataan Sejak
 
 ---
 
-### Task 5: Seksi sertifikasi jadi band data
-
-**Files:**
-- Modify: `src/features/home/certifications.tsx` (tulis ulang penuh)
-- Modify: `src/features/home/certifications.test.tsx`
-
-**Interfaces:**
-- Consumes: `COMPANY`, `PORTS` (belum ada sampai Task 6), `useCounter`, `yearsOperating` dari Task 4, `SectionHeader`.
-- Produces: `<Certifications />` tanpa perubahan nama ekspor.
-
-Task ini bergantung `PORTS` yang baru ditulis ulang di Task 6. Untuk menghindari ketergantungan maju, metrik keempat dibaca dari `PORTS` yang **sudah ada sekarang** di `src/features/route-map/ports.ts` (empat entri, nama sama), dan Task 6 menjaga nama ekspor `PORTS` tetap sama sehingga task ini tidak perlu diubah lagi.
-
-- [ ] **Step 1: Tulis test yang gagal**
-
-Ganti isi `src/features/home/certifications.test.tsx`:
-
-```tsx
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { Certifications } from "./certifications";
-import { COMPANY } from "@/content/company";
-import { PORTS } from "@/features/route-map/ports";
-
-beforeEach(() => {
-  vi.stubGlobal(
-    "matchMedia",
-    vi.fn().mockImplementation((query: string) => ({
-      matches: true,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  );
-});
-
-describe("Certifications", () => {
-  it("render setiap sertifikasi perusahaan", () => {
-    render(<Certifications />);
-    for (const cert of COMPANY.certifications) {
-      expect(screen.getByText(cert)).toBeInTheDocument();
-    }
-  });
-
-  it("render empat metrik", () => {
-    const { container } = render(<Certifications />);
-    expect(container.querySelectorAll("[data-testid='metrik']")).toHaveLength(4);
-  });
-
-  // Menulis "4" langsung akan melenceng begitu rute bertambah. Angka
-  // pelabuhan harus turunan dari PORTS, dan test ini yang menjaganya.
-  it("jumlah pelabuhan diturunkan dari PORTS, bukan angka tangan", () => {
-    render(<Certifications />);
-    const label = screen.getByText(/pelabuhan dilayani/i);
-    const metric = label.closest("[data-testid='metrik']");
-    expect(metric?.textContent).toContain(String(PORTS.length));
-  });
-
-  it("mengelompokkan sertifikasi jadi dua klaster berlabel", () => {
-    render(<Certifications />);
-    expect(screen.getByText("Operasi kapal")).toBeInTheDocument();
-    expect(screen.getByText("Galangan")).toBeInTheDocument();
-  });
-});
-```
-
-- [ ] **Step 2: Jalankan test, pastikan gagal**
-
-Run: `bun run test -- src/features/home/certifications.test.tsx`
-Expected: FAIL, `toHaveLength(4)` menerima 0 karena `data-testid='metrik'` belum ada.
-
-- [ ] **Step 3: Tulis ulang komponen**
-
-Ganti isi `src/features/home/certifications.tsx`:
-
-```tsx
-"use client";
-
-import { COMPANY } from "@/content/company";
-import { PORTS } from "@/features/route-map/ports";
-import { useCounter } from "@/lib/motion/use-counter";
-import { yearsOperating } from "./since-1985";
-import { Reveal } from "@/components/motion/reveal";
-
-/**
- * Sertifikasi dikelompokkan karena ISO 9001 berlaku untuk galangan, bukan
- * untuk operasi kapal. Satu deret pill seragam menyamarkan perbedaan itu.
- */
-const CERT_CLUSTERS = [
-  { label: "Operasi kapal", certs: ["ISM Code", "ISPS Code", "SIRE"] },
-  { label: "Galangan", certs: ["ISO 9001:2015"] },
-] as const;
-
-function Metric({ value, label, format }: { value: number; label: string; format?: "id" }) {
-  const counter = useCounter(value);
-  const shown = format === "id" ? counter.value.toLocaleString("id-ID") : String(counter.value);
-  return (
-    <div data-testid="metrik" className="px-6 py-8 first:pl-0 md:border-l md:border-surface-3">
-      <p
-        ref={counter.ref as React.RefObject<HTMLParagraphElement>}
-        className="font-mono text-4xl text-accent md:text-5xl"
-      >
-        {shown}
-      </p>
-      <p className="mt-2 text-sm text-ink-muted">{label}</p>
-    </div>
-  );
-}
-
-export function Certifications() {
-  const years = yearsOperating(COMPANY.foundedIso, new Date());
-
-  return (
-    <section className="bg-surface-2 py-24 md:py-32">
-      <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <div className="grid grid-cols-2 border-y border-surface-3 md:grid-cols-4">
-          <Metric value={COMPANY.fleetSummary.vessels} label="Kapal" />
-          <Metric value={COMPANY.fleetSummary.totalDwt} label="Total DWT" format="id" />
-          <Metric value={years} label="Tahun beroperasi" />
-          <Metric value={PORTS.length} label="Pelabuhan dilayani" />
-        </div>
-
-        <Reveal className="mt-16 grid gap-10 md:grid-cols-2" stagger={0.08}>
-          {CERT_CLUSTERS.map((cluster) => (
-            <div key={cluster.label}>
-              <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
-              <ul className="mt-4 flex flex-wrap gap-3">
-                {cluster.certs.map((cert) => (
-                  <li
-                    key={cert}
-                    className="rounded-full border border-surface-3 px-4 py-2 font-mono text-sm text-ink"
-                  >
-                    {cert}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-```
-
-- [ ] **Step 4: Jalankan test, pastikan lulus**
-
-Run: `bun run test -- src/features/home/certifications.test.tsx`
-Expected: PASS, 4 test.
-
-- [ ] **Step 5: Jalankan gerbang**
-
-Run: `bun run lint && bun run typecheck && bun run doctor`
-Expected: ketiganya keluar dengan kode 0.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add src/features/home/certifications.tsx src/features/home/certifications.test.tsx
-git commit -m "feat: seksi sertifikasi jadi band data empat metrik dengan klaster sertifikasi"
-```
-
----
-
-### Task 6: Pipeline peta, garis pantai asli dan koordinat geografis
+### Task 5: Pipeline peta, garis pantai asli dan koordinat geografis
 
 **Files:**
 - Create: `scripts/prepare-map.ts`
@@ -1588,6 +1425,177 @@ git commit -m "feat: pipeline garis pantai Natural Earth dan koordinat geografis
 
 ---
 
+### Task 6: Seksi sertifikasi jadi band data
+
+**Files:**
+- Modify: `src/features/home/certifications.tsx` (tulis ulang penuh)
+- Modify: `src/features/home/certifications.test.tsx`
+
+**Interfaces:**
+- Consumes: `COMPANY`, `useCounter`, `yearsOperating` dari Task 4, `SectionHeader`, dan `PORTS` bertipe baru dari Task 5.
+- Produces: `<Certifications />` tanpa perubahan nama ekspor.
+
+Task ini sengaja berjalan **sesudah** Task 5. `PORTS` versi Task 5 berisi lima entri: empat pelabuhan ditambah kantor pusat Banjarmasin. Metrik "Pelabuhan dilayani" karena itu wajib menyaring `kind === "pelabuhan"`, bukan memakai `PORTS.length` mentah, yang akan mengklaim lima pelabuhan padahal cuma ada empat.
+
+- [ ] **Step 1: Tulis test yang gagal**
+
+Ganti isi `src/features/home/certifications.test.tsx`:
+
+```tsx
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { Certifications } from "./certifications";
+import { COMPANY } from "@/content/company";
+import { PORTS } from "@/features/route-map/ports";
+
+beforeEach(() => {
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  );
+});
+
+describe("Certifications", () => {
+  it("render setiap sertifikasi perusahaan", () => {
+    render(<Certifications />);
+    for (const cert of COMPANY.certifications) {
+      expect(screen.getByText(cert)).toBeInTheDocument();
+    }
+  });
+
+  it("render empat metrik", () => {
+    const { container } = render(<Certifications />);
+    expect(container.querySelectorAll("[data-testid='metrik']")).toHaveLength(4);
+  });
+
+  // Menulis "4" langsung akan melenceng begitu rute bertambah. Angka
+  // pelabuhan harus turunan dari PORTS, dan test ini yang menjaganya.
+  // Kantor pusat Banjarmasin ikut ada di PORTS tapi bukan pelabuhan yang
+  // dilayani, jadi PORTS.length mentah akan mengklaim lima.
+  it("jumlah pelabuhan menyaring kantor, bukan memakai PORTS.length mentah", () => {
+    render(<Certifications />);
+    const label = screen.getByText(/pelabuhan dilayani/i);
+    const metric = label.closest("[data-testid='metrik']");
+    const jumlahPelabuhan = PORTS.filter((port) => port.kind === "pelabuhan").length;
+    expect(jumlahPelabuhan).toBeLessThan(PORTS.length);
+    expect(metric?.textContent).toContain(String(jumlahPelabuhan));
+  });
+
+  it("mengelompokkan sertifikasi jadi dua klaster berlabel", () => {
+    render(<Certifications />);
+    expect(screen.getByText("Operasi kapal")).toBeInTheDocument();
+    expect(screen.getByText("Galangan")).toBeInTheDocument();
+  });
+});
+```
+
+- [ ] **Step 2: Jalankan test, pastikan gagal**
+
+Run: `bun run test -- src/features/home/certifications.test.tsx`
+Expected: FAIL, `toHaveLength(4)` menerima 0 karena `data-testid='metrik'` belum ada.
+
+- [ ] **Step 3: Tulis ulang komponen**
+
+Ganti isi `src/features/home/certifications.tsx`:
+
+```tsx
+"use client";
+
+import { COMPANY } from "@/content/company";
+import { PORTS } from "@/features/route-map/ports";
+import { useCounter } from "@/lib/motion/use-counter";
+import { yearsOperating } from "./since-1985";
+import { Reveal } from "@/components/motion/reveal";
+
+/**
+ * Sertifikasi dikelompokkan karena ISO 9001 berlaku untuk galangan, bukan
+ * untuk operasi kapal. Satu deret pill seragam menyamarkan perbedaan itu.
+ */
+const CERT_CLUSTERS = [
+  { label: "Operasi kapal", certs: ["ISM Code", "ISPS Code", "SIRE"] },
+  { label: "Galangan", certs: ["ISO 9001:2015"] },
+] as const;
+
+function Metric({ value, label, format }: { value: number; label: string; format?: "id" }) {
+  const counter = useCounter(value);
+  const shown = format === "id" ? counter.value.toLocaleString("id-ID") : String(counter.value);
+  return (
+    <div data-testid="metrik" className="px-6 py-8 first:pl-0 md:border-l md:border-surface-3">
+      <p
+        ref={counter.ref as React.RefObject<HTMLParagraphElement>}
+        className="font-mono text-4xl text-accent md:text-5xl"
+      >
+        {shown}
+      </p>
+      <p className="mt-2 text-sm text-ink-muted">{label}</p>
+    </div>
+  );
+}
+
+export function Certifications() {
+  const years = yearsOperating(COMPANY.foundedIso, new Date());
+  // Kantor pusat ikut hidup di PORTS supaya bisa digambar di peta, tapi ia
+  // bukan pelabuhan yang dilayani. Tanpa saringan ini metriknya mengklaim
+  // lima pelabuhan padahal cuma empat.
+  const servedPorts = PORTS.filter((port) => port.kind === "pelabuhan").length;
+
+  return (
+    <section className="bg-surface-2 py-24 md:py-32">
+      <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+        <div className="grid grid-cols-2 border-y border-surface-3 md:grid-cols-4">
+          <Metric value={COMPANY.fleetSummary.vessels} label="Kapal" />
+          <Metric value={COMPANY.fleetSummary.totalDwt} label="Total DWT" format="id" />
+          <Metric value={years} label="Tahun beroperasi" />
+          <Metric value={servedPorts} label="Pelabuhan dilayani" />
+        </div>
+
+        <Reveal className="mt-16 grid gap-10 md:grid-cols-2" stagger={0.08}>
+          {CERT_CLUSTERS.map((cluster) => (
+            <div key={cluster.label}>
+              <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
+              <ul className="mt-4 flex flex-wrap gap-3">
+                {cluster.certs.map((cert) => (
+                  <li
+                    key={cert}
+                    className="rounded-full border border-surface-3 px-4 py-2 font-mono text-sm text-ink"
+                  >
+                    {cert}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+```
+
+- [ ] **Step 4: Jalankan test, pastikan lulus**
+
+Run: `bun run test -- src/features/home/certifications.test.tsx`
+Expected: PASS, 4 test.
+
+- [ ] **Step 5: Jalankan gerbang**
+
+Run: `bun run lint && bun run typecheck && bun run doctor`
+Expected: ketiganya keluar dengan kode 0.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/features/home/certifications.tsx src/features/home/certifications.test.tsx
+git commit -m "feat: seksi sertifikasi jadi band data empat metrik dengan klaster sertifikasi"
+```
+
+---
+
 ### Task 7: Seksi rute ro-ro dengan peta asli
 
 Memperbaiki cacat audit spec §2.1 nomor 2, 3, dan 4.
@@ -1598,7 +1606,7 @@ Memperbaiki cacat audit spec §2.1 nomor 2, 3, dan 4.
 - Modify: `tests/e2e/beranda.spec.ts:41`
 
 **Interfaces:**
-- Consumes: `PORTS`, `ROUTE_LEGS`, `project`, `VIEWBOX` dari Task 6; `coastline.json`; `SectionHeader`, `OverlayPanel`, `MOTION`.
+- Consumes: `PORTS`, `ROUTE_LEGS`, `project`, `VIEWBOX` dari Task 5; `coastline.json`; `SectionHeader`, `OverlayPanel`, `MOTION`.
 - Produces: `<RouteMap />` tanpa perubahan nama ekspor.
 
 - [ ] **Step 1: Tulis test yang gagal**
@@ -2662,6 +2670,11 @@ function ModelHull({ url, lengthMeters }: { url: string; lengthMeters: number })
     // besar dari yang lain dan perbandingan skala jadi tidak ada artinya.
     const scale = size.x > 0 ? lengthMeters / 10 / size.x : 1;
     copy.scale.setScalar(scale);
+    // Titik asal tiap GLB ada di tempat berbeda, ada yang di lunas ada yang di
+    // tengah lambung. ContactShadows di Stage duduk tetap di y=0, jadi tanpa
+    // normalisasi ini sebagian lambung akan mengambang di atas bayangannya dan
+    // sebagian lagi tenggelam menembusnya.
+    copy.position.y = -new THREE.Box3().setFromObject(copy).min.y;
     copy.traverse((node) => {
       if (node instanceof THREE.Mesh) {
         node.material = new THREE.MeshStandardMaterial({
@@ -2965,6 +2978,8 @@ Expected: PASS, 3 test seksi ditambah test hull-geometry dan class-index yang su
 
 Jalankan `bun run dev`, buka beranda di 1440x900, gulir perlahan melewati seluruh pin comparator. Yang harus terlihat: lima lambung berganti berurutan, setiap lambung muat penuh dalam frame tanpa terpotong, grid tetap ukurannya, dan dua lambung buatan (SPOB, Oil Barge) tidak terlihat berbeda kualitas dari tiga model unduhan.
 
+Periksa juga dua hal yang tidak bisa dilihat dari test: bayangan kontak menempel di lunas tiap lambung, bukan mengambang atau tertembus; dan grid 20 unit (satu kotak sama dengan 10 m) benar-benar terbaca sebagai patokan skala di kedua ujung, motor tanker 95 m dan tugboat 32 m. Kalau di kelas terkecil grid justru jadi kekacauan visual, yang perlu diubah adalah luas gridnya, bukan jarak kameranya.
+
 Kalau kedua lambung buatan jelas terlihat lebih kasar sampai mengganggu, jalankan jalan mundur yang sudah disetujui di spec §9 Delta 2: seluruh comparator kembali ke estetika wireframe blueprint dengan mengganti `meshStandardMaterial` di `BuiltHull` dan `ModelHull` menjadi `lineSegments` berwarna `ACCENT_LINE_COLOR` di atas `meshBasicMaterial` gelap. Catat keputusan dan alasannya di laporan task.
 
 - [ ] **Step 11: Jalankan gerbang**
@@ -3008,9 +3023,33 @@ Hasil yang diharapkan hanya `hero.tsx`.
 Ganti isi `src/features/home/hero.test.tsx`:
 
 ```tsx
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Hero } from "./hero";
+
+/**
+ * Vitest tidak menghormati batas Server Component, jadi HeroCanvas dan
+ * HeroHeadline ikut dirender di sini. matches: true memilih jalur reduced
+ * motion di keduanya: HeroCanvas berhenti sebelum memasang canvas, dan
+ * HeroHeadline mengembalikan heading utuh tanpa memanggil SplitText, yang
+ * memang tidak bisa memecah baris di jsdom karena tidak ada layout. Pola stub
+ * ini sama dengan business-lines.test.tsx dan certifications.test.tsx.
+ *
+ * Menyandarkan assertion "tidak ada canvas" pada default global di
+ * vitest.setup.ts akan membuat test ini diam-diam terbalik kalau default itu
+ * berubah, jadi stubnya ditulis eksplisit di sini.
+ */
+beforeEach(() => {
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  );
+});
 
 describe("Hero", () => {
   it("render headline sebagai h1", () => {
