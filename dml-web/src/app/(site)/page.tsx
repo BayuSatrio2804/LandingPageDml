@@ -1,13 +1,23 @@
+import { Hero } from "@/features/home/hero";
+import { DayCut } from "@/features/home/day-cut";
+import { BusinessLines } from "@/features/home/business-lines";
+import { FleetComparator } from "@/features/home/fleet-comparator";
+import { RouteMap } from "@/features/home/route-map";
+import { Lineage } from "@/features/home/lineage";
+import { Certifications } from "@/features/home/certifications";
+import { CtaSection } from "@/features/home/cta-section";
+
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-24 md:px-8">
-      <h1 className="font-display text-4xl font-bold tracking-tight md:text-6xl">
-        Menggerakkan energi dan orang di perairan Kalimantan sejak 1985.
-      </h1>
-      <p className="mt-6 max-w-[55ch] text-ink-muted">
-        Beranda sinematik dibangun di Plan 5. Halaman ini sengaja polos agar
-        fondasi bisa diverifikasi lebih dulu.
-      </p>
-    </div>
+    <>
+      <Hero />
+      <DayCut />
+      <BusinessLines />
+      <FleetComparator />
+      <RouteMap />
+      <Lineage />
+      <Certifications />
+      <CtaSection />
+    </>
   );
 }
