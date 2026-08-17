@@ -28,7 +28,7 @@ export const MEDIA: Record<MediaSetId, MediaAsset[]> = {
   "lini-bisnis": [
     { id: "transportasi-bbm", basePath: "/media/lini-bisnis/transportasi-bbm", widths: STANDARD_WIDTHS, alt: "Motor tanker Sri Yuliani dan MT AS Marine Satu bersandar STS membawa BBM" },
     { id: "penumpang-roro", basePath: "/media/lini-bisnis/penumpang-roro", widths: STANDARD_WIDTHS, alt: "KMP Jambo X bersandar di ramp pelabuhan penyeberangan, pintu rampa terbuka" },
-    { id: "operasi-sts", basePath: "/media/lini-bisnis/operasi-sts", widths: STANDARD_WIDTHS, alt: "Tiga kapal tanker dipotret tegak lurus dari udara saat operasi ship-to-ship, kapal induk di tengah dihubungkan tali tambat dengan dua kapal pendamping di kedua sisi, geladak hijau membentang siang hari di laut terbuka" },
+    { id: "operasi-sts", basePath: "/media/lini-bisnis/operasi-sts", widths: STANDARD_WIDTHS, alt: "Dua kapal tanker, Sri Yuliani dan MT AS Marine Satu, bersandar STS haluan-ke-haluan dilihat dari sudut udara oblique, geladak hijau dan crane kapal terlihat siang hari berawan di laut terbuka" },
   ],
 };
 
