@@ -16,6 +16,9 @@ const eslintConfig = defineConfig([
     "src/app/(payload)/admin/importMap.js",
     "src/payload/payload-types.ts",
     "src/migrations/**",
+    // Decoder Draco vendor, disalin apa adanya dari
+    // node_modules/three/examples/jsm/libs/draco/gltf/, bukan kode tulisan tangan:
+    "public/draco/**",
   ]),
 ]);
 
