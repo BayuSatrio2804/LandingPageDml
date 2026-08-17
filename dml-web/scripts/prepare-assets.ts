@@ -26,7 +26,7 @@ const RAW_SOURCE: Record<string, string> = {
   "/media/hari/dji-0030": "sts-06-juli/DJI_0030.JPG",
   "/media/lini-bisnis/transportasi-bbm": "sts-sri-yuliani/DJI_0660.JPG",
   "/media/lini-bisnis/penumpang-roro": "kapal-kapal/DJI_0322.JPG",
-  "/media/lini-bisnis/galangan-kapal": "kapal-kapal/DJI_0359.JPG",
+  "/media/lini-bisnis/operasi-sts": "sts-sri-yuliani/DJI_0750.JPG",
 };
 
 async function processAsset(asset: MediaAsset): Promise<void> {
