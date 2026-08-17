@@ -116,10 +116,17 @@ Skrip baru `scripts/prepare-models.ts`, dipanggil lewat `bun run prepare-models`
    `Authorization: Token ${SKETCHFAB_TOKEN}`. Token dibaca dari `.env.local`, tidak pernah
    di-commit. Ditambahkan ke `.env.example` sebagai variabel opsional dengan penjelasan.
 2. `dedup`, `weld`, `join`, `prune` untuk membuang node dan material tak terpakai.
-3. `simplify` (meshoptimizer) dengan target ratio per model sampai 30.000 sampai 60.000 tris.
-   Angka final ditentukan saat implementasi lewat inspeksi visual, dicatat di laporan task.
+3. `simplify` (meshoptimizer, build time saja) dengan target ratio per model sampai 30.000
+   sampai 60.000 tris. Angka final ditentukan saat implementasi lewat inspeksi visual,
+   dicatat di laporan task.
 4. Tekstur di-resize maksimal 1024 px dan dikonversi ke WebP.
-5. Kompresi geometri `meshopt`.
+5. `quantize`, **bukan** Draco atau meshopt. Alasan: keduanya butuh decoder runtime.
+   Decoder Draco bawaan drei diambil dari CDN Google, yang melanggar prinsip nol dependency
+   runtime pihak ketiga di seksi peta, dan self-host decoder menambah 245 kB wasm ke
+   halaman. `quantize` tidak butuh decoder sama sekali. Kalau setelah simplify plus quantize
+   ada model yang tetap melewati anggaran, jalan mundurnya Draco dengan decoder di-self-host
+   dari `node_modules/three/examples/jsm/libs/draco/gltf/` ke `public/draco/`, dipasang lewat
+   `useGLTF(url, "/draco/")`, dan penambahan bytenya dicatat di laporan task.
 6. Keluaran ke `public/models/*.glb`. GLB mentah dan `assets/_raw/models/` masuk
    `.gitignore`, hanya turunan yang di-commit. Pola sama dengan pipeline gambar yang sudah
    berjalan.
@@ -129,8 +136,12 @@ Skrip baru `scripts/prepare-models.ts`, dipanggil lewat `bun run prepare-models`
 - Per model setelah optimasi: maksimal **700 kB**.
 - Total seluruh model di beranda: maksimal **2,2 MB**.
 - Seluruh model dimuat lazy, tidak ada yang masuk bundel awal.
-- HDRI lingkungan: satu file `.hdr` CC0 dari Poly Haven, resolusi 1k, maksimal 400 kB,
-  dipakai bersama oleh hero dan comparator lewat satu loader.
+- **Lingkungan pencahayaan nol byte.** Tidak ada berkas HDRI. Refleksi PBR dihasilkan
+  prosedural lewat `<Environment resolution={256}>` berisi `<Lightformer>` dari
+  `@react-three/drei` 10.7.8 (`EnvironmentPortal`, dipakai dengan children). Ini menghapus
+  unduhan 1,5 MB `.hdr` sekaligus satu kewajiban atribusi, dan tetap memberi highlight
+  memanjang yang dibutuhkan lambung logam supaya terbaca sebagai permukaan, bukan siluet.
+  Susunan lightformer identik dipakai hero dan comparator lewat satu komponen bersama.
 - Gerbang: `bun run prepare-models` gagal dan keluar non-nol kalau ada berkas melewati
   anggaran, supaya angka ini tidak diam-diam melar.
 
@@ -156,7 +167,8 @@ Rencana memakai nol eyebrow; judul seksi sudah cukup menerangkan.
 Keluarga layout: pinned WebGL canvas, konten teks rata kiri bawah.
 
 Panggung R3F full-bleed: satu lambung tanker mengambang di atas bidang air gelap, disinari
-HDRI senja maritim plus satu key light hangat dari haluan. Tanpa langit fotografis; latar
+lingkungan lightformer prosedural (§4.3) plus satu key light hangat dari haluan. Tanpa langit
+fotografis; latar
 tetap `--color-surface` supaya lambung terbaca sebagai artefak, bukan foto.
 
 Gerak kamera digerakkan scroll lewat ScrollTrigger `pin: true`, `start: "top top"`,
@@ -442,7 +454,8 @@ dalam kondisi apa pun.
 
 ### 7.3 Anggaran jaringan
 
-- Model dan HDRI: maksimal 2,6 MB total, seluruhnya lazy, nol di bundel awal.
+- Model: maksimal 2,2 MB total, seluruhnya lazy, nol di bundel awal. Tidak ada HDRI
+  (§4.3), jadi tidak ada biaya jaringan lingkungan sama sekali.
 - Canvas hero mount setelah frame pertama; canvas comparator mount lewat IntersectionObserver
   `rootMargin: 200px` seperti sekarang.
 - `coastline.json` maksimal 60 kB, di-commit, dirender server.
