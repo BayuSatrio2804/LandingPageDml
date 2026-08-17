@@ -39,7 +39,3 @@ export function avifSrc(asset: MediaAsset, width: number): string {
 export function avifSrcSet(asset: MediaAsset): string {
   return asset.widths.map((width) => `${avifSrc(asset, width)} ${width}w`).join(", ");
 }
-
-export function webpSrc(asset: MediaAsset, width: number): string {
-  return `${asset.basePath}-${width}.webp`;
-}

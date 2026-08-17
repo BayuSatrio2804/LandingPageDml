@@ -1,15 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { gsap, registerGsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
 import { type MediaAsset, avifSrc } from "@/lib/media/manifest";
 
 /**
  * Layer poster (di Hero, Server Component) tetap jadi LCP. Komponen ini
- * menambah sembilan frame sisanya sebagai layer <img> bertumpuk yang
+ * menambah sembilan frame sisanya sebagai layer next/image bertumpuk yang
  * di-crossfade lewat opacity mengikuti progress scroll. Tidak ada WebGL,
  * tidak ada elemen di atas fold selain poster yang sudah ada.
+ *
+ * next/image dipakai (bukan <img> mentah) supaya sembilan frame non-poster
+ * ini ikut lewat optimizer bawaan Next dan diberi ukuran responsif per
+ * viewport, sama seperti poster di hero.tsx dan kartu di business-lines.tsx
+ * -- react-doctor/nextjs-no-img-element menandai versi <img> sebelumnya
+ * karena tiap frame selalu mengirim varian 1600px penuh walau di viewport
+ * mobile, ikut membebani antrean unduhan LCP.
  */
 export function NightSequence({ frames }: { frames: MediaAsset[] }) {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -52,14 +60,16 @@ export function NightSequence({ frames }: { frames: MediaAsset[] }) {
   return (
     <div ref={sectionRef} className="absolute inset-0" aria-hidden>
       {frames.map((frame, index) => (
-        <img
+        <Image
           key={frame.id}
           ref={(el) => {
             layerRefs.current[index] = el;
           }}
           src={avifSrc(frame, 1600)}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
           loading={index === 0 ? "eager" : "lazy"}
         />
       ))}

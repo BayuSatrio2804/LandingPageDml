@@ -17,6 +17,13 @@ function ClassMesh({ index, opacityRef }: { index: number; opacityRef: React.Ref
 
   const hullGeometry = useMemo(() => (fleetClass ? buildHullGeometry(fleetClass) : null), [fleetClass]);
   const superGeometry = useMemo(() => (fleetClass ? buildSuperstructureGeometry(fleetClass) : null), [fleetClass]);
+  // Dimemo-kan terhadap hullGeometry: sebelumnya dibuat langsung di body
+  // komponen (di luar useMemo), jadi THREE.EdgesGeometry baru dialokasikan
+  // di SETIAP render, bukan cuma saat hullGeometry berubah. Temuan
+  // react-doctor/three-no-object-construction-in-render dan
+  // react-doctor/r3f-no-inline-resource-prop (baris JSX geometry={edges} di
+  // bawah) sama-sama berakar dari sini.
+  const edges = useMemo(() => (hullGeometry ? new THREE.EdgesGeometry(hullGeometry) : null), [hullGeometry]);
 
   useFrame(() => {
     const opacity = opacityRef.current[index] ?? 0;
@@ -24,9 +31,7 @@ function ClassMesh({ index, opacityRef }: { index: number; opacityRef: React.Ref
     if (wireMaterialRef.current) wireMaterialRef.current.opacity = opacity;
   });
 
-  if (!fleetClass || !hullGeometry || !superGeometry) return null;
-
-  const edges = new THREE.EdgesGeometry(hullGeometry);
+  if (!fleetClass || !hullGeometry || !superGeometry || !edges) return null;
 
   return (
     <group>
@@ -45,7 +50,17 @@ function ClassMesh({ index, opacityRef }: { index: number; opacityRef: React.Ref
 
 function Rig({ progressRef }: { progressRef: React.RefObject<number> }) {
   const groupRef = useRef<THREE.Group>(null);
-  const opacityRef = useRef<number[]>(FLEET_CLASSES.map(() => 0));
+  // useRef(FLEET_CLASSES.map(() => 0)) langsung mengevaluasi map() itu di
+  // SETIAP render meski hasilnya cuma dipakai sekali sebagai nilai awal
+  // (argumen useRef bukan lazy initializer seperti useState). Array awal
+  // dihitung lewat useMemo (deps kosong, jadi hanya sekali) supaya useRef
+  // menerima referensi yang sudah stabil. Sesudah render pertama, isinya
+  // ditulis ulang langsung lewat opacityRef.current di useFrame di bawah
+  // (loop 60fps R3F, di luar siklus render React), bukan dibaca sebagai
+  // turunan reaktif dari render -- makanya bukan opacityRef itu sendiri
+  // yang di-useMemo-kan.
+  const initialOpacity = useMemo(() => FLEET_CLASSES.map(() => 0), []);
+  const opacityRef = useRef<number[]>(initialOpacity);
 
   useFrame((_, delta) => {
     if (groupRef.current) {
