@@ -85,7 +85,7 @@ export function RouteMap() {
       <svg
         ref={mapRef}
         viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`}
-        preserveAspectRatio="xMidYMid slice"
+        preserveAspectRatio="xMidYMid meet"
         className="absolute inset-0 h-full w-full"
         role="img"
         aria-label="Peta jaringan penyeberangan ro-ro antara Jawa Timur, Lombok, dan Kalimantan Tengah"
