@@ -15,7 +15,7 @@ export const metadata: Metadata = buildMetadata({
   path: "/",
 });
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" className={`${fontVariables} h-full antialiased`}>
       {/*
