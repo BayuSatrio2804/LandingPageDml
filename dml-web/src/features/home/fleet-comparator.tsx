@@ -1,12 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { gsap, registerGsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
+import { useScrollProgress } from "@/lib/motion/use-scroll-progress";
 import { FLEET_CLASSES } from "@/content/fleet";
 import { BlueprintSvg } from "@/features/fleet/blueprint-svg";
 import { FleetSpecTable } from "@/features/fleet/spec-table";
+import { SectionHeader } from "@/components/ui/section-header";
 
 const FleetCanvas = dynamic(() => import("./fleet-3d/fleet-canvas").then((mod) => mod.FleetCanvas), {
   ssr: false,
@@ -25,14 +26,9 @@ function getDesktopSnapshot(): boolean {
 }
 
 /**
- * Sama seperti usePrefersReducedMotion: server dan render pertama saat
- * hidrasi belum tahu lebar viewport asli. useState plus setState di dalam
- * effect di sini akan (a) memicu render bertingkat, ditolak aturan
- * react-hooks/set-state-in-effect, dan (b) berisiko mismatch hidrasi karena
- * initializer useState lazy akan membaca matchMedia asli saat render klien
- * pertama, beda dari asumsi server. useSyncExternalStore menghindari
- * keduanya: snapshot server tetap konsisten untuk render pertama, lalu
- * disinkronkan ke nilai asli oleh React sendiri setelah hidrasi selesai.
+ * Sama seperti usePrefersReducedMotion: server dan render pertama saat hidrasi
+ * belum tahu lebar viewport asli. useSyncExternalStore menjaga snapshot server
+ * konsisten untuk render pertama, lalu React sendiri yang menyinkronkannya.
  */
 function useIsDesktop(): boolean {
   return useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, () => true);
@@ -40,15 +36,21 @@ function useIsDesktop(): boolean {
 
 export function FleetComparator() {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const progressRef = useRef(0);
   const reduced = usePrefersReducedMotion();
-  const [canvasVisible, setCanvasVisible] = useState(false);
   const isDesktop = useIsDesktop();
+  const canvasEnabled = isDesktop && !reduced;
+  const [canvasVisible, setCanvasVisible] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const progressRef = useScrollProgress(sectionRef, {
+    end: "+=300%",
+    pin: true,
+    disabled: !canvasEnabled,
+  });
 
   useEffect(() => {
     const section = sectionRef.current;
-    if (!section || !isDesktop) return;
-
+    if (!section || !canvasEnabled) return;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -59,53 +61,56 @@ export function FleetComparator() {
     );
     observer.observe(section);
     return () => observer.disconnect();
-  }, [isDesktop]);
+  }, [canvasEnabled]);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (reduced || !section || !isDesktop) return;
-    registerGsap();
+  const handleActiveIndexChange = useCallback((index: number) => {
+    setActiveIndex(index);
+  }, []);
 
-    const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: "+=300%",
-        pin: true,
-        scrub: 1,
-        onUpdate: (self) => {
-          // self.progress is normally already clamped to [0, 1] by
-          // ScrollTrigger, but progressRef is the only bridge into the R3F
-          // boundary (Rig in fleet-canvas.tsx derives activeIndex from it
-          // without its own clamp), and an out-of-range value there
-          // silently produces an all-zero opacity array, ie. an invisible
-          // canvas. Clamp explicitly as defense-in-depth.
-          progressRef.current = Math.min(1, Math.max(0, self.progress));
-        },
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, [reduced, isDesktop]);
+  const active = FLEET_CLASSES[activeIndex] ?? FLEET_CLASSES[0];
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-surface py-16 md:py-0">
-      <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <h2 className="font-display text-3xl font-bold text-ink md:text-5xl">Perbandingan Armada</h2>
-        <p className="mt-4 max-w-[55ch] text-ink-muted">
-          Lima kelas kapal, dari SPOB terkecil sampai motor tanker terbesar, dalam satu skala.
-        </p>
-      </div>
+    <section ref={sectionRef} className="relative min-h-[100dvh] bg-surface py-24 md:py-0">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-8 px-4 md:min-h-[100dvh] md:items-center md:px-8">
+        <div className="col-span-12 md:col-span-4">
+          <SectionHeader
+            title="Perbandingan Armada"
+            description="Lima kelas kapal, dari SPOB terkecil sampai motor tanker terbesar, dalam satu skala."
+          />
+          {canvasEnabled && active ? (
+            <dl className="mt-12 space-y-4 font-mono text-sm">
+              <div>
+                <dt className="text-ink-muted">Kelas</dt>
+                <dd className="text-2xl text-ink">{active.name}</dd>
+              </div>
+              <div>
+                <dt className="text-ink-muted">Panjang</dt>
+                <dd className="text-ink">{active.lengthMeters} m</dd>
+              </div>
+              <div>
+                <dt className="text-ink-muted">DWT</dt>
+                <dd className="text-ink">{active.dwt === null ? "-" : active.dwt.toLocaleString("id-ID")}</dd>
+              </div>
+              <div>
+                <dt className="text-ink-muted">Kapasitas</dt>
+                <dd className="text-ink">{active.capacityLabel}</dd>
+              </div>
+            </dl>
+          ) : null}
+        </div>
 
-      {isDesktop && !reduced ? (
-        <div className="relative mt-8 h-[60vh] md:h-[70vh]">
-          {canvasVisible && <FleetCanvas progressRef={progressRef} />}
+        <div className="col-span-12 md:col-span-8">
+          {canvasEnabled ? (
+            <div className="h-[60vh] md:h-[75vh]">
+              {canvasVisible && (
+                <FleetCanvas progressRef={progressRef} onActiveIndexChange={handleActiveIndexChange} />
+              )}
+            </div>
+          ) : (
+            <BlueprintSvg fleetClasses={FLEET_CLASSES} />
+          )}
         </div>
-      ) : (
-        <div className="mt-8">
-          <BlueprintSvg fleetClasses={FLEET_CLASSES} />
-        </div>
-      )}
+      </div>
 
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <FleetSpecTable fleetClasses={FLEET_CLASSES} />
