@@ -8,6 +8,13 @@ import { createRateLimiter } from "./rate-limit";
 
 const rateLimiter = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
 
+// react-doctor/server-auth-actions: sengaja tanpa auth. Ini form kontak
+// publik, pengunjung anonim harus bisa submit tanpa login. Perlindungan
+// datang dari honeypot (di atas), validasi skema server-side (safeParse di
+// bawah, bukan cuma client), dan rate limit per-IP, bukan dari auth gate,
+// sesuai rekomendasi dokumentasi rule ini untuk contact form/newsletter/
+// public search: jangan tempel auth() no-op cuma buat bungkam linter.
+// react-doctor-disable-next-line react-doctor/server-auth-actions
 export async function submitInquiry(
   input: unknown,
   source: string,
