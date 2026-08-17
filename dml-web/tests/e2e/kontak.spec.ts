@@ -39,7 +39,10 @@ test("form kontak sukses submit mengalihkan ke WhatsApp", async ({ page, context
   if (popup) {
     expect(popup.url()).toContain("wa.me");
   } else {
-    await expect(page).toHaveURL(/wa\.me|web\.whatsapp\.com|api\.whatsapp\.com/, {
+    // api.whatsapp.com (tujuan redirect nyata dari wa.me, diverifikasi lewat
+    // debug run headless) meletakkan nomor di query param "phone", bukan di
+    // path seperti wa.me/<nomor>, jadi kedua bentuk diterima.
+    await expect(page).toHaveURL(/wa\.me\/\d+|whatsapp\.com\/.*[?&]phone=\d+/, {
       timeout: 15_000,
     });
   }

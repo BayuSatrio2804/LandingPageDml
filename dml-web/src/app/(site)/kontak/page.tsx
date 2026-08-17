@@ -15,7 +15,10 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function KontakPage() {
-  const whatsappNumber = process.env.WHATSAPP_NUMBER ?? "";
+  const whatsappNumber = process.env.WHATSAPP_NUMBER;
+  if (!whatsappNumber) {
+    throw new Error("WHATSAPP_NUMBER belum diset, redirect WhatsApp di /kontak akan rusak diam-diam.");
+  }
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Kontak", path: "/kontak" },
