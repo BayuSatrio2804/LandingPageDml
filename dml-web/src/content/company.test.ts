@@ -17,6 +17,16 @@ describe("COMPANY", () => {
   });
 });
 
+describe("COMPANY.whatsapp", () => {
+  it("hanya berisi digit, tanpa tanda plus atau spasi", () => {
+    expect(COMPANY.whatsapp).toMatch(/^\d+$/);
+  });
+
+  it("sama dengan COMPANY.phone tanpa karakter non-digit", () => {
+    expect(COMPANY.whatsapp).toBe(COMPANY.phone.replace(/\D/g, ""));
+  });
+});
+
 describe("NAV_ITEMS", () => {
   it("setiap href internal diawali garis miring", () => {
     for (const item of NAV_ITEMS.filter((i) => !i.external)) {

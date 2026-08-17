@@ -13,6 +13,7 @@ export type Company = {
   founder: string;
   parent: string;
   phone: string;
+  whatsapp: string;
   offices: Office[];
   certifications: string[];
   fleetSummary: { vessels: number; totalDwt: number };
