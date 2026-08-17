@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "prepare-assets": "bun scripts/prepare-assets.ts",
     "doctor": "react-doctor . -y --blocking warning --no-score",
     "doctor:design": "react-doctor design",
     "check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run doctor",
