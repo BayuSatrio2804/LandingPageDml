@@ -3,13 +3,30 @@ import { render, screen } from "@testing-library/react";
 import { DayCut } from "./day-cut";
 
 describe("DayCut", () => {
-  it("render paragraf penjelasan ship-to-ship transfer", () => {
+  it("render paragraf penjelasan ship-to-ship", () => {
     render(<DayCut />);
-    expect(screen.getByText(/ship-to-ship/i)).toBeInTheDocument();
+    expect(screen.getByText(/ship-to-ship transfer memindahkan bbm/i)).toBeInTheDocument();
   });
 
-  it("render gambar wide anchorage dengan alt text", () => {
+  it("paragraf memakai warna ink, bukan ink-muted di atas foto", () => {
     render(<DayCut />);
-    expect(screen.getByAltText(/area labuh jangkar/i)).toBeInTheDocument();
+    const paragraph = screen.getByText(/ship-to-ship transfer memindahkan bbm/i);
+    expect(paragraph.className).toMatch(/text-ink\b/);
+    expect(paragraph.className).not.toMatch(/text-ink-muted/);
+  });
+
+  // Panel scrim, bukan gradien, yang menjamin kontras. Gradien boleh ada
+  // sebagai lapisan tambahan tapi tidak boleh jadi satu-satunya.
+  it("paragraf duduk di dalam panel scrim", () => {
+    render(<DayCut />);
+    const panel = screen.getByText(/ship-to-ship transfer memindahkan bbm/i).closest("div");
+    expect(panel?.className).toMatch(/bg-surface\//);
+  });
+
+  it("seksi setinggi viewport dinamis", () => {
+    const { container } = render(<DayCut />);
+    const section = container.querySelector("section");
+    expect(section?.className).toMatch(/min-h-\[100dvh\]/);
+    expect(section?.className).not.toMatch(/h-screen/);
   });
 });
