@@ -2,12 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Certifications } from "./certifications";
 import { COMPANY } from "@/content/company";
+import { PORTS } from "@/features/route-map/ports";
 
-// jsdom tidak mengimplementasikan window.matchMedia. Reveal (dipakai untuk
-// deretan sertifikasi) memanggilnya lewat usePrefersReducedMotion. Stub ini
-// hanya supaya pohon render tidak meledak; matches: true (reduced motion)
-// memilih jalur render paling sederhana (tanpa GSAP/ScrollTrigger) karena tes
-// ini menguji konten, bukan perilaku animasi.
 beforeEach(() => {
   vi.stubGlobal(
     "matchMedia",
@@ -28,9 +24,27 @@ describe("Certifications", () => {
     }
   });
 
-  it("render label jumlah kapal dan total DWT", () => {
+  it("render empat metrik", () => {
+    const { container } = render(<Certifications />);
+    expect(container.querySelectorAll("[data-testid='metrik']")).toHaveLength(4);
+  });
+
+  // Menulis "4" langsung akan melenceng begitu rute bertambah. Angka
+  // pelabuhan harus turunan dari PORTS, dan test ini yang menjaganya.
+  // Kantor pusat Banjarmasin ikut ada di PORTS tapi bukan pelabuhan yang
+  // dilayani, jadi PORTS.length mentah akan mengklaim lima.
+  it("jumlah pelabuhan menyaring kantor, bukan memakai PORTS.length mentah", () => {
     render(<Certifications />);
-    expect(screen.getByText(/kapal/i)).toBeInTheDocument();
-    expect(screen.getByText(/dwt/i)).toBeInTheDocument();
+    const label = screen.getByText(/pelabuhan dilayani/i);
+    const metric = label.closest("[data-testid='metrik']");
+    const jumlahPelabuhan = PORTS.filter((port) => port.kind === "pelabuhan").length;
+    expect(jumlahPelabuhan).toBeLessThan(PORTS.length);
+    expect(metric?.textContent).toContain(String(jumlahPelabuhan));
+  });
+
+  it("mengelompokkan sertifikasi jadi dua klaster berlabel", () => {
+    render(<Certifications />);
+    expect(screen.getByText("Operasi kapal")).toBeInTheDocument();
+    expect(screen.getByText("Galangan")).toBeInTheDocument();
   });
 });
