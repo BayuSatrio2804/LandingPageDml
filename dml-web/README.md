@@ -1,30 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# dml-web
 
-## Getting Started
+Situs company profile PT Dutabahari Menara Line. Next.js 16.3 App Router, Payload CMS 3 (Postgres), Tailwind v4.
 
-First, run the development server:
+## Setup fresh clone
 
-```bash
-bun dev
-```
+1. `bun install`
+2. Salin `.env.example` jadi `.env.local`, isi setiap variabel (lihat komentar di file itu).
+3. `docker compose up -d` dan tunggu healthcheck Postgres lolos sebelum lanjut:
+   ```bash
+   docker compose up -d
+   until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
+   ```
+4. `bun run payload migrate`
+5. `bun run dev`, buka `http://localhost:3000`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Perintah penting
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `bun run check`: lint, typecheck, test, build, doctor berurutan. Gerbang wajib sebelum deploy.
+- `bun run test:e2e`: Playwright, butuh `bun run build && bun run start` (otomatis lewat `playwright.config.ts`).
+- `bun run payload migrate`: jalankan migrasi Payload. Jangan pernah mengandalkan dev-mode schema push, lihat `payload.config.ts` (`push: false`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Struktur
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/(site)/`: halaman publik.
+- `src/app/(payload)/`: admin panel Payload di `/admin`.
+- `src/payload/`: config dan collection Payload.
+- `src/features/`: logika per fitur (form inquiry; seksi beranda menyusul).
+- `src/content/`: data korporat hardcoded, wajib ditandai `// unverified: <sumber>` untuk angka yang belum dikonfirmasi klien.

@@ -6,6 +6,11 @@ services:
       POSTGRES_USER: dml
       POSTGRES_PASSWORD: dml_dev_only
       POSTGRES_DB: dml
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dml"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
     ports:
       - "5432:5432"
     volumes:
