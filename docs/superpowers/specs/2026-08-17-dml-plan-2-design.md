@@ -90,6 +90,8 @@ Server Component statis yang merender `<ContactForm />`. Sukses submit mengarahk
 
 Kontras seluruh elemen form (input, placeholder, focus ring, label, helper text, error text) terhadap `--color-surface-2` diuji lewat `tokens.test.ts`, mengikuti pola Task 3 Plan 1: kontras dijaga oleh gerbang test, bukan review mata.
 
+Spec bagian 5 juga meminta "kontak per divisi" di halaman ini. `COMPANY` cuma punya satu nomor telepon terverifikasi, dan halaman `/bisnis/*` baru dibangun Plan 3, jadi bagian ini ditampilkan sebagai daftar tiga lini bisnis (diambil dari `FOOTER_GROUPS` yang sudah ada, bukan data baru) yang untuk saat ini berbagi satu kanal kontak yang sama, tanpa nomor terpisah yang dikarang dan tanpa tautan ke halaman yang belum ada.
+
 ### `/tentang-kami`
 
 Satu halaman, dua section (`#silsilah`, `#profil`) dengan anchor nav sticky yang state aktifnya diatur `IntersectionObserver`, bukan listener `scroll` (Global Constraints Plan 1 tetap berlaku).
