@@ -28,7 +28,7 @@ export const MEDIA: Record<MediaSetId, MediaAsset[]> = {
   "lini-bisnis": [
     { id: "transportasi-bbm", basePath: "/media/lini-bisnis/transportasi-bbm", widths: STANDARD_WIDTHS, alt: "Motor tanker Sri Yuliani dan MT AS Marine Satu bersandar STS membawa BBM" },
     { id: "penumpang-roro", basePath: "/media/lini-bisnis/penumpang-roro", widths: STANDARD_WIDTHS, alt: "KMP Jambo X bersandar di ramp pelabuhan penyeberangan, pintu rampa terbuka" },
-    { id: "galangan-kapal", basePath: "/media/lini-bisnis/galangan-kapal", widths: STANDARD_WIDTHS, alt: "KMP Jambo XI bersandar di dermaga Tanjung Perak, Surabaya, dengan crane galangan di latar belakang" },
+    { id: "operasi-sts", basePath: "/media/lini-bisnis/operasi-sts", widths: STANDARD_WIDTHS, alt: "Tiga kapal tanker dipotret tegak lurus dari udara saat operasi ship-to-ship, kapal induk di tengah dihubungkan tali tambat dengan dua kapal pendamping di kedua sisi, geladak hijau membentang siang hari di laut terbuka" },
   ],
 };
 
