@@ -14,6 +14,7 @@ function ClassMesh({ index, opacityRef }: { index: number; opacityRef: React.Ref
   const fleetClass = FLEET_CLASSES[index];
   const materialRef = useRef<THREE.MeshBasicMaterial>(null);
   const wireMaterialRef = useRef<THREE.LineBasicMaterial>(null);
+  const superstructureMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
 
   const hullGeometry = useMemo(() => (fleetClass ? buildHullGeometry(fleetClass) : null), [fleetClass]);
   const superGeometry = useMemo(() => (fleetClass ? buildSuperstructureGeometry(fleetClass) : null), [fleetClass]);
@@ -29,6 +30,7 @@ function ClassMesh({ index, opacityRef }: { index: number; opacityRef: React.Ref
     const opacity = opacityRef.current[index] ?? 0;
     if (materialRef.current) materialRef.current.opacity = opacity;
     if (wireMaterialRef.current) wireMaterialRef.current.opacity = opacity;
+    if (superstructureMaterialRef.current) superstructureMaterialRef.current.opacity = opacity;
   });
 
   if (!fleetClass || !hullGeometry || !superGeometry || !edges) return null;
@@ -42,7 +44,7 @@ function ClassMesh({ index, opacityRef }: { index: number; opacityRef: React.Ref
         <lineBasicMaterial ref={wireMaterialRef} color={WIREFRAME_COLOR} transparent opacity={0} />
       </lineSegments>
       <mesh geometry={superGeometry} position={[0, 0.6, 0]}>
-        <meshBasicMaterial color={HULL_COLOR} transparent opacity={0} />
+        <meshBasicMaterial ref={superstructureMaterialRef} color={HULL_COLOR} transparent opacity={0} />
       </mesh>
     </group>
   );
