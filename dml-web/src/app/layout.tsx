@@ -1,13 +1,9 @@
+import type { Metadata } from "next";
 import { fontVariables } from "@/lib/fonts";
-import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider";
-import { SkipLink } from "@/components/layout/skip-link";
-import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { buildMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
 
-export const metadata = buildMetadata({
+export const metadata: Metadata = buildMetadata({
   title: "PT Dutabahari Menara Line",
   description:
     "Perusahaan pelayaran Banjarmasin sejak 1985. Transportasi BBM, penyeberangan ro-ro, dan galangan kapal.",
@@ -28,22 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         kena efek itu. Footer terbukti tidak terkunci ke dasar viewport
         dengan min-h-full begitu class "lenis" nempel di <html>.
       */}
-      <body className="min-h-dvh flex flex-col">
-        <SkipLink />
-        <SmoothScrollProvider>
-          <SiteHeader />
-          <main id="konten-utama" tabIndex={-1} className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
-        </SmoothScrollProvider>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: safeJsonLdString(organizationJsonLd()),
-          }}
-        />
-      </body>
+      <body className="min-h-dvh flex flex-col">{children}</body>
     </html>
   );
 }
