@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   breadcrumbJsonLd,
+  jobPostingJsonLd,
   organizationJsonLd,
   safeJsonLdString,
 } from "./json-ld";
@@ -62,5 +63,24 @@ describe("safeJsonLdString", () => {
   it("hasilnya tetap JSON valid dan identik setelah dibaca balik lewat JSON.parse", () => {
     const payload = { evil: "</script>" };
     expect(JSON.parse(safeJsonLdString(payload))).toEqual(payload);
+  });
+});
+
+describe("jobPostingJsonLd", () => {
+  it("menghasilkan struktur schema.org JobPosting", () => {
+    const result = jobPostingJsonLd({
+      title: "Nakhoda Kapal Ro-Ro",
+      description: "Memimpin operasional kapal ro-ro rute Ketapang-Lembar.",
+      datePosted: "2026-09-01",
+    });
+
+    expect(result).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      title: "Nakhoda Kapal Ro-Ro",
+      description: "Memimpin operasional kapal ro-ro rute Ketapang-Lembar.",
+      datePosted: "2026-09-01",
+      hiringOrganization: { "@type": "Organization", name: "PT Dutabahari Menara Line" },
+    });
   });
 });
