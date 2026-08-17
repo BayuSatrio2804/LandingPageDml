@@ -258,6 +258,13 @@ Tiga representasi data, semuanya membaca `src/content/fleet.ts`:
 2. `BlueprintSvg` lima kelas, di bawah 768 px atau reduced motion. Dipertahankan apa adanya.
 3. `FleetSpecTable`, selalu ada di DOM server. Dipertahankan apa adanya.
 
+**Tabrakan selector yang harus ditangani.** `beranda.spec.ts` menguji fallback mobile lewat
+`page.locator("svg[role='img']").first()`. Seksi 5 sekarang juga merender SVG peta dengan
+`role="img"`, jadi assertion itu bergantung pada urutan DOM dan akan rapuh. Test diperbarui
+untuk menargetkan blueprint lewat nama aksesibelnya
+(`getByRole("img", { name: /blueprint/i })`), bukan `.first()`. Nama aksesibel peta dan
+blueprint dibuat berbeda dan eksplisit.
+
 ### 5.5 Rute ro-ro — peta vektor asli
 
 Keluarga layout: peta full-bleed dengan teks overlay, scrollytelling.
@@ -306,11 +313,13 @@ Menggantikan seksi Silsilah. Alasan penggantian tercatat di §9 delta 3.
 
 Grid 12 kolom asimetris. Kiri (span 7): angka tahun besar dalam Geist Mono, "1985" ke angka
 usia perusahaan yang menghitung naik saat masuk viewport, memakai `useCounter` yang sudah
-ada. Kanan (span 5): satu foto arsip dari `assets/_raw`, satu kalimat pendiri dari
-`TIMELINE[0]`, dan tautan "Lihat silsilah lengkap" ke `/tentang-kami#silsilah`.
+ada. Kanan (span 5): satu foto arsip dari `assets/_raw`, satu kalimat pendiri, dan tautan
+"Lihat silsilah lengkap" ke `/tentang-kami#silsilah`.
 
-`TIMELINE` tetap dipakai sebagai sumber, jadi tidak ada data yang ditinggalkan dan
-`/tentang-kami#silsilah` tidak berubah. `LineagePan` dan `lineage-pan` dihapus dari beranda;
+Sumber data dipilih tunggal supaya dua tempat tidak bisa berbeda: **tahun dan nama pendiri
+dibaca dari `COMPANY.foundedIso` dan `COMPANY.founder`**, bukan dari prosa `TIMELINE[0].label`
+yang kebetulan mengulang keduanya. `TIMELINE` tetap jadi sumber tunggal untuk
+`/tentang-kami#silsilah`, tidak berubah dan tidak ditinggalkan. `LineagePan` dan `lineage-pan` dihapus dari beranda;
 tidak ada konsumen lain (diverifikasi: hanya `lineage.tsx` yang mengimpornya).
 
 Heading berubah dari "Silsilah" menjadi "Sejak 1985". Dua spec e2e yang mengassert heading
@@ -322,9 +331,18 @@ Tidak ada angka tonggak yang dikarang. Data yang ada tetap satu entri terverifik
 
 Keluarga layout: band data padat, hairline, tanpa kartu.
 
-Empat metrik dalam Geist Mono dipisah hairline vertikal, bukan kartu: jumlah kapal, total
-DWT, tahun beroperasi, jumlah pelabuhan yang dilayani. Counter naik saat masuk viewport,
-`useCounter` dipakai ulang.
+Empat metrik dalam Geist Mono dipisah hairline vertikal, bukan kartu. Setiap angka diturunkan
+dari sumber data yang sudah ada, tidak ada yang ditulis tangan:
+
+| Metrik | Sumber |
+|---|---|
+| Jumlah kapal | `COMPANY.fleetSummary.vessels` |
+| Total DWT | `COMPANY.fleetSummary.totalDwt` |
+| Tahun beroperasi | dihitung dari `COMPANY.foundedIso` |
+| Pelabuhan dilayani | `PORTS.length` dari `ports.ts` |
+
+Menghitung pelabuhan dari `PORTS` (bukan menulis "4") memastikan angka ini tidak melenceng
+saat rute bertambah. Counter naik saat masuk viewport, `useCounter` dipakai ulang.
 
 Sertifikasi dikelompokkan jadi dua klaster berlabel, "Operasi kapal" (ISM Code, ISPS Code,
 SIRE) dan "Galangan" (ISO 9001:2015), bukan satu deret pill seragam. Radius mengikuti sistem
@@ -370,6 +388,12 @@ Untuk membunuh markup duplikat yang sekarang ada di enam seksi:
   pill penuh. Sudah konsisten sekarang, dipertahankan.
 - Aksen: `--color-accent` #FF5A1F, satu-satunya aksen, dipakai identik di garis ukur 3D,
   garis rute peta, angka counter, dan CTA.
+- **Aksen selalu sebagai warna teks atau garis di atas surface gelap, tidak pernah sebagai
+  latar yang menampung teks `--color-ink`.** Kombinasi itu 2,72:1 dan digagalkan
+  `tests/e2e/contrast-tokens.spec.ts`. Satu-satunya latar aksen yang boleh ada adalah tombol
+  CTA, yang memakai `--color-on-accent` (#0A1418), bukan ink. Label garis ukur comparator dan
+  label pelabuhan peta karena itu berupa teks aksen atau teks ink di atas surface, bukan pill
+  beraksen.
 - Tema terkunci gelap (`color-scheme: dark`). Tidak ada seksi yang membalik ke terang.
 - Semua teks di atas foto lewat `OverlayPanel`, tidak ada lagi yang mengandalkan gradien saja.
 
@@ -384,17 +408,26 @@ untuk karya nyata, dan diwajibkan lisensi.
 
 ## 7. Anggaran performa dan gerbang
 
-### 7.1 Perubahan ambang
+### 7.1 Ambang LCP: ukur dulu, longgarkan belakangan
 
-`lighthouserc.json`, `largest-contentful-paint` dinaikkan **5000 ms ke 6000 ms**.
+Pengguna mengizinkan pelonggaran gerbang LCP. Spec ini **tidak** memakainya di muka.
 
-Alasan ditulis eksplisit supaya tidak jadi kebiasaan menaikkan ambang ke angka apa pun yang
-kebetulan lolos: hero sekarang memuat HDRI dan satu GLB setelah LCP, yang menambah kontensi
-jaringan di jendela pengukuran Lighthouse mobile-throttled meski elemen LCP-nya sendiri tidak
-berubah. 6000 ms adalah headroom terbatas, bukan pencabutan gerbang. Kalau hasil ukur ternyata
-di bawah 5000 ms, ambang dikembalikan ke 5000 ms dan angka ini dihapus.
+`lighthouserc.json` tetap `largest-contentful-paint: 5000` sampai ada hasil ukur yang gagal.
+Alasannya ada di spec ini sendiri: §5.1 menetapkan poster `<Image priority>` tetap elemen LCP
+di semua kondisi dan canvas baru mount setelah frame pertama, jadi LCP secara teori nyaris
+tidak bergeser. Kalau begitu, menaikkan ambang lebih dulu berarti mengulang persis kebiasaan
+yang dikritik di commit `506723d`: ambang diseret ke angka apa pun yang kebetulan lolos.
 
-`cumulative-layout-shift` tetap 0,1. `categories:seo` tetap 0,95. Keduanya tidak dilonggarkan.
+Urutannya mengikat:
+
+1. Implementasi hero selesai dengan ambang 5000 ms tidak disentuh.
+2. `bun run lighthouse` dijalankan, angka LCP asli dicatat di laporan task.
+3. Ambang dinaikkan hanya kalau langkah 2 gagal, hanya sampai angka terukur ditambah margin
+   10 persen, dan angka itu ditulis di laporan bersama alasannya. Batas atas pelonggaran
+   yang disetujui: **6000 ms**. Melewati itu berarti hero yang diperbaiki, bukan ambangnya.
+
+`cumulative-layout-shift` tetap 0,1. `categories:seo` tetap 0,95. Keduanya tidak dilonggarkan
+dalam kondisi apa pun.
 
 ### 7.2 Gerbang yang tidak berubah
 
@@ -453,7 +486,9 @@ berisi satu entri dan penambahan entri karangan ditolak sejak Plan 3. Horizontal
 satu kartu bukan desain, itu bug yang terlihat. Kalau klien nanti memberi tonggak asli,
 seksi ini boleh kembali jadi horizontal pan tanpa perlu re-approval desain.
 
-**Delta 4 — ambang LCP naik ke 6000 ms (§8).** Alasan dan syarat pengembalian di §7.1.
+**Delta 4 — pelonggaran ambang LCP disetujui, dengan batas 6000 ms (§8).** Bukan kenaikan di
+muka. Ambang tetap 5000 ms sampai ada hasil ukur yang gagal; urutan mengikat dan batas atasnya
+di §7.1.
 
 Master spec §7.10 (larangan) dan §4.2 (batas komponen R3F dan GSAP) tidak berubah.
 
