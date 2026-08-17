@@ -69,7 +69,7 @@ export function NightSequence({ frames }: { frames: MediaAsset[] }) {
           alt=""
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-cover opacity-0"
           loading={index === 0 ? "eager" : "lazy"}
         />
       ))}
