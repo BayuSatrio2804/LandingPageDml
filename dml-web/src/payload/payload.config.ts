@@ -22,6 +22,13 @@ export default buildConfig({
     // migrasi individualnya) terhubung ke entry point sungguhan, bukan
     // dead code.
     prodMigrations: migrations,
+    // push:false wajib: tanpa ini, "bun run dev" diam-diam push skema
+    // langsung ke DB dan menandai baris migrasi dengan batch:-1. Baris itu
+    // membuat migrate() (termasuk prodMigrations di atas saat boot
+    // produksi) berhenti di prompt konfirmasi interaktif, yang hang
+    // selamanya di proses non-TTY (container, CI, Playwright webServer).
+    // Migrasi terkomit sudah jadi satu-satunya sumber kebenaran skema.
+    push: false,
   }),
   editor: lexicalEditor(),
   sharp,

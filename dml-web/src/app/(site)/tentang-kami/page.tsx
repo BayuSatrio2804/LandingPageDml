@@ -45,6 +45,7 @@ export default function TentangKamiPage() {
         <h2 className="font-display text-2xl font-bold">Profil Perusahaan</h2>
         <Reveal className="mt-8 grid gap-10 md:grid-cols-2">
           <div>
+            {/* draft: visi-misi belum direview klien, konfirmasi sebelum situs live */}
             <h3 className="font-display font-bold text-ink">Visi</h3>
             <p className="mt-2 max-w-[50ch] text-ink-muted">
               Menjadi mitra pelayaran terpercaya di perairan Kalimantan, menghubungkan energi
