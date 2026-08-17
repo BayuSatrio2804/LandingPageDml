@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { COMPANY } from "@/content/company";
 import { FOOTER_GROUPS } from "@/content/navigation";
+import { MODEL_CREDITS } from "@/content/model-credits";
 import { ExternalLink } from "./external-link";
 
 export function SiteFooter() {
@@ -54,9 +55,28 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-surface-3">
-        <div className="mx-auto max-w-[1400px] px-4 py-6 text-xs text-ink-muted md:px-8">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-6 text-xs text-ink-muted md:flex-row md:items-center md:justify-between md:px-8">
           <p>
             {new Date().getFullYear()} {COMPANY.legalName}
+          </p>
+          {/* Atribusi CC BY adalah syarat lisensi model 3D, jadi baris ini
+              tidak boleh disembunyikan di balik disclosure atau diredupkan
+              di bawah kontras AA. */}
+          <p data-testid="kredit-model" className="text-xs text-ink-muted">
+            Model 3D:{" "}
+            {MODEL_CREDITS.map((credit, index) => (
+              <span key={credit.id}>
+                {index > 0 ? ", " : ""}
+                <a href={credit.modelUrl} className="hover:text-ink" rel="noopener noreferrer" target="_blank">
+                  {credit.title}
+                </a>{" "}
+                oleh{" "}
+                <a href={credit.authorUrl} className="hover:text-ink" rel="noopener noreferrer" target="_blank">
+                  {credit.author}
+                </a>
+              </span>
+            ))}
+            . Lisensi CC BY 4.0.
           </p>
         </div>
       </div>
