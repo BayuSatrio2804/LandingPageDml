@@ -37,7 +37,7 @@ test("form kontak sukses submit mengalihkan ke WhatsApp", async ({ page, context
 
   const popup = await popupPromise;
   if (popup) {
-    expect(popup.url()).toContain("wa.me");
+    expect(popup.url()).toMatch(/wa\.me\/\d+|whatsapp\.com\/.*[?&]phone=\d+/);
   } else {
     // api.whatsapp.com (tujuan redirect nyata dari wa.me, diverifikasi lewat
     // debug run headless) meletakkan nomor di query param "phone", bukan di
