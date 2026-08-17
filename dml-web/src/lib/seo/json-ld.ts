@@ -52,3 +52,18 @@ export function safeJsonLdString(data: unknown): string {
   // ditulis ke HTML tapi tetap didekode balik jadi "<" oleh JSON.parse.
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
+
+export function jobPostingJsonLd(input: {
+  title: string;
+  description: string;
+  datePosted: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: input.title,
+    description: input.description,
+    datePosted: input.datePosted,
+    hiringOrganization: { "@type": "Organization", name: COMPANY.legalName },
+  };
+}
