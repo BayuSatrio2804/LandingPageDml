@@ -15,7 +15,6 @@ export default function KarierPage() {
     { name: "Beranda", path: "/" },
     { name: "Karier", path: "/karier" },
   ]);
-  const waNumber = COMPANY.phone.replace("+", "");
   const waMessage = "Halo, saya ingin mengirimkan lamaran kerja spontan ke PT Dutabahari Menara Line.";
 
   return (
@@ -29,7 +28,7 @@ export default function KarierPage() {
           WhatsApp, tim kami akan menyimpannya untuk kebutuhan rekrutmen berikutnya.
         </p>
         <ExternalLink
-          href={`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`}
+          href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(waMessage)}`}
           label="Kirim lamaran lewat WhatsApp"
           className="mt-6 inline-flex items-center gap-1 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-on-accent hover:bg-accent-hover"
         />
