@@ -34,3 +34,15 @@ export type TimelineEntry = {
   year: number;
   label: string;
 };
+
+export type FleetClass = {
+  slug: string;
+  name: string;
+  category: string;
+  lengthMeters: number;
+  beamMeters: number;
+  dwt: number | null;
+  capacityLabel: string;
+  passengerCapacity: number | null;
+  altText: string;
+};
