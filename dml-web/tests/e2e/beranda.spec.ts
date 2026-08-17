@@ -39,6 +39,6 @@ test.describe("beranda mobile", () => {
   test("fallback blueprint SVG tampil, bukan canvas", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("canvas")).toHaveCount(0);
-    await expect(page.locator("svg[role='img']").first()).toBeVisible();
+    await expect(page.getByRole("img", { name: /blueprint skematik/i }).first()).toBeVisible();
   });
 });
