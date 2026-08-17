@@ -2,12 +2,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Hero } from "./hero";
 
-// jsdom tidak mengimplementasikan window.matchMedia. NightSequence (client leaf,
-// dirender di dalam Hero) memanggilnya lewat usePrefersReducedMotion. Hero
-// sendiri Server Component murni; stub ini hanya supaya pohon render tidak
-// meledak saat NightSequence dipasang, matches: true (reduced motion) memilih
-// jalur paling sederhana (NightSequence me-render null) karena tes ini menguji
-// konten server, bukan perilaku GSAP/ScrollTrigger.
+/**
+ * Vitest tidak menghormati batas Server Component, jadi HeroCanvas dan
+ * HeroHeadline ikut dirender di sini. matches: true memilih jalur reduced
+ * motion di keduanya: HeroCanvas berhenti sebelum memasang canvas, dan
+ * HeroHeadline mengembalikan heading utuh tanpa memanggil SplitText, yang
+ * memang tidak bisa memecah baris di jsdom karena tidak ada layout. Pola stub
+ * ini sama dengan business-lines.test.tsx dan certifications.test.tsx.
+ *
+ * Menyandarkan assertion "tidak ada canvas" pada default global di
+ * vitest.setup.ts akan membuat test ini diam-diam terbalik kalau default itu
+ * berubah, jadi stubnya ditulis eksplisit di sini.
+ */
 beforeEach(() => {
   vi.stubGlobal(
     "matchMedia",
@@ -21,18 +27,41 @@ beforeEach(() => {
 });
 
 describe("Hero", () => {
-  it("render headline sebagai h1 dan CTA ke /kontak", () => {
+  it("render headline sebagai h1", () => {
     render(<Hero />);
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+  });
+
+  // Disiplin hero master spec: headline maksimal dua baris di desktop.
+  // Versi lama tiga baris. Batas kata adalah proksi yang bisa diuji.
+  it("headline maksimal tujuh kata", () => {
+    render(<Hero />);
+    const words = screen.getByRole("heading", { level: 1 }).textContent?.trim().split(/\s+/) ?? [];
+    expect(words.length).toBeLessThanOrEqual(7);
+  });
+
+  it("subteks maksimal dua puluh kata", () => {
+    render(<Hero />);
+    const subtext = screen.getByTestId("hero-subteks").textContent?.trim().split(/\s+/) ?? [];
+    expect(subtext.length).toBeLessThanOrEqual(20);
+  });
+
+  it("CTA primer mengarah ke kontak", () => {
+    render(<Hero />);
     expect(screen.getByRole("link", { name: /hubungi kami/i })).toHaveAttribute("href", "/kontak");
   });
 
-  it("gambar poster frame tengah punya priority dan alt text", () => {
-    render(<Hero />);
-    // MEDIA["hero-malam"][4] (dji-0815): alt text ditulis ulang di Task 4 tanpa
-    // klaim "orbit" karena drone tidak melakukan orbit sirkuler penuh yang jelas
-    // di sekitar kapal (lihat kontak sheet DJI_0811-DJI_0820).
-    const poster = screen.getByAltText(/air laut gelap di sekeliling lambung/i);
-    expect(poster).toBeInTheDocument();
+  // Kontrak LCP: poster harus ada di HTML server dengan priority, apa pun
+  // yang terjadi pada canvas. Ini yang menjaga ambang Lighthouse tetap 5000.
+  it("poster hero dirender sebagai gambar prioritas di HTML server", () => {
+    const { container } = render(<Hero />);
+    const poster = container.querySelector("[data-testid='hero-poster'] img, img[data-testid='hero-poster']");
+    expect(poster).not.toBeNull();
+    expect(poster?.getAttribute("src")).toMatch(/dji-0815/);
+  });
+
+  it("tidak ada canvas di HTML server", () => {
+    const { container } = render(<Hero />);
+    expect(container.querySelector("canvas")).toBeNull();
   });
 });
