@@ -6,6 +6,7 @@ import sharp from "sharp";
 import { buildConfig } from "payload";
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
+import { Inquiries } from "./collections/Inquiries";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -17,7 +18,7 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   sharp,
-  collections: [Users, Media],
+  collections: [Users, Media, Inquiries],
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
