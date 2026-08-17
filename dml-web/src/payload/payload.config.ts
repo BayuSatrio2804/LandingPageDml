@@ -5,6 +5,7 @@ import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { Users } from "./collections/Users";
+import { Media } from "./collections/Media";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -16,7 +17,7 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   sharp,
-  collections: [Users],
+  collections: [Users, Media],
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
