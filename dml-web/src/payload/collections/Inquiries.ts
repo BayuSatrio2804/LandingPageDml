@@ -5,7 +5,12 @@ export const Inquiries: CollectionConfig = {
   admin: { useAsTitle: "name", defaultColumns: ["name", "phone", "service", "createdAt"] },
   access: {
     read: ({ req: { user } }) => Boolean(user),
-    create: () => true,
+    // REST/GraphQL di /api mount dengan overrideAccess:false, jadi access
+    // control inilah satu-satunya gerbang untuk request langsung ke luar
+    // submitInquiry. Local API payload.create() di actions.ts default
+    // overrideAccess:true, jadi submitInquiry tetap bisa menulis meski
+    // create dikunci ke admin saja di sini.
+    create: ({ req: { user } }) => Boolean(user),
     update: () => false,
     delete: () => false,
   },
