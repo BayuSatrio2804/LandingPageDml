@@ -28,3 +28,8 @@ export type FooterGroup = {
   heading: string;
   items: NavItem[];
 };
+
+export type TimelineEntry = {
+  year: number;
+  label: string;
+};
