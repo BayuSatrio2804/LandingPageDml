@@ -36,7 +36,7 @@ export function HeroHeadline({ children }: { children: React.ReactNode }) {
   return (
     <h1
       ref={ref}
-      className="max-w-[14ch] font-display text-4xl font-bold tracking-tight text-ink md:text-6xl"
+      className="max-w-[22ch] font-display text-4xl font-bold tracking-tight text-ink md:text-6xl"
     >
       {children}
     </h1>

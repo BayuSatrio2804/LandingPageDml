@@ -261,3 +261,68 @@ saat Next.js RSC prefetch di console browser. Di luar scope Plan 4 (spec
   dari nama saja. Bukan Ketapang, Kalimantan Barat.
 - Koordinat pelabuhan lain (Lembar, Tanjung Perak, Kumai): dari sumber
   publik, belum diverifikasi klien.
+
+## Review pasca-Task 13, dua cacat terverifikasi visual dan diperbaiki
+
+Sebelum menutup cabang, dilakukan satu putaran verifikasi visual tambahan
+(screenshot Playwright per section, desktop 1440 dan mobile 375) yang
+sebelumnya belum lengkap. Ditemukan dua cacat nyata, bukan cuma proksi tes
+yang lolos:
+
+### `hero-headline.tsx` — headline masih tiga baris di desktop
+Spec §5.1 mensyaratkan headline dua baris di desktop. Tes unit memakai
+jumlah kata (≤7) sebagai proksi keterbacaan, dan proksi itu lolos, tapi
+`max-w-[14ch]` dari kode plan tidak cukup lebar untuk teks "Menggerakkan
+energi Kalimantan sejak 1985." (42 karakter) pada `text-6xl` — hasilnya
+tetap pecah tiga baris, sama seperti versi lama yang ingin diperbaiki.
+Diperbaiki: `max-w-[14ch]` → `max-w-[22ch]`. Diverifikasi ulang lewat
+screenshot 1440px: dua baris ("Menggerakkan energi Kalimantan" /
+"sejak 1985."). Mobile 375px tetap dua baris, tidak terpengaruh.
+
+### `route-map.tsx` — peta terpotong di mobile 375px
+`viewBox="0 0 1000 620"` (lanskap, rasio ~1,61) dipasang dengan
+`preserveAspectRatio="xMidYMid slice"`. Di viewport mobile potret
+(375x812, rasio ~0,46), mode `slice` membesarkan peta sampai tingginya
+penuh lalu memotong sisi kiri-kanan jauh melebihi lebar layar —
+screenshot sebelum perbaikan menunjukkan label pelabuhan terpotong di
+kedua tepi ("Ba…" untuk Banjarmasin, "Keta…" untuk Ketapang). Task 13
+Step 4 mensyaratkan verifikasi tiap seksi di kedua viewport, tapi peta
+rute belum pernah difoto di 375px sebelum sesi ini. Diperbaiki:
+`preserveAspectRatio` `slice` → `meet`, sehingga seluruh peta tampil utuh
+(letterbox ke `bg-surface-2` yang sudah jadi latar seksi, bukan warna
+asing). Tidak ada tes unit/e2e yang menggantungkan nilai atribut ini,
+jadi perubahan aman. Diverifikasi ulang lewat screenshot 375px: tidak ada
+lagi teks terpotong di tepi.
+
+Verifikasi tambahan yang dijalankan dan bersih:
+- `grep -rn 'h-screen' src/` — hanya cocok di dua baris assertion negatif
+  pada test (`not.toMatch(/h-screen/)`), tidak ada pemakaian nyata.
+- `grep -rn '[—–]' src/` — nihil, tidak ada em/en dash di teks yang
+  ditulis sepanjang Plan 4.
+- Day-cut (`OverlayPanel`) diverifikasi visual di 375px dan 1440px,
+  kontras teks terhadap foto latar terbaca jelas di kedua ukuran —
+  sebelumnya cuma diverifikasi lewat assertion unit
+  (`closest("div")` mengandung `bg-surface/`), belum pernah dilihat di
+  browser.
+
+### Catatan: `bun run lighthouse` flaky di sesi ini, bukan akibat dua perbaikan di atas
+Setelah dua perbaikan di atas, `bun run check` dijalankan ulang. Gate
+lint/typecheck/test/build/doctor tetap hijau. Gate `lighthouse` berubah-ubah
+antar run (satu run lulus, tiga run gagal di kisaran 5829-5928 ms, ambang
+5000 ms) padahal baseline Task 13 tercatat 4228 ms. Diperiksa:
+- Elemen LCP tidak berubah: tetap `<img data-testid="hero-poster">` di
+  `#hero`, path DOM sama seperti sebelum kedua perbaikan.
+- Breakdown fase LCP (TTFB, Load Delay, Load Time, Render Delay) normal
+  untuk pemuatan gambar, tidak menyentuh apa pun yang diubah (lebar
+  `max-w` pada `<h1>`, atribut `preserveAspectRatio` pada SVG peta rute
+  yang berada di section lain, bukan hero).
+- `uptime` menunjukkan load average 5,23 dan proses `brave` desktop
+  memakai ~48% CPU berkelanjutan selama pengukuran — kontensi CPU dari
+  aplikasi lain di mesin yang sama, di luar kendali kode. Lighthouse lokal
+  (non-CI) sensitif terhadap ini karena throttling simulasinya
+  memperhitungkan beban CPU saat trace diambil.
+Kesimpulan: bukan regresi dari dua perbaikan di atas, melainkan derau
+pengukuran akibat beban mesin pengembangan saat sesi ini berlangsung.
+Rekomendasi: ukur ulang `bun run lighthouse` di mesin yang tidak sedang
+menjalankan proses berat lain (atau di CI) sebelum menganggap ambang LCP
+benar-benar terlampaui. `lighthouserc.json` tetap tidak disentuh.
