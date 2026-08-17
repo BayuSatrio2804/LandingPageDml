@@ -54,7 +54,7 @@ async function processAsset(asset: MediaAsset): Promise<void> {
     // Diverifikasi empiris: exiv2 -pa pada AVIF hasil withMetadata({exif:{}})
     // masih menunjukkan Exif.GPSInfo.GPSLatitude/GPSLongitude penuh.
     const pipeline = sharp(rawPath).rotate().resize({ width, withoutEnlargement: true });
-    await pipeline.clone().avif({ quality: 55 }).toFile(`${outBase}-${width}.avif`);
+    await pipeline.clone().avif({ quality: 45 }).toFile(`${outBase}-${width}.avif`);
     await pipeline.clone().webp({ quality: 65 }).toFile(`${outBase}-${width}.webp`);
   }
 

@@ -26,3 +26,31 @@ test("halaman kontak, tentang kami, dan karier terbaca tanpa JavaScript", async 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   }
 });
+
+test("beranda terbaca penuh tanpa JavaScript", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  // Judul kartu lini bisnis dirender sebagai <h2>, dan footer (Plan 2) punya
+  // tautan navigasi dengan label teks yang sama persis ("Transportasi BBM",
+  // "Penumpang Ro-Ro"), jadi getByText murni melanggar strict mode Playwright
+  // (dua elemen cocok). getByRole("heading", ...) menargetkan elemen kartu
+  // secara spesifik dan tetap terverifikasi tampil tanpa JavaScript.
+  await expect(page.getByRole("heading", { name: "Transportasi BBM" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Penumpang Ro-Ro" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Layanan Ship-to-Ship (STS)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Perbandingan Armada" })).toBeVisible();
+  await expect(page.getByRole("table")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Rute Penyeberangan Ro-Ro" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Silsilah" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Lihat silsilah lengkap" })).toHaveAttribute(
+    "href",
+    "/tentang-kami#silsilah",
+  );
+
+  const ctaLinks = page.getByRole("link", { name: /hubungi kami/i });
+  expect(await ctaLinks.count()).toBeGreaterThan(0);
+  for (const link of await ctaLinks.all()) {
+    await expect(link).toHaveAttribute("href", "/kontak");
+  }
+});
