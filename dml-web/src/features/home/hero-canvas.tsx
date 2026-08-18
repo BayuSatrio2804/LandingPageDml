@@ -64,6 +64,21 @@ function prepare(scene: THREE.Object3D): Prepared {
   return { object: copy, size };
 }
 
+/**
+ * Lantai panggung, sama seperti di Perbandingan Armada. Dengan foto poster dan
+ * bingkai kartu sama-sama dilepas, satu-satunya yang menahan lambung adalah
+ * bayangan kontak, dan bayangan tanpa bidang membuat kapal terbaca mengambang
+ * di ruang kosong. Grid ini yang mengubahnya jadi objek yang berdiri di
+ * studio.
+ *
+ * Tidak ada keterangan "1 kotak = sekian meter" di sini, berbeda dengan
+ * comparator: hero menormalkan panjang lambung ke sepuluh satuan dunia apa pun
+ * kelas kapalnya, jadi angka meter di panggung ini akan jadi angka karangan.
+ */
+function StageFloor() {
+  return <gridHelper args={[20, 20, "#24404A", "#18292F"]} position={[0, -0.02, 0]} />;
+}
+
 function Vessel() {
   const { scene } = useGLTF(MODEL_URL, DRACO_PATH);
   const { object, size } = useMemo(() => prepare(scene), [scene]);
@@ -79,7 +94,12 @@ function Vessel() {
    */
   useEffect(() => {
     const aspect = viewport.height > 0 ? viewport.width / viewport.height : 1;
-    const distance = fitCameraDistanceForBox(size, FOV, aspect, 1.18);
+    // Margin 1,05, bukan 1,18. Panggung hero sekarang lebar dan tidak lagi
+    // dibingkai kartu, jadi sisa ruang di sekeliling lambung tidak punya tepi
+    // yang perlu dihormati: yang tersisa cuma jaminan bahwa putaran otomatis
+    // tidak membawa diagonal jejak lambung keluar frame. Di bawah 1,02 haluan
+    // mulai menyentuh tepi kanvas saat autoRotate melintasi sudut serong.
+    const distance = fitCameraDistanceForBox(size, FOV, aspect, 1.05);
     if (distance <= 0) return;
     camera.position.set(distance * 0.72, distance * 0.34, distance * 0.6);
     const center = new THREE.Vector3(0, size.y * 0.45, 0);
@@ -146,12 +166,13 @@ export function HeroCanvas() {
           }}
         >
           <Stage />
+          <StageFloor />
           <Vessel />
         </Canvas>
       </div>
 
       <p
-        className="pointer-events-none absolute bottom-3 left-4 font-mono text-[11px] text-ink-muted transition-opacity duration-700"
+        className="pointer-events-none absolute bottom-0 left-0 font-mono text-[11px] text-ink-muted transition-opacity duration-700"
         style={{ opacity: ready ? 1 : 0 }}
       >
         Seret untuk memutar
