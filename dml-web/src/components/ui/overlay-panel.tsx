@@ -1,5 +1,5 @@
 /**
- * Panel scrim untuk teks yang duduk di atas foto. Latar surface 85 persen
+ * Panel scrim untuk teks yang duduk di atas foto. Latar surface-2 90 persen
  * adalah bagian yang menjamin kontras; backdrop-blur cuma kosmetik dan tidak
  * boleh jadi satu-satunya lapisan, karena browser yang menolak backdrop-filter
  * akan menyisakan teks di atas foto telanjang.
@@ -19,7 +19,7 @@ export function OverlayPanel({
   return (
     <div
       {...rest}
-      className={`rounded-card border border-surface-3 bg-surface/85 p-6 backdrop-blur-sm md:p-8 ${alignment} ${className ?? ""}`}
+      className={`rounded-card border border-surface-3 bg-surface-2/90 p-6 backdrop-blur-sm md:p-8 ${alignment} ${className ?? ""}`}
     >
       {children}
     </div>

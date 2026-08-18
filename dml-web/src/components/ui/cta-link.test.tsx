@@ -17,13 +17,20 @@ describe("CtaLink", () => {
     expect(link.className).not.toContain("text-ink ");
   });
 
-  it("variant ghost tidak memakai latar accent", () => {
+  // Yang dilarang adalah latar terisi saat diam. Isian accent-soft pada hover
+  // justru yang membuat ghost punya umpan balik di halaman terang, dan
+  // pemeriksaan "tidak mengandung bg-accent" apa adanya akan ikut melarangnya.
+  it("variant ghost tidak memakai latar terisi saat diam", () => {
     render(
       <CtaLink href="/kontak" variant="ghost">
         Hubungi Kami
       </CtaLink>,
     );
     const link = screen.getByRole("link", { name: "Hubungi Kami" });
-    expect(link.className).not.toContain("bg-accent");
+    const restingClasses = link.className
+      .split(" ")
+      .filter((name) => !name.includes(":"));
+    expect(restingClasses.some((name) => name.startsWith("bg-"))).toBe(false);
+    expect(link.className).toContain("border-line");
   });
 });

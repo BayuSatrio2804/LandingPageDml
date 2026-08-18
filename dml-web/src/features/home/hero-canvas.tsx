@@ -6,7 +6,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { Stage } from "./three/stage";
 import { fitCameraDistanceForBox } from "./three/fit-camera";
-import { HULL_MATERIAL } from "./three/materials";
+import { HULL_MATERIAL, GRID_COLORS } from "./three/materials";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
 import { refreshScrollTriggers } from "@/lib/motion/gsap";
 import { useElementHandle, useInViewport } from "@/lib/motion/use-in-viewport";
@@ -76,7 +76,7 @@ function prepare(scene: THREE.Object3D): Prepared {
  * kelas kapalnya, jadi angka meter di panggung ini akan jadi angka karangan.
  */
 function StageFloor() {
-  return <gridHelper args={[20, 20, "#24404A", "#18292F"]} position={[0, -0.02, 0]} />;
+  return <gridHelper args={[20, 20, GRID_COLORS.main, GRID_COLORS.sub]} position={[0, -0.02, 0]} />;
 }
 
 function Vessel() {

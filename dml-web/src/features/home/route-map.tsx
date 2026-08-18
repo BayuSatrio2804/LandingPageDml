@@ -9,8 +9,32 @@ import { PORTS, ROUTE_LEGS, type RouteLeg } from "@/features/route-map/ports";
 import { VIEWBOX, project } from "@/features/route-map/projection";
 import { SectionHeader } from "@/components/ui/section-header";
 import coastline from "@/features/route-map/coastline.json";
+import { TOKENS } from "@/lib/tokens";
 
 const PORT_BY_ID = new Map(PORTS.map((port) => [port.id, port]));
+
+/**
+ * Warna peta, dibaca sebagai peta dan bukan sebagai diagram. Laut memakai
+ * isian navy paling tipis dan daratan memakai putih, arah yang sama dengan
+ * peta cetak: bidang berwarna adalah air, bidang kosong adalah tanah.
+ *
+ * Garis pantai punya nilainya sendiri, #B6C6DC, dan itu bukan token yang
+ * malas dipilih. Beda terang antara putih dan laut cuma 1,1:1, jadi yang
+ * benar-benar menggambar bentuk pulau adalah goresannya, bukan isiannya.
+ * Token surface3 terlalu pucat untuk pekerjaan itu di atas laut.
+ */
+const MAP = {
+  sea: TOKENS.accentSoft,
+  land: TOKENS.surface2,
+  coast: "#B6C6DC",
+  routeDml: TOKENS.accent,
+  routeMitra: TOKENS.line,
+  portOffice: TOKENS.inkMuted,
+  portLit: TOKENS.accent,
+  portDim: "#94A6C0",
+  labelLit: TOKENS.ink,
+  labelDim: TOKENS.inkMuted,
+} as const;
 
 /**
  * Waktu timeline dalam satuan sembarang; ScrollTrigger yang memetakannya ke
@@ -104,8 +128,8 @@ function RouteSvg({
           key={index}
           data-testid="garis-pantai"
           d={coastlinePath(ring)}
-          fill="#18292F"
-          stroke="#111E24"
+          fill={MAP.land}
+          stroke={MAP.coast}
           strokeWidth={1}
         />
       ))}
@@ -119,7 +143,7 @@ function RouteSvg({
           }}
           d={legPath(leg.fromId, leg.toId)}
           fill="none"
-          stroke={leg.operator === "dml" ? "#FF5A1F" : "#8FA1A8"}
+          stroke={leg.operator === "dml" ? MAP.routeDml : MAP.routeMitra}
           strokeWidth={(index === activeIndex ? 3.5 : 2.5) * markerScale}
           strokeLinecap="round"
           strokeDasharray={drawn ? undefined : 0}
@@ -143,7 +167,7 @@ function RouteSvg({
               cx={x}
               cy={y}
               r={(office ? 3.5 : lit ? 7 : 5) * markerScale}
-              fill={office ? "#8FA1A8" : lit ? "#FF5A1F" : "#4C6773"}
+              fill={office ? MAP.portOffice : lit ? MAP.portLit : MAP.portDim}
               className="transition-all duration-300"
             />
             <text
@@ -151,7 +175,7 @@ function RouteSvg({
               y={labelY}
               textAnchor={anchor}
               fontSize={13 * markerScale}
-              fill={lit ? "#F2EFE9" : "#8FA1A8"}
+              fill={lit ? MAP.labelLit : MAP.labelDim}
               fontFamily="var(--font-mono)"
               className="transition-colors duration-300"
             >
@@ -198,7 +222,7 @@ function StaticRouteMap() {
           title="Rute Penyeberangan Ro-Ro"
           description="Lima lintasan yang menghubungkan Sumatera, Jawa, Bali, Lombok, dan Kalimantan Tengah."
         />
-        <div className="mt-10 aspect-3/2 w-full overflow-hidden rounded-card bg-surface">
+        <div className="mt-10 aspect-3/2 w-full overflow-hidden rounded-card bg-accent-soft">
           <RouteSvg activeIndex={-1} drawn markerScale={2.3} />
         </div>
         <LegList activeIndex={-1} />
@@ -280,12 +304,12 @@ export function RouteMap() {
   return (
     <section className="relative bg-surface-2">
       <div ref={stageRef} className="relative h-[100dvh] overflow-hidden">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-accent-soft">
           <RouteSvg mapRef={mapRef} legRefs={legRefs} activeIndex={activeIndex} drawn={false} />
         </div>
 
         <div className="relative z-10 mx-auto grid h-full max-w-[1400px] grid-cols-12 content-center px-4 md:px-8">
-          <div className="col-span-12 rounded-card border border-surface-3 bg-surface/85 p-6 backdrop-blur-sm md:col-span-4 md:p-8">
+          <div className="col-span-12 rounded-card border border-surface-3 bg-surface-2/90 p-6 backdrop-blur-sm md:col-span-4 md:p-8">
             <SectionHeader
               title="Rute Penyeberangan Ro-Ro"
               description="Lima lintasan yang menghubungkan Sumatera, Jawa, Bali, Lombok, dan Kalimantan Tengah."

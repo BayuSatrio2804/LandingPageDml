@@ -42,7 +42,12 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
         id="menu-mobile"
         aria-label="Navigasi utama mobile"
         hidden={!open}
-        className="fixed inset-x-0 top-16 border-b border-surface-3 bg-surface px-4 pb-8 pt-4"
+        // Panel putih di atas bidang biru-putih, bukan bidang yang sama dengan
+        // halaman. Di palet gelap panel bg-surface masih terpisah karena berada
+        // di atas foto; di sini ia akan menyatu dengan latar dan menu terbaca
+        // seperti halaman yang tiba-tiba menumpuk teks. Bayangan mengikuti
+        // --shadow-bg pthis.id.
+        className="fixed inset-x-0 top-16 border-b border-surface-3 bg-surface-2 px-4 pb-8 pt-4 shadow-[0_6px_18px_rgba(22,65,148,0.08)]"
       >
         <ul className="space-y-1">
           {items.map((item) => (

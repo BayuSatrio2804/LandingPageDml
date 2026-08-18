@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { TOKENS } from "@/lib/tokens";
 import { DECK_MATERIAL, HULL_MATERIAL, ACCENT_LINE_COLOR } from "./materials";
 
 describe("material panggung", () => {
@@ -16,6 +17,6 @@ describe("material panggung", () => {
   });
 
   it("garis ukur memakai token aksen situs", () => {
-    expect(ACCENT_LINE_COLOR).toBe("#FF5A1F");
+    expect(ACCENT_LINE_COLOR).toBe(TOKENS.accent);
   });
 });

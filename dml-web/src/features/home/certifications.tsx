@@ -66,7 +66,7 @@ export function Certifications() {
                 {cluster.items.map((item) => (
                   <li
                     key={item.name}
-                    className="rounded-full border border-surface-3 px-4 py-2 font-mono text-sm text-ink"
+                    className="rounded-full bg-accent-soft px-4 py-2 font-mono text-sm text-accent"
                     title={
                       item.source === "cp-pdf"
                         ? undefined

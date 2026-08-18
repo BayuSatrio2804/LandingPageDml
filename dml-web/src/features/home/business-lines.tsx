@@ -212,7 +212,7 @@ export function BusinessLines() {
               menumpang di atas foto. */}
           <div
             aria-hidden
-            className="absolute inset-0 z-10 bg-gradient-to-r from-surface via-surface/20 to-transparent"
+            className="absolute inset-0 z-10 bg-gradient-to-r from-surface via-surface/40 to-transparent"
             style={{ zIndex: MAIN_LINES.length }}
           />
         </div>
