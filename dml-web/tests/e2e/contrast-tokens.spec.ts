@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { TOKENS } from "../../src/lib/tokens";
+import { hexToRgbString } from "./rgb";
 
-const ACCENT = "rgb(255, 90, 31)";
-const INK = "rgb(242, 239, 233)";
+const ACCENT = hexToRgbString(TOKENS.accent);
+const INK = hexToRgbString(TOKENS.ink);
 
 test("tidak ada elemen dengan latar aksen yang memakai teks ink", async ({
   page,
@@ -37,7 +39,7 @@ test("tidak ada elemen dengan latar aksen yang memakai teks ink", async ({
       { accent: ACCENT, ink: INK },
     );
 
-    // Kombinasi ini 2,72:1 dan gagal WCAG AA. Lihat spec bagian 6.2.
+    // Kombinasi ini 1,80:1 dan gagal WCAG AA. Lihat spec bagian 6.2.
     expect(violations, `route ${path}`).toEqual([]);
   }
 });

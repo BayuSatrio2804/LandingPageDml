@@ -38,7 +38,7 @@ export function Hero() {
           lambung dari latar tanpa perlu menggambar tepi. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_72%_46%,rgba(255,90,31,0.16),transparent_64%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_72%_46%,rgba(22,65,148,0.10),transparent_64%)]"
       />
 
       <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-12 items-center gap-y-12 px-4 md:gap-x-8 md:px-8">

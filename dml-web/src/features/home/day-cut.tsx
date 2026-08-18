@@ -11,7 +11,7 @@ export function DayCut() {
   return (
     <section className="relative flex min-h-[100dvh] items-center overflow-hidden bg-surface-2">
       <DayCutMedia frame={frame} />
-      <div className="absolute inset-0 bg-gradient-to-r from-surface-2/80 via-surface-2/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-surface-2/75 via-surface-2/25 to-transparent" />
       <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-12 px-4 md:px-8">
         <OverlayPanel className="col-span-12 md:col-span-6 lg:col-span-5">
           <h2 className="font-display text-2xl font-bold text-ink md:text-3xl">

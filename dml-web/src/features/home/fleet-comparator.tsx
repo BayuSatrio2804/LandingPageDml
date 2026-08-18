@@ -128,7 +128,7 @@ export function FleetComparator() {
                       <span
                         aria-hidden
                         className={`h-px transition-all duration-300 ${
-                          current ? "w-8 bg-accent" : "w-4 bg-surface-3"
+                          current ? "w-8 bg-accent" : "w-4 bg-line"
                         }`}
                       />
                       {fleetClass.name}

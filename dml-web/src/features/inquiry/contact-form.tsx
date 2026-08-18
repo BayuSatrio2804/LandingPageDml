@@ -66,7 +66,7 @@ export function ContactForm({ whatsappNumber }: { whatsappNumber: string }) {
         <input id="website" type="text" tabIndex={-1} autoComplete="off" {...register("website")} />
       </div>
       {formError ? (
-        <p role="alert" className="text-sm text-accent">
+        <p role="alert" className="text-sm text-danger">
           {formError}
         </p>
       ) : null}
