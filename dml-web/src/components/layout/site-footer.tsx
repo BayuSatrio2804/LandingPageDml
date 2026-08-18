@@ -11,7 +11,7 @@ export function SiteFooter() {
         <div>
           <p className="font-display text-xl font-bold">{COMPANY.legalName}</p>
           <p className="mt-3 max-w-[38ch] text-sm text-ink-muted">
-            Perusahaan pelayaran Banjarmasin sejak 1985. Bagian dari{" "}
+            Perusahaan pelayaran Banjarmasin sejak 1988. Bagian dari{" "}
             {COMPANY.parent}.
           </p>
           <address className="mt-6 space-y-4 not-italic text-sm text-ink-muted">

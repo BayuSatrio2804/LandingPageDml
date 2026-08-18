@@ -32,10 +32,10 @@ test("kedua section terbaca tanpa JavaScript", async ({ browser }) => {
 
   await expect(page.locator("#silsilah")).toBeVisible();
   await expect(page.locator("#profil")).toBeVisible();
-  // Footer juga menyebut "sejak 1985", jadi getByText("1985") tanpa scope
+  // Footer juga menyebut "sejak 1988", jadi getByText("1988") tanpa scope
   // mencocokkan dua elemen. Scope ke #silsilah supaya cuma entri timeline
   // yang diperiksa.
-  await expect(page.locator("#silsilah").getByText("1985")).toBeVisible();
+  await expect(page.locator("#silsilah").getByText("1988")).toBeVisible();
 
   await context.close();
 });
