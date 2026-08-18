@@ -1,28 +1,28 @@
 import type { FleetClass } from "./types";
 
 /**
- * Lima kelas dipakai fleet comparator 3D (spec bagian 7.4). Panjang dan
- * kapasitas kelas Motor Tanker, Oil Barge, SPOB, Tugboat adalah estimasi
- * proporsional dari kategori kapasitas liter yang sudah tersitasi di
- * docs/superpowers/specs/2026-08-16-dml-corporate-design.md bagian 2, karena
- * belum ada sumber publik yang merinci dimensi per kelas. DWT per kelas
- * adalah pembagian proporsional dari total armada (40.546 DWT, 15 kapal),
- * bukan angka yang tersitasi langsung. Kelas Ro-Ro Ferry memakai data real
- * dari spec yang sama (Jambo VIII/X, 68 m, sekitar 400 penumpang).
- * Wajib dikonfirmasi klien sebelum situs live.
+ * Lima kelas dipakai fleet comparator 3D. Jumlah kapal per kelas
+ * (`vesselCount`) berasal dari daftar armada company profile resmi
+ * `assets/CP DML.pdf` halaman 04.
  *
- * Riset tambahan (17 Agustus 2026): ditemukan data dimensi kapal yang
- * dibangun PT Dutabahari Menara Line Dockyard (ptdml.com/v2/projects.htm)
- * untuk kelas Tug Boat, Oil Tanker, dan Self Propeller Oil Barge, serta studi
- * akademik SPOB 3500 DWT yang bersumber dari data DMLD (Wulandari & Ikhwani,
- * "Collision Analysis of a Self Propelled Oil Barge's (SPOB) Using Finite
- * Element Method", Kapal: Jurnal Ilmu Pengetahuan dan Teknologi Kelautan).
- * Tidak dipakai di sini karena kapal-kapal tersebut tercatat milik klien
- * eksternal galangan (PT Masada Jaya Lines, PT Lintas Samudera Borneo, PT
- * Sinar Alam Duta Perdana), bukan armada Lini 1 PT Dutabahari Menara Line
- * sendiri yang dideskripsikan di spec. Estimasi proporsional di bawah
- * dipertahankan sampai ada sumber yang secara eksplisit merujuk armada
- * milik PT Dutabahari Menara Line.
+ * PERINGATAN ANGKA, wajib dikonfirmasi klien: PDF menulis ringkasan 64 kapal
+ * (09 ro-ro + 55 pengangkut BBM), tapi daftar nama kapal di halaman yang sama
+ * memuat 9 ro-ro + 7 MT + 9 OB + 30 SPOB + 11 TB = 66. Selisih dua kapal ini
+ * tidak dijembatani sendiri: COMPANY.fleetSummary memakai angka ringkasan PDF,
+ * dan vesselCount di bawah memakai hasil hitung daftar. Tidak ada tempat di
+ * situs yang menjumlahkan vesselCount, jadi kedua angka tidak pernah tampil
+ * saling membantah.
+ *
+ * Panjang, lebar, dan DWT per kelas TIDAK ada di PDF. Semua angka dimensi di
+ * bawah tetap estimasi proporsional dari kategori kapasitas liter di master
+ * spec bagian 2, kecuali Ro-Ro Ferry yang memakai data Jambo VIII/X (68 m,
+ * sekitar 400 penumpang). Semuanya masih bertanda unverified.
+ *
+ * Riset tambahan (17 Agustus 2026): ada data dimensi kapal bangunan PT
+ * Dutabahari Menara Line Dockyard di ptdml.com untuk kelas Tug Boat, Oil
+ * Tanker, dan SPOB, serta studi SPOB 3500 DWT (Wulandari & Ikhwani, Kapal:
+ * Jurnal Ilmu Pengetahuan dan Teknologi Kelautan). Tidak dipakai karena
+ * kapal-kapal itu milik klien eksternal galangan, bukan armada DML sendiri.
  */
 export const FLEET_CLASSES: FleetClass[] = [
   {
@@ -34,6 +34,7 @@ export const FLEET_CLASSES: FleetClass[] = [
     dwt: 9500, // unverified: estimasi proporsional dari total armada
     capacityLabel: "hingga 8 juta liter",
     passengerCapacity: null,
+    vesselCount: 7, // cp-pdf hal. 04: MT Royalty, Jazeel, AS Marine Satu, Gonaya VIII, Jefferson, Winston 01, Ocean River
     altText: "Blueprint skematik motor tanker, kelas terbesar armada BBM",
   },
   {
@@ -45,6 +46,7 @@ export const FLEET_CLASSES: FleetClass[] = [
     dwt: 5600, // unverified: estimasi proporsional dari total armada
     capacityLabel: "hingga 4,7 juta liter",
     passengerCapacity: null,
+    vesselCount: 9, // cp-pdf hal. 04
     altText: "Blueprint skematik oil barge, ditarik tugboat pendamping",
   },
   {
@@ -56,6 +58,7 @@ export const FLEET_CLASSES: FleetClass[] = [
     dwt: 1900, // unverified: estimasi proporsional dari total armada
     capacityLabel: "hingga 1,6 juta liter",
     passengerCapacity: null,
+    vesselCount: 30, // cp-pdf hal. 04
     altText: "Blueprint skematik SPOB, kelas terkecil armada tanker",
   },
   {
@@ -67,6 +70,7 @@ export const FLEET_CLASSES: FleetClass[] = [
     dwt: 450, // unverified: estimasi proporsional dari total armada
     capacityLabel: "pendamping oil barge",
     passengerCapacity: null,
+    vesselCount: 11, // cp-pdf hal. 04
     altText: "Blueprint skematik tugboat pendamping oil barge",
   },
   {
@@ -78,6 +82,12 @@ export const FLEET_CLASSES: FleetClass[] = [
     dwt: null,
     capacityLabel: "sekitar 400 penumpang",
     passengerCapacity: 400, // spec: docs/superpowers/specs/2026-08-16-dml-corporate-design.md baris 50
+    // cp-pdf hal. 04 mendaftar sembilan kapal ro-ro di dalam armada DML: Jambo
+    // VI, VIII, IX, X, XI, XII, XIV, KMP BSP 1, dan KMP Salvatore. Dua yang
+    // terakhir melayani Merak-Bakauheni, yang di halaman 03 dioperasikan PT Tri
+    // Sumaja Lines. PDF sendiri yang tidak konsisten di dua halamannya, dan
+    // angka ringkasannya yang dipakai di sini. Termasuk butir konfirmasi klien.
+    vesselCount: 9,
     altText: "Blueprint skematik KMP Jambo X, ferry ro-ro penumpang",
   },
 ];

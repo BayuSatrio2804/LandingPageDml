@@ -1,5 +1,13 @@
 # DML Corporate, Plan 1: Fondasi Implementation Plan
 
+> **SUPERSEDED SEBAGIAN, 18 Agustus 2026.** Sumber data perusahaan sekarang company
+> profile resmi klien, `assets/CP DML.pdf`, dan susunan beranda ditulis ulang di Plan 5.
+> Setiap angka, rute, dan struktur lini bisnis di dokumen ini yang bertentangan dengan
+> `docs/superpowers/specs/2026-08-18-dml-plan-5-profil-dan-beranda-design.md` sudah
+> tidak berlaku. Dokumen ini dipertahankan apa adanya sebagai catatan apa yang dibangun
+> kapan; jangan dijadikan rujukan data.
+
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Membangun fondasi teknis situs company profile PT Dutabahari Menara Line: project Next.js baru dengan design token yang kontrasnya terbukti lolos WCAG, infrastruktur motion yang menghormati `prefers-reduced-motion`, shell layout, primitif SEO, dan gerbang kualitas otomatis.

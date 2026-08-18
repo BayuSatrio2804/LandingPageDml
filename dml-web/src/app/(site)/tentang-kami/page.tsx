@@ -8,7 +8,7 @@ import { Reveal } from "@/components/motion/reveal";
 
 export const metadata: Metadata = buildMetadata({
   title: "Tentang Kami | PT Dutabahari Menara Line",
-  description: "Silsilah dan profil perusahaan PT Dutabahari Menara Line, bagian dari SinarAlam Corporation.",
+  description: "Silsilah dan profil perusahaan PT Dutabahari Menara Line, bagian dari Sinar Alam Corporation.",
   path: "/tentang-kami",
 });
 
@@ -60,16 +60,21 @@ export default function TentangKamiPage() {
           <div>
             <h3 className="font-display font-bold text-ink">Legalitas dan Sertifikasi</h3>
             <p className="mt-2 text-ink-muted">{COMPANY.legalName}, bagian dari {COMPANY.parent}.</p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {COMPANY.certifications.map((cert) => (
-                <li
-                  key={cert}
-                  className="rounded-full border border-surface-3 px-3 py-1 text-xs text-ink-muted"
-                >
-                  {cert}
-                </li>
-              ))}
-            </ul>
+            {COMPANY.standards.map((cluster) => (
+              <div key={cluster.label} className="mt-4">
+                <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {cluster.items.map((item) => (
+                    <li
+                      key={item.name}
+                      className="rounded-full border border-surface-3 px-3 py-1 text-xs text-ink-muted"
+                    >
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </Reveal>
       </section>
