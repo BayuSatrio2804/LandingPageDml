@@ -51,13 +51,15 @@ describe("Hero", () => {
     expect(screen.getByRole("link", { name: /hubungi kami/i })).toHaveAttribute("href", "/kontak");
   });
 
-  // Kontrak LCP: poster harus ada di HTML server dengan priority, apa pun
-  // yang terjadi pada canvas. Ini yang menjaga ambang Lighthouse tetap 5000.
-  it("poster hero dirender sebagai gambar prioritas di HTML server", () => {
+  // Kontrak LCP setelah poster dilepas: kandidat LCP hero adalah teks yang
+  // dicat dari HTML server, bukan gambar yang menunggu jaringan. Assertion-nya
+  // "tidak ada <img> di hero" karena itu yang bisa diam-diam kembali: satu
+  // gambar dekoratif yang ditambahkan nanti akan merebut kembali peran LCP dan
+  // menghidupkan lagi risiko ambang Lighthouse 5000.
+  it("hero tidak merender gambar apa pun di HTML server", () => {
     const { container } = render(<Hero />);
-    const poster = container.querySelector("[data-testid='hero-poster'] img, img[data-testid='hero-poster']");
-    expect(poster).not.toBeNull();
-    expect(poster?.getAttribute("src")).toMatch(/dji-0815/);
+    expect(container.querySelector("img")).toBeNull();
+    expect(screen.getByRole("heading", { level: 1 }).textContent?.trim()).not.toHaveLength(0);
   });
 
   it("tidak ada canvas di HTML server", () => {
