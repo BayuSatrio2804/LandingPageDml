@@ -13,6 +13,6 @@ describe("TIMELINE", () => {
   });
 
   it("entri pertama adalah tahun berdirinya perusahaan", () => {
-    expect(TIMELINE[0]?.year).toBe(1985);
+    expect(TIMELINE[0]?.year).toBe(1988);
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -8,12 +8,20 @@ import { FLEET_CLASSES } from "@/content/fleet";
 import { FLEET_MODEL_BY_SLUG } from "@/content/model-credits";
 import type { FleetClass } from "@/content/types";
 import { Stage } from "../three/stage";
-import { fitCameraDistance } from "../three/fit-camera";
-import { DECK_MATERIAL, HULL_MATERIAL, ACCENT_LINE_COLOR } from "../three/materials";
+import { fitCameraDistanceForBox } from "../three/fit-camera";
+import { DECK_MATERIAL, HULL_MATERIAL } from "../three/materials";
 import { buildHullGeometry, buildHullShape, buildSuperstructureGeometry } from "./hull-geometry";
-import { activeClassIndex } from "./class-index";
+import { segmentAt, segmentOpacities } from "@/lib/motion/segments";
+import { refreshScrollTriggers } from "@/lib/motion/gsap";
 
-const FOV = 40;
+const FOV = 38;
+/**
+ * Bagian tiap iris progress yang dipakai menyeberang ke kelas berikutnya.
+ * Sisanya jeda diam. Nilai 0,35 memberi kelas terakhir jeda penuh sepanjang
+ * seperlima scroll terakhir, jadi Ro-Ro Ferry sudah berdiri utuh jauh sebelum
+ * pin dilepas.
+ */
+const TRANSITION = 0.35;
 const DRACO_PATH = "/draco/";
 
 /**
@@ -44,12 +52,23 @@ function ModelHull({ url, lengthMeters }: { url: string; lengthMeters: number })
     // (panjang asli di Z) akan tegak lurus 90 derajat terhadap ferry dan dua
     // lambung buatan dalam frame yang sama.
     if (size.z === modelLength) copy.rotation.y = Math.PI / 2;
-    // Titik asal tiap GLB ada di tempat berbeda, ada yang di lunas ada yang di
-    // tengah lambung. ContactShadows di Stage duduk tetap di y=0, jadi tanpa
-    // normalisasi ini sebagian lambung akan mengambang di atas bayangannya dan
-    // sebagian lagi tenggelam menembusnya. Dihitung ulang sesudah rotasi
-    // karena memutar bisa mengubah tinggi minimum.
-    copy.position.y = -new THREE.Box3().setFromObject(copy).min.y;
+    // Titik asal tiap GLB ada di tempat berbeda, ada yang di lunas, ada yang di
+    // tengah lambung, dan sebagian tidak berada di tengah panjangnya sama
+    // sekali. Lambung digeser sampai pusat kotak pembatasnya duduk di sumbu
+    // kamera untuk X dan Z, dan sampai lunasnya menyentuh y=0 untuk Y.
+    //
+    // Tanpa penengahan X dan Z, seluruh aritmetika fit kamera memakai asumsi
+    // yang salah: ia memuat UKURAN kotak dengan anggapan kotak itu berpusat di
+    // titik bidik, jadi lambung yang asalnya melenceng tetap terpotong di tepi
+    // frame meskipun jaraknya sudah benar. Diverifikasi di checkpoint browser
+    // Plan 5, tempat motor tanker terpotong di tepi kanan kanvas.
+    //
+    // ContactShadows di Stage duduk tetap di y=0, jadi normalisasi Y juga yang
+    // menjaga lambung tidak mengambang di atas bayangannya. Dihitung sesudah
+    // rotasi karena memutar bisa mengubah batas-batasnya.
+    const placed = new THREE.Box3().setFromObject(copy);
+    const center = placed.getCenter(new THREE.Vector3());
+    copy.position.set(-center.x, -placed.min.y, -center.z);
     copy.traverse((node) => {
       if (node instanceof THREE.Mesh) {
         node.material = new THREE.MeshStandardMaterial({
@@ -156,13 +175,37 @@ function BuiltHull({ index }: { index: number }) {
 function ClassGroup({
   index,
   opacityRef,
+  sizesRef,
 }: {
   index: number;
   opacityRef: React.RefObject<number[]>;
+  sizesRef: React.RefObject<THREE.Vector3[]>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const fleetClass = FLEET_CLASSES[index];
   const modelUrl = fleetClass ? FLEET_MODEL_BY_SLUG[fleetClass.slug] : null;
+
+  /**
+   * Radius bola pembatas diukur dari geometri yang benar-benar ada di scene,
+   * satu kali, sebelum frame pertama sempat menyembunyikan grup ini.
+   *
+   * Versi Plan 4 menurunkan radius kamera dari separuh panjang kelas lalu
+   * menambal kekurangannya dengan margin 1,5, karena separuh panjang tidak
+   * tahu apa-apa soal tinggi tiang dan deckhouse. Akibatnya kelas kecil
+   * seperti tugboat, yang tiangnya lebih tinggi dari separuh panjangnya,
+   * tetap terpotong, sementara kelas panjang tampil terlalu kecil. Mengukur
+   * kotak yang sebenarnya membuat margin bisa turun ke angka jujur dan
+   * "zoom sesuai ukuran kapal" jadi benar untuk kelima kelas.
+   */
+  useLayoutEffect(() => {
+    const group = groupRef.current;
+    if (!group) return;
+    group.updateWorldMatrix(true, true);
+    const size = new THREE.Box3().setFromObject(group).getSize(new THREE.Vector3());
+    if (Number.isFinite(size.x) && Number.isFinite(size.y) && size.x > 0) {
+      sizesRef.current[index] = size;
+    }
+  }, [index, sizesRef]);
 
   useFrame(() => {
     const group = groupRef.current;
@@ -191,15 +234,21 @@ function ClassGroup({
 }
 
 /**
- * Grid tetap sepanjang 10 m per kotak. Tidak ikut berganti saat kelas berganti,
- * jadi mata punya patokan tetap dan perbedaan panjang antar kelas benar-benar
- * terbaca sebagai perbedaan ukuran, bukan perubahan jarak kamera.
+ * Satu kotak grid selalu 10 m dunia dan tidak pernah berubah ukuran, jadi ia
+ * tetap jadi patokan skala meskipun kamera mendekat mengikuti kelas yang
+ * sedang tampil: kapal pendek difoto dari dekat memperbesar kotaknya juga,
+ * dan panjang lambung tetap bisa dihitung dalam satuan kotak.
+ *
+ * Dua garis tengahnya tidak lagi berwarna aksen. Dengan kamera yang kini
+ * mendekat sesuai ukuran kapal, sepasang garis oranye sepanjang 200 m
+ * membentang melewati tepi kanvas dan terbaca sebagai goresan nyasar, bukan
+ * sebagai sumbu.
  */
 function ScaleGrid() {
-  return (
-    <gridHelper args={[20, 20, ACCENT_LINE_COLOR, "#18292F"]} position={[0, -0.02, 0]} />
-  );
+  return <gridHelper args={[20, 20, "#24404A", "#18292F"]} position={[0, -0.02, 0]} />;
 }
+
+type OrbitTarget = { target: THREE.Vector3 };
 
 function Rig({
   progressRef,
@@ -210,43 +259,84 @@ function Rig({
 }) {
   const initialOpacity = useMemo(() => FLEET_CLASSES.map(() => 0), []);
   const opacityRef = useRef<number[]>(initialOpacity);
+  // Cadangan sebelum pengukuran selesai: dimensi dari data kelas, dalam satuan
+  // dunia yang sama dengan hull-geometry.ts (meter dibagi sepuluh).
+  const sizesRef = useRef<THREE.Vector3[]>(
+    FLEET_CLASSES.map(
+      (entry) =>
+        new THREE.Vector3(entry.lengthMeters / 10, entry.beamMeters / 25, entry.beamMeters / 10),
+    ),
+  );
   const lastIndexRef = useRef(-1);
   const groupRef = useRef<THREE.Group>(null);
+  const offset = useMemo(() => new THREE.Vector3(), []);
+  const framed = useMemo(() => new THREE.Vector3(), []);
 
-  useFrame(({ camera }, delta) => {
+  useFrame((state, delta) => {
+    const { camera } = state;
+    // Dibaca dari state useFrame, bukan lewat useThree di badan komponen.
+    // OrbitControls memang untuk dimutasi tiap frame, sedangkan nilai yang
+    // dikembalikan sebuah hook tidak boleh ditulisi (react-hooks/immutability),
+    // dan aturan itu benar untuk kasus umumnya.
+    const controls = state.controls as OrbitTarget | null;
     if (groupRef.current) groupRef.current.rotation.y += delta * 0.12;
 
-    const { index, blend } = activeClassIndex(progressRef.current ?? 0, FLEET_CLASSES.length);
-    opacityRef.current = FLEET_CLASSES.map((_, i) => {
-      if (i === index) return 1 - blend;
-      if (i === index + 1) return blend;
-      return 0;
-    });
+    const segment = segmentAt(progressRef.current ?? 0, FLEET_CLASSES.length, TRANSITION);
+    opacityRef.current = segmentOpacities(segment, FLEET_CLASSES.length);
 
-    // Kamera mengikuti ukuran kelas aktif, bukan berdiri di posisi tetap.
-    const active = FLEET_CLASSES[index];
-    if (active) {
-      const radius = active.lengthMeters / 20;
-      // Margin dinaikkan dari default 1.15: radius di sini cuma separuh
-      // panjang, tidak memperhitungkan tinggi deckhouse/tiang. Kelas kecil
-      // seperti tugboat punya tiang yang melampaui separuh panjangnya,
-      // dan margin default memotong ujung tiang di frame kamera.
-      const distance = fitCameraDistance(radius, FOV, 1.5);
-      const target = new THREE.Vector3(distance * 0.72, distance * 0.38, distance * 0.72);
-      camera.position.lerp(target, Math.min(1, delta * 2.2));
-      camera.lookAt(0, 0, 0);
+    /**
+     * Ukuran ikut di-lerp lintas pasangan kelas, bukan meloncat di batas
+     * indeks. Versi Plan 4 menghitung jarak dari indeks bulat saja, jadi
+     * targetnya berpindah seketika di tengah crossfade dan kamera mengejarnya
+     * dengan lerp: itu yang terlihat sebagai sentakan zoom tiap ganti kelas.
+     */
+    const sizes = sizesRef.current;
+    const near = sizes[segment.index];
+    const far = sizes[segment.index + 1] ?? near;
+    if (!near || !far) return;
+    framed.copy(near).lerp(far, segment.blend);
+
+    const aspect = state.size.height > 0 ? state.size.width / state.size.height : 1;
+    const distance = fitCameraDistanceForBox(framed, FOV, aspect, 1.18);
+    if (distance <= 0) return;
+
+    /**
+     * Hanya JARAK dan tinggi titik bidik yang dikendalikan di sini; sudut
+     * orbit tetap milik OrbitControls. Menulis camera.position penuh seperti
+     * versi sebelumnya berarti setiap kali pengguna memutar kapal dengan
+     * tangan, frame berikutnya menariknya kembali ke sudut tetap.
+     */
+    const target = controls?.target;
+    const ease = Math.min(1, delta * 2.4);
+    const centerY = framed.y * 0.5;
+
+    if (target) {
+      target.y = THREE.MathUtils.lerp(target.y, centerY, ease);
+      offset.copy(camera.position).sub(target);
+      const nextLength = THREE.MathUtils.lerp(offset.length(), distance, ease);
+      camera.position.copy(target).add(offset.setLength(nextLength));
+    } else {
+      offset.copy(camera.position);
+      const nextLength = THREE.MathUtils.lerp(offset.length(), distance, ease);
+      camera.position.copy(offset.setLength(nextLength));
+      camera.lookAt(0, centerY, 0);
     }
 
-    if (index !== lastIndexRef.current) {
-      lastIndexRef.current = index;
-      onActiveIndexChange(index);
+    if (segment.index !== lastIndexRef.current) {
+      lastIndexRef.current = segment.index;
+      onActiveIndexChange(segment.index);
     }
   });
 
   return (
     <group ref={groupRef}>
       {FLEET_CLASSES.map((fleetClass, index) => (
-        <ClassGroup key={fleetClass.slug} index={index} opacityRef={opacityRef} />
+        <ClassGroup
+          key={fleetClass.slug}
+          index={index}
+          opacityRef={opacityRef}
+          sizesRef={sizesRef}
+        />
       ))}
     </group>
   );
@@ -255,16 +345,31 @@ function Rig({
 export function FleetCanvas({
   progressRef,
   onActiveIndexChange,
+  active,
 }: {
   progressRef: React.RefObject<number>;
   onActiveIndexChange: (index: number) => void;
+  /** Panggung sedang di dekat viewport. Di luar itu render loop dimatikan. */
+  active: boolean;
 }) {
   return (
-    <Canvas camera={{ position: [8, 4, 8], fov: FOV }} dpr={[1, 1.5]}>
+    <Canvas
+      camera={{ position: [8, 4, 8], fov: FOV }}
+      dpr={[1, 1.5]}
+      frameloop={active ? "always" : "never"}
+      onCreated={refreshScrollTriggers}
+    >
       <Stage />
       <ScaleGrid />
       <Rig progressRef={progressRef} onActiveIndexChange={onActiveIndexChange} />
-      <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />
+      <OrbitControls
+        makeDefault
+        enableZoom={false}
+        enablePan={false}
+        autoRotate={false}
+        minPolarAngle={Math.PI * 0.16}
+        maxPolarAngle={Math.PI * 0.49}
+      />
     </Canvas>
   );
 }

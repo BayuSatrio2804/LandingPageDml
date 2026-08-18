@@ -5,12 +5,12 @@ import { DayCut } from "./day-cut";
 describe("DayCut", () => {
   it("render paragraf penjelasan ship-to-ship", () => {
     render(<DayCut />);
-    expect(screen.getByText(/ship-to-ship transfer memindahkan bbm/i)).toBeInTheDocument();
+    expect(screen.getByText(/memindahkan bahan bakar langsung antar kapal/i)).toBeInTheDocument();
   });
 
   it("paragraf memakai warna ink, bukan ink-muted di atas foto", () => {
     render(<DayCut />);
-    const paragraph = screen.getByText(/ship-to-ship transfer memindahkan bbm/i);
+    const paragraph = screen.getByText(/memindahkan bahan bakar langsung antar kapal/i);
     expect(paragraph.className).toMatch(/text-ink\b/);
     expect(paragraph.className).not.toMatch(/text-ink-muted/);
   });
@@ -19,7 +19,7 @@ describe("DayCut", () => {
   // sebagai lapisan tambahan tapi tidak boleh jadi satu-satunya.
   it("paragraf duduk di dalam panel scrim", () => {
     render(<DayCut />);
-    const panel = screen.getByText(/ship-to-ship transfer memindahkan bbm/i).closest("div");
+    const panel = screen.getByText(/memindahkan bahan bakar langsung antar kapal/i).closest("div");
     expect(panel?.className).toMatch(/bg-surface\//);
   });
 

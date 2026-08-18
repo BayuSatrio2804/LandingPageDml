@@ -17,9 +17,13 @@ dml-corporate-old-1/
 dml-corporate-old-2/
 reference-jeskojets/
 
-# arsip foto drone mentah, jangan di-commit
-assets/*.zip
-assets/_raw/
+# Seluruh folder assets, termasuk company profile PDF dan arsip foto drone
+# mentah. Isinya sumber kerja, bukan artefak build, dan ukurannya ratusan MB.
+#
+# CATATAN: assets/CP DML.pdf adalah sumber data perusahaan yang dirujuk komentar
+# di src/content/ dan spec Plan 5. Berkas itu tidak ikut di repo, jadi ia harus
+# dibagikan lewat kanal terpisah supaya rujukan itu tetap bisa ditelusuri.
+assets/
 
 # arsip font mentah, hanya turunannya yang dipakai
 fonts/*.zip

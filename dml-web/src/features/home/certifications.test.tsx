@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Certifications } from "./certifications";
 import { COMPANY } from "@/content/company";
-import { PORTS } from "@/features/route-map/ports";
+import { DML_SERVED_PORT_IDS, PORTS } from "@/features/route-map/ports";
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -17,11 +17,25 @@ beforeEach(() => {
 });
 
 describe("Certifications", () => {
-  it("render setiap sertifikasi perusahaan", () => {
+  it("render setiap butir standar dari setiap klaster", () => {
     render(<Certifications />);
-    for (const cert of COMPANY.certifications) {
-      expect(screen.getByText(cert)).toBeInTheDocument();
+    for (const cluster of COMPANY.standards) {
+      expect(screen.getByText(cluster.label)).toBeInTheDocument();
+      for (const item of cluster.items) {
+        expect(screen.getByText(item.name)).toBeInTheDocument();
+      }
     }
+  });
+
+  // SAP adalah ERP, bukan sertifikat keselamatan, dan BKI adalah biro
+  // klasifikasi. Satu deret pill seragam akan menyamarkan perbedaan itu.
+  it("memisahkan ERP dari sistem manajemen lewat klaster berbeda", () => {
+    const { container } = render(<Certifications />);
+    const clusters = container.querySelectorAll("[data-testid='klaster-standar']");
+    expect(clusters.length).toBeGreaterThanOrEqual(3);
+    const sapCluster = screen.getByText("SAP").closest("[data-testid='klaster-standar']");
+    const ismCluster = screen.getByText("ISM Code").closest("[data-testid='klaster-standar']");
+    expect(sapCluster).not.toBe(ismCluster);
   });
 
   it("render empat metrik", () => {
@@ -29,22 +43,25 @@ describe("Certifications", () => {
     expect(container.querySelectorAll("[data-testid='metrik']")).toHaveLength(4);
   });
 
-  // Menulis "4" langsung akan melenceng begitu rute bertambah. Angka
-  // pelabuhan harus turunan dari PORTS, dan test ini yang menjaganya.
-  // Kantor pusat Banjarmasin ikut ada di PORTS tapi bukan pelabuhan yang
-  // dilayani, jadi PORTS.length mentah akan mengklaim lima.
-  it("jumlah pelabuhan menyaring kantor, bukan memakai PORTS.length mentah", () => {
-    render(<Certifications />);
-    const label = screen.getByText(/pelabuhan dilayani/i);
-    const metric = label.closest("[data-testid='metrik']");
-    const jumlahPelabuhan = PORTS.filter((port) => port.kind === "pelabuhan").length;
-    expect(jumlahPelabuhan).toBeLessThan(PORTS.length);
-    expect(metric?.textContent).toContain(String(jumlahPelabuhan));
+  it("render keanggotaan dari company profile", () => {
+    const { container } = render(<Certifications />);
+    expect(container.querySelectorAll("[data-testid='keanggotaan']")).toHaveLength(
+      COMPANY.memberships.length,
+    );
+    expect(screen.getByText("GAPASDAP")).toBeInTheDocument();
   });
 
-  it("mengelompokkan sertifikasi jadi dua klaster berlabel", () => {
+  /**
+   * Angka pelabuhan harus turunan data, bukan angka yang diketik. Ia juga
+   * harus menyaring dua hal sekaligus: kantor pusat yang ikut hidup di PORTS
+   * supaya bisa digambar di peta, dan lintasan Merak-Bakauheni yang
+   * dioperasikan afiliasi. Tanpa saringan kedua, situs mengklaim melayani
+   * pelabuhan milik perusahaan lain.
+   */
+  it("jumlah pelabuhan menyaring kantor dan lintasan afiliasi", () => {
     render(<Certifications />);
-    expect(screen.getByText("Operasi kapal")).toBeInTheDocument();
-    expect(screen.getByText("Galangan")).toBeInTheDocument();
+    const metric = screen.getByText(/pelabuhan dilayani/i).closest("[data-testid='metrik']");
+    expect(DML_SERVED_PORT_IDS.length).toBeLessThan(PORTS.length);
+    expect(metric?.textContent).toContain(String(DML_SERVED_PORT_IDS.length));
   });
 });
