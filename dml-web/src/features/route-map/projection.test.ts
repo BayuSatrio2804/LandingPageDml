@@ -38,3 +38,20 @@ describe("project", () => {
     expect(utara.y).toBeLessThan(selatan.y);
   });
 });
+
+describe("VIEWBOX", () => {
+  /**
+   * Skala x dan y harus sama. Versi Plan 4 memaku tinggi viewBox ke 620 untuk
+   * bbox yang sebenarnya butuh sekitar 1006, jadi peta dipipihkan vertikal
+   * hampir 40 persen: Kalimantan tampak gepeng dan sudut tiap leg rute salah.
+   * Tes ini yang menahannya kalau MAP_BOUNDS diubah lagi tanpa menghitung
+   * ulang tingginya.
+   */
+  it("menjaga skala derajat per piksel sama di kedua sumbu", () => {
+    const lonSpanRad = ((MAP_BOUNDS.maxLon - MAP_BOUNDS.minLon) * Math.PI) / 180;
+    const latSpan = mercatorY(MAP_BOUNDS.maxLat) - mercatorY(MAP_BOUNDS.minLat);
+    const xScale = VIEWBOX.width / lonSpanRad;
+    const yScale = VIEWBOX.height / latSpan;
+    expect(yScale / xScale).toBeCloseTo(1, 2);
+  });
+});

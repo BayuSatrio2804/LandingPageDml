@@ -1,111 +1,124 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { useEffect, useMemo, useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { Stage } from "./three/stage";
-import { fitCameraDistance } from "./three/fit-camera";
+import { fitCameraDistanceForBox } from "./three/fit-camera";
 import { HULL_MATERIAL } from "./three/materials";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
-import { useScrollProgress } from "@/lib/motion/use-scroll-progress";
+import { refreshScrollTriggers } from "@/lib/motion/gsap";
+import { useElementHandle, useInViewport } from "@/lib/motion/use-in-viewport";
 
 const MODEL_URL = "/models/tanker.glb";
 const DRACO_PATH = "/draco/";
-const FOV = 38;
+const FOV = 34;
+const WORLD_LENGTH = 10;
 
-function Vessel() {
-  const { scene } = useGLTF(MODEL_URL, DRACO_PATH);
-  const prepared = useMemo(() => {
-    const copy = scene.clone(true);
-    const box = new THREE.Box3().setFromObject(copy);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    // Sumbu memanjang lambung tidak konsisten antar model Sketchfab
-    // (diverifikasi di Task 11: model tanker ini sendiri panjang di sumbu Z,
-    // bukan X). Dimensi terpanjang dipakai sebagai acuan skala. Kamera awal
-    // duduk di sumbu +Z memandang ke origin (lihat posisi Canvas di bawah),
-    // jadi lambung diputar ke sumbu X (menyamping terhadap kamera) supaya
-    // dolly-in dan orbit CameraRig menyingkap profil sisi kapal, bukan
-    // memandang haluan/buritan lurus dari depan.
-    const modelLength = Math.max(size.x, size.y, size.z);
-    const scale = modelLength > 0 ? 9.5 / modelLength : 1;
-    copy.scale.setScalar(scale);
-    if (size.z === modelLength) copy.rotation.y = Math.PI / 2;
-    copy.position.y = -new THREE.Box3().setFromObject(copy).min.y;
-    copy.traverse((node) => {
-      if (node instanceof THREE.Mesh) {
-        node.material = new THREE.MeshStandardMaterial({
-          color: HULL_MATERIAL.color,
-          metalness: HULL_MATERIAL.metalness,
-          roughness: HULL_MATERIAL.roughness,
-        });
-      }
-    });
-    return copy;
-  }, [scene]);
+type Prepared = { object: THREE.Object3D; size: THREE.Vector3 };
 
-  return <primitive object={prepared} />;
-}
+function prepare(scene: THREE.Object3D): Prepared {
+  const copy = scene.clone(true);
+  const raw = new THREE.Box3().setFromObject(copy).getSize(new THREE.Vector3());
+  // Sumbu memanjang lambung tidak konsisten antar model Sketchfab: model
+  // tanker ini panjang di sumbu Z, bukan X. Dimensi terpanjang dipakai sebagai
+  // acuan skala, lalu lambung diputar ke sumbu X supaya kamera yang duduk di
+  // kuadran +X +Z menyingkap profil sisi kapal, bukan haluan lurus dari depan.
+  const modelLength = Math.max(raw.x, raw.y, raw.z);
+  copy.scale.setScalar(modelLength > 0 ? WORLD_LENGTH / modelLength : 1);
+  if (raw.z === modelLength) copy.rotation.y = Math.PI / 2;
 
-/**
- * Tiga beat kamera yang dijahit jadi satu gerakan: masuk, memutar melewati
- * lambung, lalu terangkat dan menunduk ke geladak. Alasannya satu kalimat:
- * skala kapal hanya terbaca kalau kamera bergerak melewatinya.
- */
-function CameraRig({ progressRef }: { progressRef: React.RefObject<number> }) {
-  const target = useMemo(() => new THREE.Vector3(), []);
+  // Titik asal tiap GLB ada di tempat berbeda, ada yang di lunas, ada yang di
+  // tengah lambung, dan sebagian tidak berada di tengah panjangnya sama
+  // sekali. Lambung digeser sampai pusat kotak pembatasnya duduk di sumbu
+  // kamera untuk X dan Z, dan sampai lunasnya menyentuh y=0 untuk Y.
+  //
+  // Tanpa penengahan X dan Z, seluruh aritmetika fit kamera memakai asumsi
+  // yang salah: ia memuat UKURAN kotak dengan anggapan kotak itu berpusat di
+  // titik bidik, jadi lambung yang asalnya melenceng tetap terpotong di tepi
+  // frame meskipun jaraknya sudah benar. Diverifikasi di checkpoint browser
+  // Plan 5, tempat motor tanker terpotong di tepi kanan kanvas.
+  const scaled = new THREE.Box3().setFromObject(copy);
+  const center = scaled.getCenter(new THREE.Vector3());
+  copy.position.set(-center.x, -scaled.min.y, -center.z);
 
-  useFrame(({ camera }, delta) => {
-    const progress = progressRef.current ?? 0;
-    const near = fitCameraDistance(5.4, FOV);
-    const far = near * 2.1;
-
-    const distance = THREE.MathUtils.lerp(far, near, Math.min(1, progress * 1.6));
-    const yaw = THREE.MathUtils.degToRad(-20 + progress * 35);
-    const height = THREE.MathUtils.lerp(distance * 0.16, distance * 0.44, progress);
-
-    target.set(Math.sin(yaw) * distance, height, Math.cos(yaw) * distance);
-    camera.position.lerp(target, Math.min(1, delta * 2.5));
-    camera.lookAt(0, THREE.MathUtils.lerp(1.4, 0.4, progress), 0);
-  });
-
-  return null;
-}
-
-export function HeroCanvas() {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [ready, setReady] = useState(false);
-  const reduced = usePrefersReducedMotion();
-
-  const progressRef = useScrollProgress(sectionRef, {
-    end: "+=120%",
-    pin: true,
-    disabled: reduced || !mounted,
+  copy.traverse((node) => {
+    if (node instanceof THREE.Mesh) {
+      node.material = new THREE.MeshStandardMaterial({
+        color: HULL_MATERIAL.color,
+        metalness: HULL_MATERIAL.metalness,
+        roughness: HULL_MATERIAL.roughness,
+      });
+    }
   });
 
   /**
-   * Satu efek, bukan dua. Versi dua efek (satu mengisi sectionRef, satu
-   * memasang canvas) bergantung pada urutan pemanggilan efek: efek di dalam
-   * useScrollProgress terdaftar lebih dulu karena hook-nya dipanggil di atas,
-   * jadi ia bisa berjalan saat sectionRef masih null dan pin tidak pernah
-   * terpasang. Mengisi sectionRef di sini, sebelum setMounted, membuat urutan
-   * itu tidak lagi jadi soal.
-   *
-   * Penundaannya sendiri yang menjaga LCP: poster next/image yang mengecat
-   * pertama dan tetap jadi elemen LCP. Kalau canvas dipasang di render
-   * pertama, WebGL ikut bersaing di jendela pengukuran LCP tanpa mengubah apa
-   * yang sebenarnya dilihat pengguna lebih dulu.
+   * Kotak pembatas diukur SETELAH skala dan rotasi, dan yang dipakai kotaknya,
+   * bukan bola pembatasnya. Bola yang mengelilingi lambung punya radius sebesar
+   * separuh panjang kapal, jadi memuatnya ke bukaan vertikal kamera membuat
+   * kapal panjang tampil kecil di tengah frame yang mayoritas kosong.
+   */
+  const size = new THREE.Box3().setFromObject(copy).getSize(new THREE.Vector3());
+
+  return { object: copy, size };
+}
+
+function Vessel() {
+  const { scene } = useGLTF(MODEL_URL, DRACO_PATH);
+  const { object, size } = useMemo(() => prepare(scene), [scene]);
+  const camera = useThree((state) => state.camera);
+  const viewport = useThree((state) => state.size);
+  const controls = useThree((state) => state.controls) as { target?: THREE.Vector3 } | null;
+
+  /**
+   * Kamera dipasang sekali setelah model terukur, lalu OrbitControls yang
+   * pegang kendali. Tidak ada lagi useFrame yang menarik kamera tiap frame:
+   * itu yang dulu bertengkar dengan tangan pengguna, dan brief-nya memang
+   * meminta artefak yang bisa diputar manual seperti di perbandingan armada.
+   */
+  useEffect(() => {
+    const aspect = viewport.height > 0 ? viewport.width / viewport.height : 1;
+    const distance = fitCameraDistanceForBox(size, FOV, aspect, 1.18);
+    if (distance <= 0) return;
+    camera.position.set(distance * 0.72, distance * 0.34, distance * 0.6);
+    const center = new THREE.Vector3(0, size.y * 0.45, 0);
+    camera.lookAt(center);
+    if (controls?.target) controls.target.copy(center);
+  }, [camera, controls, size, viewport]);
+
+  return (
+    <>
+      <primitive object={object} />
+      <OrbitControls
+        makeDefault
+        enableZoom={false}
+        enablePan={false}
+        autoRotate
+        autoRotateSpeed={0.55}
+        minPolarAngle={Math.PI * 0.18}
+        maxPolarAngle={Math.PI * 0.49}
+      />
+    </>
+  );
+}
+
+export function HeroCanvas() {
+  const [wrapNode, attachWrap] = useElementHandle<HTMLDivElement>();
+  const [mounted, setMounted] = useState(false);
+  const [ready, setReady] = useState(false);
+  const reduced = usePrefersReducedMotion();
+  const { inViewport } = useInViewport(wrapNode);
+
+  /**
+   * Penundaannya yang menjaga LCP: poster next/image yang mengecat pertama dan
+   * tetap jadi elemen LCP. Kalau kanvas dipasang di render pertama, WebGL ikut
+   * bersaing di jendela pengukuran LCP tanpa mengubah apa yang sebenarnya
+   * dilihat pengguna lebih dulu.
    */
   useEffect(() => {
     if (reduced) return;
     if (!window.matchMedia("(min-width: 768px)").matches) return;
-
-    const section = document.getElementById("hero");
-    if (!(section instanceof HTMLElement)) return;
-    sectionRef.current = section;
-
     const timer = window.setTimeout(() => setMounted(true), 600);
     return () => window.clearTimeout(timer);
   }, [reduced]);
@@ -113,20 +126,36 @@ export function HeroCanvas() {
   if (reduced || !mounted) return null;
 
   return (
-    <div
-      className="absolute inset-0 transition-opacity duration-700"
-      style={{ opacity: ready ? 1 : 0 }}
-      aria-hidden
-    >
-      <Canvas
-        camera={{ position: [0, 3, 26], fov: FOV }}
-        dpr={[1, 1.5]}
-        onCreated={() => setReady(true)}
+    <div ref={attachWrap} className="absolute inset-0">
+      <div
+        className="absolute inset-0 transition-opacity duration-700"
+        style={{ opacity: ready ? 1 : 0 }}
+        aria-hidden
       >
-        <Stage />
-        <Vessel />
-        <CameraRig progressRef={progressRef} />
-      </Canvas>
+        <Canvas
+          camera={{ position: [8, 3, 6], fov: FOV }}
+          dpr={[1, 1.5]}
+          frameloop={inViewport ? "always" : "never"}
+          onCreated={() => {
+            setReady(true);
+            // Kanvas ini tidak mengubah tinggi dokumen, tapi font dan gambar
+            // di sekitarnya bisa saja baru selesai bersamaan dengannya.
+            // Menghitung ulang di sini lebih murah daripada satu pin yang
+            // mulai di koordinat basi.
+            refreshScrollTriggers();
+          }}
+        >
+          <Stage />
+          <Vessel />
+        </Canvas>
+      </div>
+
+      <p
+        className="pointer-events-none absolute bottom-3 left-4 font-mono text-[11px] text-ink-muted transition-opacity duration-700"
+        style={{ opacity: ready ? 1 : 0 }}
+      >
+        Seret untuk memutar
+      </p>
     </div>
   );
 }

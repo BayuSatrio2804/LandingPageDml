@@ -1,17 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { PORTS, ROUTE_LEGS } from "./ports";
+import { DML_SERVED_PORT_IDS, PORTS, ROUTE_LEGS } from "./ports";
 import { MAP_BOUNDS } from "./projection";
 
 describe("PORTS", () => {
-  it("punya empat pelabuhan dan satu kantor", () => {
-    expect(PORTS.filter((p) => p.kind === "pelabuhan")).toHaveLength(4);
-    expect(PORTS.filter((p) => p.kind === "kantor")).toHaveLength(1);
-  });
-
   it("setiap id unik", () => {
     expect(new Set(PORTS.map((p) => p.id)).size).toBe(PORTS.length);
   });
 
+  it("tepat satu kantor, sisanya pelabuhan", () => {
+    expect(PORTS.filter((p) => p.kind === "kantor")).toHaveLength(1);
+    expect(PORTS.filter((p) => p.kind === "pelabuhan").length).toBe(PORTS.length - 1);
+  });
+
+  // Bbox peta melebar ke barat di Plan 5 untuk memuat Selat Sunda. Kalau ada
+  // pelabuhan yang jatuh di luar kotak, ia digambar di luar viewBox dan hilang
+  // tanpa error.
   it("setiap koordinat berada di dalam bbox peta", () => {
     for (const port of PORTS) {
       expect(port.lon).toBeGreaterThanOrEqual(MAP_BOUNDS.minLon);
@@ -22,18 +25,15 @@ describe("PORTS", () => {
   });
 
   // Ketapang yang dimaksud adalah Banyuwangi, Jawa Timur, bukan Ketapang,
-  // Kalimantan Barat. Disimpulkan dari pasangan rutenya ke Lembar di master
-  // spec bagian 2. Ketapang Kalbar ada di lintang sekitar -1,8; kalau angka
-  // itu yang masuk, test ini gagal.
+  // Kalimantan Barat yang ada di lintang sekitar -1,8.
   it("Ketapang berada di Jawa Timur, bukan Kalimantan Barat", () => {
-    const ketapang = PORTS.find((p) => p.id === "ketapang");
-    expect(ketapang?.lat).toBeLessThan(-7);
+    expect(PORTS.find((p) => p.id === "ketapang")?.lat).toBeLessThan(-7);
   });
 });
 
 describe("ROUTE_LEGS", () => {
-  it("punya tiga leg terpisah, bukan satu rantai", () => {
-    expect(ROUTE_LEGS).toHaveLength(3);
+  it("memuat kelima lintasan company profile", () => {
+    expect(ROUTE_LEGS).toHaveLength(5);
   });
 
   it("setiap ujung leg merujuk id pelabuhan yang ada", () => {
@@ -48,5 +48,25 @@ describe("ROUTE_LEGS", () => {
     for (const leg of ROUTE_LEGS) {
       expect(leg.fromId).not.toBe(leg.toId);
     }
+  });
+
+  // Halaman 03 company profile menaruh Merak-Bakauheni di bawah PT Tri Sumaja
+  // Lines, bukan di bawah DML. Kalau operator ini hilang, situs mengklaim
+  // lintasan milik perusahaan lain sebagai lintasannya sendiri.
+  it("Merak-Bakauheni dicatat sebagai lintasan afiliasi", () => {
+    expect(ROUTE_LEGS.find((leg) => leg.id === "merak-bakauheni")?.operator).toBe("tsl");
+  });
+});
+
+describe("DML_SERVED_PORT_IDS", () => {
+  it("hanya memuat pelabuhan dari lintasan yang dioperasikan DML sendiri", () => {
+    expect(DML_SERVED_PORT_IDS).not.toContain("merak");
+    expect(DML_SERVED_PORT_IDS).not.toContain("bakauheni");
+    expect(DML_SERVED_PORT_IDS).toContain("kumai");
+  });
+
+  it("tidak memuat kantor, dan tidak ada duplikat", () => {
+    expect(DML_SERVED_PORT_IDS).not.toContain("banjarmasin");
+    expect(new Set(DML_SERVED_PORT_IDS).size).toBe(DML_SERVED_PORT_IDS.length);
   });
 });

@@ -1,5 +1,13 @@
 # DML Plan 2, Desain: Fondasi Payload dan Halaman Statis
 
+> **SUPERSEDED SEBAGIAN, 18 Agustus 2026.** Sumber data perusahaan sekarang company
+> profile resmi klien, `assets/CP DML.pdf`, dan susunan beranda ditulis ulang di Plan 5.
+> Setiap angka, rute, dan struktur lini bisnis di dokumen ini yang bertentangan dengan
+> `docs/superpowers/specs/2026-08-18-dml-plan-5-profil-dan-beranda-design.md` sudah
+> tidak berlaku. Dokumen ini dipertahankan apa adanya sebagai catatan apa yang dibangun
+> kapan; jangan dijadikan rujukan data.
+
+
 Design spec, 17 Agustus 2026. Turunan dari `docs/superpowers/specs/2026-08-16-dml-corporate-design.md`, mengisi bagian yang belum diklaim Plan 1 (Fondasi), Plan 3 (Bisnis dan form inquiry), Plan 4 (CMS artikel), atau Plan 5 (Beranda).
 
 ## 1. Ringkasan dan scope

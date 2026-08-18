@@ -37,12 +37,19 @@ test("beranda terbaca penuh tanpa JavaScript", async ({ page }) => {
   // (dua elemen cocok). getByRole("heading", ...) menargetkan elemen kartu
   // secara spesifik dan tetap terverifikasi tampil tanpa JavaScript.
   await expect(page.getByRole("heading", { name: "Transportasi BBM" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Penumpang Ro-Ro" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Layanan Ship-to-Ship (STS)" })).toBeVisible();
+  // exact: true wajib di sini. Pencocokan nama getByRole default-nya substring,
+  // dan seksi peta punya heading "Rute Penyeberangan Ro-Ro" yang ikut cocok,
+  // yang berarti dua elemen dan pelanggaran strict mode.
+  await expect(
+    page.getByRole("heading", { name: "Penyeberangan Ro-Ro", exact: true }),
+  ).toBeVisible();
+  // Ship-to-ship bukan lagi kartu lini bisnis sejak Plan 5, ia seksi sendiri.
+  await expect(page.getByRole("heading", { name: "Ship-to-ship transfer" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Perusahaan afiliasi" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Perbandingan Armada" })).toBeVisible();
   await expect(page.getByRole("table")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Rute Penyeberangan Ro-Ro" })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "Sejak 1985" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Sejak 1988" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Lihat silsilah lengkap" })).toHaveAttribute(
     "href",
     "/tentang-kami#silsilah",

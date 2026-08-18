@@ -5,7 +5,7 @@ Design spec, 16 Agustus 2026.
 ## 1. Ringkasan
 
 Situs company profile grup PT Dutabahari Menara Line: perusahaan pelayaran Banjarmasin
-berdiri 1985, bagian SinarAlam Corporation, dengan tiga lini bisnis. Dibangun dari nol
+berdiri 1988, bagian Sinar Alam Corporation, dengan dua lini bisnis utama. Dibangun dari nol
 sebagai project Next.js baru di subfolder `dml-web/`. Tiga folder yang sudah ada di
 repo (`dml-corporate-old-1`, `dml-corporate-old-2`, `reference-jeskojets`) tidak dipakai
 dan sudah masuk `.gitignore`.
@@ -20,48 +20,74 @@ Tujuan situs, berurutan berdasarkan prioritas:
 
 ## 2. Data perusahaan
 
-Sumber: SinarAlam Corporation, ptdml.com, MagicPort, arsip berita Banjarmasin Post.
-Semua angka di bawah berasal dari sumber publik dan **wajib diverifikasi klien**
-sebelum situs live. Tandai setiap angka yang belum diverifikasi dengan komentar
-`{/* unverified: sumber */}` di file konten.
+> **SUPERSEDED, 18 Agustus 2026.** Sumber utama data perusahaan sekarang company
+> profile resmi klien, `assets/CP DML.pdf`. Bagian ini ditulis ulang mengikuti PDF itu.
+> Daftar lengkap koreksi, penjelasan tiap perbedaan, dan tujuh butir yang masih wajib
+> dikonfirmasi klien ada di
+> `docs/superpowers/specs/2026-08-18-dml-plan-5-profil-dan-beranda-design.md`.
+> Kalau bagian ini dan spec Plan 5 berbeda, spec Plan 5 yang berlaku.
+
+Setiap angka yang belum punya dasar di PDF tetap ditandai komentar `unverified: sumber`
+di file konten, dan setiap butir standar membawa penanda `cp-pdf` atau `riset-publik`
+di tipenya.
 
 **Identitas**
-- Nama: PT Dutabahari Menara Line
-- Berdiri: 30 November 1985
+- Nama: PT Dutabahari Menara Line (DML)
+- Berdiri: 30 November 1988 di Banjarmasin (sebelumnya tercatat 1985)
 - Pendiri: Herman Chandra
-- Induk: SinarAlam Corporation
-- Kantor: Jl. Kapten Piere Tendean 174, Banjarmasin 70123, Kalimantan Selatan
-- Kantor kedua: Jl. AES Nasution, Gadang, Banjarmasin Tengah 70122
-- Telepon: +62 511 326 8280
+- Induk: Sinar Alam Corporation (dua kata, sebelumnya ditulis "SinarAlam")
+- Tagline: "From Zero to Hero with Continuous Improvement"
+- Nilai: Dynamic, Measurable, Loyalty. Huruf awalnya mengeja DML.
+- Kantor pusat DML: Jl. AES Nasution 43, Banjarmasin 70123, Kalimantan Selatan.
+  Telepon +62 511 6773845.
+- Cabang: Jl. Kalipuro, Ketapang, Banyuwangi, Jawa Timur
+- Kantor grup, bukan kantor DML: Jl. Kapten Piere Tendean 174 Banjarmasin, dan Bakrie
+  Tower Lantai 2 Rasuna Epicentrum Jakarta
+- Armada total 64 kapal: 9 ro-ro penumpang dan 55 pengangkut BBM
+- Tenaga kerja grup: lebih dari 300 orang
+- Angka 40.546 DWT dari riset publik dihapus. PDF tidak memuat angka DWT total.
 
-**Lini 1, Transportasi BBM**
-- Motor tanker hingga 8 juta liter
-- Oil barge hingga 4,7 juta liter
-- SPOB hingga 1,6 juta liter
-- Tugboat pendamping
-- Kontrak sewa jangka panjang dengan PT Pertamina Patra Niaga
-- Cakupan: hampir seluruh wilayah Kalimantan
-- Standar: ISM Code, ISPS Code, SIRE
-- Armada total 15 kapal, 40.546 DWT
+**Lini 1, Transportasi BBM** (dijalankan langsung oleh DML)
+- Motor Tanker (MT), 7 kapal
+- Oil Barge (OB), 9 kapal
+- Self Propelled Oil Barge (SPOB), 30 kapal
+- Tugboat (TB), 11 kapal
+- Distribusi bahan bakar ke pelabuhan dan pulau-pulau utama Indonesia
+- Kontrak sewa jangka panjang dengan PT Pertamina Patra Niaga (unverified: riset publik)
+- Dimensi dan DWT per kelas tidak ada di PDF, masih estimasi proporsional
 
-**Lini 2, Penumpang Ro-Ro**
-- Armada KMP Jambo VI, VIII, IX, X, XII, XIV
-- Panjang: Jambo VIII 68 m, Jambo IX 62,7 m, Jambo X 68 m
-- Kapasitas Jambo X sekitar 400 penumpang
-- Rute: Ketapang ke Lembar (sejak 20 Desember 2020), Tanjung Perak Surabaya ke Lembar
-  (25 sampai 28 jam), Kumai ke Surabaya (ekspansi Juni 2025)
+**Lini 2, Penyeberangan Ro-Ro** (dijalankan langsung oleh DML)
+- 9 kapal ro-ro penumpang
+- Ketapang - Gilimanuk: KMP Jambo VI, VIII, IX, X
+- Jangkar - Lembar: KMP Jambo XII
+- Surabaya - Kumai: KMP Jambo XIV
+- Surabaya - Lembar: KMP Jambo XI
+- Pasangan rute lama "Ketapang - Lembar" salah dan dikoreksi jadi Ketapang - Gilimanuk
 - Fasilitas: kabin ber-AC, kafe, musala, ruang medis, kabin VIP, lounge
+  (unverified: riset publik, tidak ada di PDF)
 - Booking: `dutabahari.id`, situs terpisah, di luar scope project ini
 
-**Lini 3, Galangan Kapal (DMLD)**
-- Nama: PT Dutabahari Menara Line Dockyard
-- Lokasi: Jl. Ir. H.P.M Noor, Kuin Cerucuk, Banjarmasin 70129
-- Fasilitas Pasir Mas: sekitar 9 hektar, kapasitas lebih dari 6 tongkang dan 6 tugboat
-  bersamaan; fasilitas kedua di Bakut
-- Tenaga kerja: sekitar 150 orang
-- Layanan: bangun kapal baru, konversi, perawatan, perbaikan komponen
-- Standar: ISO 9001:2015, diakui biro klasifikasi anggota IACS
+**Perusahaan afiliasi** (cp-pdf hal. 03)
+- PT Tri Sumaja Lines: ro-ro penumpang, lintasan Merak - Bakauheni (KMP BSP 1, KMP
+  Salvatore). Lintasan ini milik TSL, bukan DML.
+- PT Duta Wisata Bahari: wisata bahari Labuan Bajo, private boat charter dan open trip
+- Dutabahari Teknik: perbaikan dan perawatan kapal, internal maupun pihak ketiga
+
+**Galangan Kapal (DMLD)**
+PT Dutabahari Menara Line Dockyard adalah perusahaan terpisah di dalam Sinar Alam
+Corporation, bukan lini bisnis DML. Ia tidak lagi disebut sebagai "Lini 3" DML.
+- Lokasi: Jl. Ir. H.P.M Noor, Kuin Cerucuk, Banjarmasin 70129 (unverified: riset publik)
+- Fasilitas Pasir Mas sekitar 9 hektar, fasilitas kedua di Bakut (unverified)
+- Tenaga kerja sekitar 150 orang (unverified)
 - Situs sendiri: ptdml.com
+
+**Standar dan keanggotaan** (cp-pdf hal. 01)
+- Sistem manajemen: ISO 9001:2015 (sertifikat DQS), ISM Code
+- Biro klasifikasi: Biro Klasifikasi Indonesia (BKI)
+- Sistem informasi: SAP
+- Keanggotaan: Sinar Alam Corporation, OCIMF, GAPASDAP, IMO
+- ISPS Code dan SIRE tidak ada di PDF, tetap ditampilkan bertanda `riset-publik`
+
 
 ## 3. Tech stack
 
@@ -182,16 +208,16 @@ dml-web/
 | Route | Isi | Motion |
 |---|---|---|
 | `/` | Sembilan seksi sinematik, lihat bagian 7 | 9 |
-| `/tentang-kami` | Satu halaman, dua bagian, anchor nav sticky. `#silsilah` berisi timeline 1985 sampai kini, Herman Chandra, posisi dalam SinarAlam. `#profil` berisi visi misi, legalitas, sertifikasi, unduh PDF profil | 6 |
-| `/bisnis` | Hub, tiga kartu lini bisnis | 6 |
-| `/bisnis/transportasi-bbm` | Armada tanker, oil barge, SPOB, tugboat. Cakupan Kalimantan. Standar ISM, ISPS, SIRE. Studi kasus operasi STS. CTA Permintaan Informasi Bisnis | 6 |
+| `/tentang-kami` | Satu halaman, dua bagian, anchor nav sticky. `#silsilah` berisi timeline sejak 1988, Herman Chandra, posisi dalam Sinar Alam Corporation. `#profil` berisi visi misi, legalitas, klaster standar, struktur grup | 6 |
+| `/bisnis` | Hub. Dua lini yang dijalankan DML sendiri, plus tiga perusahaan afiliasi di tingkat lebih rendah | 6 |
+| `/bisnis/transportasi-bbm` | Armada tanker, oil barge, SPOB, tugboat. Cakupan pelabuhan dan pulau utama Indonesia. Standar ISM Code dan ISO 9001:2015. Studi kasus operasi STS. CTA Permintaan Informasi Bisnis | 6 |
 | `/bisnis/penumpang-roro` | Armada KMP Jambo, rute, fasilitas kapal. CTA Pesan Tiket keluar ke `dutabahari.id` | 6 |
-| `/bisnis/galangan-kapal` | DMLD: docking, repair, konversi, newbuild. Fasilitas Pasir Mas dan Bakut. ISO 9001:2015 | 6 |
+| `/bisnis/galangan-kapal` | **Perlu keputusan ulang.** DMLD adalah perusahaan terpisah di dalam Sinar Alam Corporation, bukan lini bisnis DML (lihat bagian 2). Perawatan kapal milik DML sendiri dikerjakan afiliasi Dutabahari Teknik | 6 |
 | `/bisnis/transportasi-bbm/permintaan-informasi` | Form inquiry B2B, prefill lewat query param | 4 |
 | `/karier` | Scaffold penuh dengan empty state. JSON-LD `JobPosting` siap dipakai. Data kosong | 4 |
 | `/artikel` | Daftar artikel dari Payload, paginasi | 4 |
 | `/artikel/[slug]` | Detail artikel | 4 |
-| `/kontak` | Form umum, peta, alamat dua kantor, kontak per divisi | 4 |
+| `/kontak` | Form umum, peta, dua kantor DML (Banjarmasin dan cabang Banyuwangi), kontak per divisi. Kantor grup dipisah di `GROUP_OFFICES` | 4 |
 
 **BookJambo bukan route.** Item navigasi yang langsung keluar ke `dutabahari.id`
 dengan ikon external dan `rel="noopener noreferrer"`.
@@ -273,145 +299,149 @@ ikon untuk seluruh project. Tidak ada SVG ikon yang digambar tangan.
 
 ## 7. Beranda
 
+> **SUPERSEDED, 18 Agustus 2026.** Susunan seksi beranda ditulis ulang di
+> `docs/superpowers/specs/2026-08-18-dml-plan-5-profil-dan-beranda-design.md` bagian 6,
+> yang memuat diagnosis tiap cacat Plan 4 beserta perbaikannya. Bagian di bawah
+> diringkas ulang mengikuti keadaan sekarang. Kalau keduanya berbeda, spec Plan 5 yang
+> berlaku.
+
 Sembilan seksi. Setiap animasi punya alasan yang bisa dinyatakan dalam satu kalimat.
 Anggaran eyebrow: maksimal tiga di seluruh halaman, hero terhitung satu.
 
-### 7.1 Seksi 1, Hero pinned, orbit malam
+**Aturan keras yang berlaku ke seluruh seksi.** Elemen yang dipaku ScrollTrigger tidak
+boleh lebih tinggi dari viewport. Memaku elemen yang lebih tinggi berarti sisa
+tingginya baru menggulir masuk setelah pin dilepas, dan itu terbaca sebagai halaman
+kosong yang harus di-scroll lagi. Setiap seksi dipaku juga wajib punya jeda diam
+sebelum pin dilepas, dan wajib jatuh ke tata letak statis di bawah 768 px atau saat
+`prefers-reduced-motion` menyala.
 
-Frame `DJI_0811` sampai `DJI_0820` dari `STS SRI YULIANI.zip`, direkam 05:36 sampai
-05:38 tanggal 28 Februari 2025. Sudah diverifikasi sebagai orbit drone kontinu: dua
-lambung berputar mantap di dalam frame dengan pergeseran heading progresif. Latar
-hitam pekat dengan lampu deck menyala, artinya kapal bisa mengambang langsung di atas
-`--color-surface` tanpa tepi foto yang terlihat.
+### 7.1 Seksi 1, Hero terbagi dua
 
-**Sepuluh frame bukan kerapatan video, dan spec ini tidak berpura-pura begitu.**
-Jarak antar frame sekitar 12 detik dengan pergeseran heading yang cukup besar. Sekuens
-scrub baru terbaca sebagai gerakan kamera pada 60 sampai 150 frame. Sepuluh frame yang
-diregangkan sepanjang 2,5 layar akan terbaca sebagai langkah diskret, bukan gerakan.
+Bidang gelap dua kolom, bukan foto satu layar penuh. Kiri: headline, subteks, satu CTA.
+Kanan: satu artefak 3D di dalam bingkai berbatas, dengan poster `DJI_0815` sebagai
+dasarnya.
 
-Perilaku yang dipakai:
-- Poster frame tengah (`DJI_0815`) render sebagai LCP dengan `priority`. Tidak ada
-  WebGL dan tidak ada sekuens di atas fold.
-- Setelah LCP selesai, sembilan frame sisanya dimuat di belakang layar.
-- Seksi dipin oleh ScrollTrigger, `start: "top top"`, `pin: true`, `scrub: 1`,
-  panjang pin **sekitar 1,2 layar**, bukan 2,5.
-- Transisi antar frame memakai **crossfade**, bukan pergantian keras: dua elemen
-  bertumpuk dengan opacity yang diinterpolasi dari progress scroll, ditambah drift
-  scale halus. Dissolve menyembunyikan lompatan heading dan membuat sepuluh frame
-  terbaca sebagai satu gerakan lambat.
-- Progress scroll memilih pasangan frame terdekat yang sudah siap. Frame yang belum
-  termuat tidak pernah menyebabkan flash.
-- Tiga beat headline mask-reveal dengan SplitText sepanjang pin.
-
-**Checkpoint implementasi:** setelah seksi ini jadi, lihat langsung di browser. Kalau
-crossfade masih terbaca melangkah, turunkan ke lima still dengan potongan keras per
-beat headline. Potongan keras adalah bahasa sinema yang sah; sekuens yang tersendat
-tidak. Jangan menambah frame untuk menutupi masalah ini, karena frame di luar cluster
-rapat berasal dari penerbangan berbeda.
-
-Alasan: menyampaikan skala operasi sebelum satu kata pun dibaca.
+- Poster render sebagai LCP dengan `priority` dan tidak pernah dilepas dari DOM. Ia yang
+  tampil tanpa JS, saat reduced motion, di mobile, dan sebelum kanvas selesai dibuat.
+- Kanvas dipasang setelah jeda idle 600 ms dan hanya di atas 768 px.
+- Kamera dipasang sekali mengikuti kotak pembatas model, lalu OrbitControls yang pegang
+  sudut: rotasi idle pelan plus seret untuk memutar manual.
+- **Tidak ada pin dan tidak ada kamera yang digerakkan scroll.** Versi Plan 4 memaku
+  hero sepanjang 1,2 layar dan menarik kamera tiap frame, yang bertengkar dengan tangan
+  pengguna dan menghabiskan satu layar penuh sebelum konten pertama.
 
 Disiplin hero: headline maksimal dua baris, subteks maksimal 20 kata, `pt-24` maksimal,
-maksimal empat elemen teks, CTA terlihat tanpa scroll. Tidak ada scroll cue, tidak ada
-strip dekorasi di bawah hero, tidak ada label versi.
+maksimal empat elemen teks, CTA terlihat tanpa scroll.
 
 ### 7.2 Seksi 2, Potong keras ke siang
 
-Wide anchorage `DJI_0710` dengan parallax lambat. Satu paragraf pendek menjelaskan apa
-itu ship-to-ship transfer dan kenapa itu penting bagi distribusi BBM Kalimantan.
+Wide anchorage siang dengan parallax lambat, foto penuh layar. Satu heading dan satu
+paragraf pendek menjelaskan apa itu ship-to-ship transfer.
 
-Alasan: kontras malam ke siang berfungsi sebagai potongan film, memberi jeda sebelum
-halaman berpindah dari suasana ke informasi.
+Alasan: hero kini bidang gelap berbingkai, jadi seksi ini yang membuka ke foto penuh
+layar. Pergantian bingkai ke penuh layar itu yang membuatnya terasa membuka, bukan
+mengulang.
 
-### 7.3 Seksi 3, Tiga lini bisnis
+### 7.3 Seksi 3, Dua lini bisnis
 
-Sticky-stack sesuai skeleton kanonik: `start: "top top"`, `pin: true`,
-`pinSpacing: false`, setiap kartu kecuali yang terakhir dipin, transform scale dan
-opacity kartu digerakkan oleh ScrollTrigger kartu berikutnya. Masing-masing kartu
-punya fotonya sendiri.
+Satu panggung setinggi satu viewport yang dipaku, dua bab, pergantian berupa sapuan
+`clip-path`. Kiri kolom teks di bidang gelapnya sendiri, kanan lapisan foto.
 
-Alasan: hierarki, satu lini bisnis mendapat perhatian penuh dalam satu waktu.
+- **Lapisan foto tidak pernah memakai opacity sebagai alat transisi.** Sticky-stack
+  Plan 4 meredupkan kartu keluar sampai opacity 0,55 lewat trigger kartu berikutnya,
+  dan jendela redup itu berimpit tepat dengan umur sticky kartu kedua, jadi kartu
+  tengah tidak pernah tampil penuh selama ia jadi kartu yang dibaca.
+- Isi babnya mengikuti company profile resmi: dua lini yang dijalankan DML sendiri.
+  Ship-to-ship bukan lini bisnis, ia sudah jadi seksi 2.
 
-### 7.4 Seksi 4, Fleet Blueprint Comparator, 3D
+### 7.4 Seksi 4, Perusahaan afiliasi
 
-Komponen 3D satu-satunya di situs.
+Tri Sumaja Lines, Duta Wisata Bahari, dan Dutabahari Teknik sebagai baris berpembatas
+tipis, bukan tiga kartu sejajar. Company profile menggambarnya sebagai cabang di bawah
+kotak DML, jadi hierarkinya memang lebih rendah dari dua lini utama.
+
+### 7.5 Seksi 5, Fleet Blueprint Comparator, 3D
 
 **Kenapa bukan globe rute.** Seluruh operasi mereka muat dalam sekitar 8 derajat
 lintang. Bola berputar akan menghabiskan hampir seluruh geometrinya menampilkan
 samudra dan benua yang tidak relevan, dan gerakan "bumi berputar masuk dari luar
-angkasa lalu berhenti di Indonesia" adalah gerakan template. Membayar sekitar 150 kB
-three.js untuk shot yang isinya 4% relevan tidak masuk akal. Geografi rute ditangani
-peta SVG di seksi 5, yang memang alat yang tepat untuk empat pelabuhan.
+angkasa lalu berhenti di Indonesia" adalah gerakan template. Geografi rute ditangani
+peta SVG di seksi 6, yang memang alat yang tepat untuk pelabuhan berkoordinat.
 
 **Kenapa 3D di sini justru benar.** Skala relatif armada adalah pertanyaan pertama
 setiap charterer, dan perbandingan volume antar kelas kapal sulit disampaikan dengan
 gambar datar.
 
 Implementasi:
-- Lima kelas kapal dibangun dari primitif: profil lambung lewat `ExtrudeGeometry`,
-  superstruktur lewat box dan lathe. **Tidak ada model GLB unduhan.** Nol risiko
-  lisensi, nol risiko model berkualitas buruk.
-- Estetika wireframe blueprint: garis oranye di atas petrol gelap. Karena tampilannya
-  memang skematik, tidak ada jurang uncanny valley antara model murah dan realisme.
-  Skematik adalah pilihan desain, bukan kompromi teknis.
-- Rotasi otomatis lambat pada sumbu Y. Drag untuk memutar manual. Scroll mengganti
-  kelas kapal dengan morph antar geometri.
-- Garis ukur dengan angka menempel: panjang, kapasitas, DWT, kapasitas penumpang.
-  Semua dalam Geist Mono.
+- Panggung setinggi satu viewport yang dipaku. Tabel spesifikasi hidup di blok sendiri
+  di bawahnya, di luar area yang dipaku.
+- Tiga kelas memakai model GLB berlisensi CC BY (tanker, tugboat, ferry), dua kelas
+  khas Indonesia (SPOB, oil barge) dibangun dari primitif. Materialnya disamakan supaya
+  kelimanya terbaca sebagai satu keluarga. Ini mengoreksi baris "tidak ada model GLB
+  unduhan" di versi awal spec ini, yang sudah tidak berlaku sejak Plan 4.
+- Pemetaan progress ke kelas memakai `segmentAt`: tiap kelas diam selama 65 persen
+  irisnya sebelum menyeberang, dan kelas terakhir berdiri penuh sepanjang 20 persen
+  scroll terakhir.
+- Kamera memuat KOTAK pembatas kelas yang diukur dari scene, bukan bola pembatasnya,
+  dan ukurannya di-lerp lintas pasangan kelas. Yang dikendalikan hanya jarak dan tinggi
+  titik bidik; sudut orbit tetap milik pengguna.
+- Grid tetap 10 m per kotak, dengan keterangan skalanya tertulis di kanvas.
 
-**Serah terima scroll ke canvas.** Aturan 4.2 melarang R3F dan GSAP berada di tree
-komponen yang sama, dan morph yang digerakkan scroll tetap butuh progress scroll masuk
-ke dalam canvas. Caranya: ScrollTrigger menulis progress ke sebuah `ref` objek biasa
-yang mutable, lalu `useFrame` di dalam canvas membacanya tiap frame. **Tidak ada React
-state, dan tidak ada tween GSAP yang menyentuh objek milik canvas.** GSAP hanya
-memegang pin dan progress; R3F memegang seluruh isi canvas.
+**Serah terima scroll ke canvas.** ScrollTrigger menulis progress ke sebuah `ref` objek
+mutable, lalu `useFrame` di dalam canvas membacanya tiap frame. Tidak ada React state
+di jalur itu, dan tidak ada tween GSAP yang menyentuh objek milik canvas.
 
-**Tiga representasi data armada, semuanya pekerjaan nyata yang harus diestimasi:**
-1. Geometri R3F untuk desktop
-2. Lima blueprint SVG statis untuk di bawah 768px, ditulis tangan
-3. Tabel spesifikasi teks untuk screen reader, lihat bagian 13
+**Tiga representasi data armada:** geometri R3F untuk desktop, lima blueprint SVG
+statis untuk di bawah 768 px, dan tabel spesifikasi teks. Ketiganya membaca sumber data
+yang sama di `src/content/fleet.ts`.
 
-Ketiganya membaca sumber data yang sama di `src/content/`, jadi angkanya tidak pernah
-bisa berbeda antar representasi.
+### 7.6 Seksi 6, Peta rute ro-ro
 
-Alasan rotasi: geometri kapalnya sendiri yang menuntut dilihat dari beberapa sudut,
-bukan rotasi yang ditempel supaya terlihat 3D.
+SVG path yang menggambar dirinya sendiri mengikuti progress scroll, lima lintasan,
+dengan label leg dan pelabuhan yang menyala mengikuti leg yang sedang digambar.
 
-### 7.5 Seksi 5, Peta rute ro-ro
+- Panggung setinggi satu viewport yang dipaku, dengan jeda akhir eksplisit sepanjang
+  26 persen timeline. Versi Plan 4 menyelesaikan leg terakhir persis di frame terakhir
+  pin, yang terbaca sebagai transisi patah.
+- Bbox peta memuat Selat Sunda sampai Lombok. Tinggi viewBox diturunkan dari bbox
+  supaya skala x dan y identik.
+- Lintasan Merak-Bakauheni digambar dengan warna berbeda dan diberi keterangan
+  operatornya, karena ia dioperasikan PT Tri Sumaja Lines.
 
-SVG path yang menggambar dirinya sendiri mengikuti progress scroll, menghubungkan
-Ketapang, Lembar, Tanjung Perak Surabaya, dan Kumai. Label pelabuhan muncul saat path
-mencapainya.
+### 7.7 Seksi 7, Sejak 1988
 
-Alasan: menggambar rute secara harfiah adalah cara paling langsung menjelaskan
-jaringan penyeberangan.
+Editorial dua kolom: penghitung tahun, kalimat pendirian, dan foto. Di bawahnya tiga
+nilai perusahaan sebagai daftar huruf gantung, karena huruf awalnya mengeja DML.
 
-### 7.6 Seksi 6, Silsilah
+Menggantikan seksi silsilah horizontal-pan yang dihapus di Plan 4. **Tidak ada lagi
+scroll hijack horizontal di seluruh situs.**
 
-Horizontal pan sesuai skeleton kanonik: wrapper dipin, track digeser
-`x: -distance`, `end: "+=distance"`, `scrub: 1`, `invalidateOnRefresh: true`.
-Dari 1985 sampai 2025. Link ke `/tentang-kami#silsilah` untuk versi lengkap.
+### 7.8 Seksi 8, Sertifikasi dan angka
 
-Alasan: kronologi memang bergerak menyamping. **Ini satu-satunya scroll hijack
-horizontal di seluruh situs.**
+Empat metrik dengan counter yang menghitung naik saat masuk viewport: 64 kapal, lebih
+dari 300 orang, tahun beroperasi, dan pelabuhan yang dilayani. Angka pelabuhan
+diturunkan dari lintasan yang dioperasikan DML sendiri, bukan dari seluruh titik di
+peta.
 
-### 7.7 Seksi 7, Sertifikasi dan angka
-
-ISM Code, ISPS Code, SIRE, ISO 9001:2015, biro klasifikasi IACS. Angka armada dengan
-counter yang menghitung naik saat masuk viewport. Reveal stagger biasa, tanpa GSAP.
+Di bawahnya standar dikelompokkan tiga klaster, bukan satu deret pill seragam: sistem
+manajemen (ISO 9001:2015, ISM Code, ISPS Code, SIRE), biro klasifikasi (BKI), dan
+sistem informasi (SAP). SAP adalah ERP, bukan sertifikat keselamatan, dan menaruhnya
+sederet dengan ISM Code akan menyesatkan. Baris terakhir memuat keanggotaan: Sinar Alam
+Corporation, OCIMF, GAPASDAP, IMO.
 
 Alasan: umpan balik visual bahwa angkanya bergerak membantu pembaca menyadari ini
 data, bukan dekorasi.
 
-### 7.8 Seksi 8, Artikel terbaru
+### 7.9 Artikel terbaru, belum dibangun
 
-Tiga post terbaru dari Payload. Grid editorial, bukan tiga kartu identik.
+Tiga post terbaru dari Payload. Grid editorial, bukan tiga kartu identik. Belum ada di
+beranda sampai koleksi artikel terisi.
 
-### 7.9 Seksi 9, CTA dan footer
+### 7.10 Seksi 9, CTA dan footer
 
 Satu CTA primer. Tidak ada dua CTA dengan intent sama di seluruh halaman.
 
-### 7.10 Yang dilarang di beranda
+### 7.11 Yang dilarang di beranda
 
 Marquee, custom cursor, scroll cue, eyebrow bernomor seksi, dot status dekoratif,
 strip lokasi atau cuaca, fake screenshot dari div, em dash, pill yang ditumpuk di atas

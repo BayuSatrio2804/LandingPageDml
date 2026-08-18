@@ -14,7 +14,7 @@ describe("organizationJsonLd", () => {
   });
 
   it("mencantumkan tanggal berdiri", () => {
-    expect(data.foundingDate).toBe("1985-11-30");
+    expect(data.foundingDate).toBe("1988-11-30");
   });
 
   it("mencantumkan kedua alamat kantor", () => {
