@@ -16,6 +16,6 @@ describe("material panggung", () => {
   });
 
   it("garis ukur memakai token aksen situs", () => {
-    expect(ACCENT_LINE_COLOR).toBe("#FF5A1F");
+    expect(ACCENT_LINE_COLOR).toBe("#C62828");
   });
 });

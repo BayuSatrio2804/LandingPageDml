@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #0a1418;
-  --color-surface-2: #111e24;
-  --color-surface-3: #18292f;
-  --color-ink: #f2efe9;
-  --color-ink-muted: #8fa1a8;
-  --color-accent: #ff5a1f;
-  --color-accent-hover: #ff7a45;
-  --color-accent-press: #e04a12;
-  --color-on-accent: #0a1418;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f7fa;
+  --color-surface-3: #e9edf3;
+  --color-ink: #181c24;
+  --color-ink-muted: #5b6b82;
+  --color-accent: #c62828;
+  --color-accent-hover: #e5453a;
+  --color-accent-press: #a81f1f;
+  --color-on-accent: #ffffff;
 
   --radius-card: 12px;
   --radius-input: 8px;
@@ -21,16 +21,18 @@
    * belakang koma tidak pernah terpakai dan browser jatuh ke font default
    * yang sering serif. Task 4 mendefinisikan dua variabel pertama.
    */
-  --font-display: var(--font-cabinet-grotesk, ui-sans-serif), system-ui, sans-serif;
+  --font-display: var(--font-gt-america, ui-sans-serif), system-ui, sans-serif;
   --font-body: var(--font-satoshi, ui-sans-serif), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono, ui-monospace), monospace;
 }
 
 html {
-  color-scheme: dark;
+  overflow-x: clip;
+  color-scheme: light;
 }
 
 body {
+  overflow-x: clip;
   background-color: var(--color-surface);
   color: var(--color-ink);
   font-family: var(--font-body);

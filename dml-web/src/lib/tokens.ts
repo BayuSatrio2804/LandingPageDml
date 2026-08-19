@@ -1,18 +1,18 @@
 /**
- * Palet "Deep Water". Sumber kebenaran tunggal untuk warna.
- * Nilai di sini wajib identik dengan blok @theme di globals.css.
- * Rasio kontrasnya dijaga oleh tokens.test.ts.
+ * Palet "Maritim Terang", selaras dengan identitas visual pthis.id
+ * pada varian light theme. Nilai di sini wajib identik dengan blok
+ * @theme di globals.css. Rasio kontrasnya dijaga oleh tokens.test.ts.
  */
 export const TOKENS = {
-  surface: "#0A1418",
-  surface2: "#111E24",
-  surface3: "#18292F",
-  ink: "#F2EFE9",
-  inkMuted: "#8FA1A8",
-  accent: "#FF5A1F",
-  accentHover: "#FF7A45",
-  accentPress: "#E04A12",
-  onAccent: "#0A1418",
+  surface: "#FFFFFF",
+  surface2: "#F5F7FA",
+  surface3: "#E9EDF3",
+  ink: "#181C24",
+  inkMuted: "#5B6B82",
+  accent: "#C62828",
+  accentHover: "#E5453A",
+  accentPress: "#A81F1F",
+  onAccent: "#FFFFFF",
 } as const;
 
 export type TokenName = keyof typeof TOKENS;

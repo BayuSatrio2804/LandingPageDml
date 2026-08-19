@@ -104,8 +104,8 @@ function RouteSvg({
           key={index}
           data-testid="garis-pantai"
           d={coastlinePath(ring)}
-          fill="#18292F"
-          stroke="#111E24"
+          fill="#E9EDF3"
+          stroke="#D8DEE8"
           strokeWidth={1}
         />
       ))}
@@ -119,7 +119,7 @@ function RouteSvg({
           }}
           d={legPath(leg.fromId, leg.toId)}
           fill="none"
-          stroke={leg.operator === "dml" ? "#FF5A1F" : "#8FA1A8"}
+          stroke={leg.operator === "dml" ? "#C62828" : "#8B98A8"}
           strokeWidth={(index === activeIndex ? 3.5 : 2.5) * markerScale}
           strokeLinecap="round"
           strokeDasharray={drawn ? undefined : 0}
@@ -143,7 +143,7 @@ function RouteSvg({
               cx={x}
               cy={y}
               r={(office ? 3.5 : lit ? 7 : 5) * markerScale}
-              fill={office ? "#8FA1A8" : lit ? "#FF5A1F" : "#4C6773"}
+              fill={office ? "#8B98A8" : lit ? "#C62828" : "#B7C1CE"}
               className="transition-all duration-300"
             />
             <text
@@ -151,7 +151,7 @@ function RouteSvg({
               y={labelY}
               textAnchor={anchor}
               fontSize={13 * markerScale}
-              fill={lit ? "#F2EFE9" : "#8FA1A8"}
+              fill={lit ? "#181C24" : "#5B6B82"}
               fontFamily="var(--font-mono)"
               className="transition-colors duration-300"
             >
@@ -166,22 +166,40 @@ function RouteSvg({
 
 function LegList({ activeIndex }: { activeIndex: number }) {
   return (
-    <ol className="mt-8 space-y-4">
+    <ol className="relative mt-8">
+      <li
+        aria-hidden="true"
+        className="absolute top-3.75 bottom-3.75 left-3.75 w-px bg-surface-3"
+      />
       {ROUTE_LEGS.map((leg: RouteLeg, index) => {
         const current = index === activeIndex;
         return (
           <li
             key={leg.id}
             data-testid="label-leg"
+            data-leg-row
             aria-current={current ? "true" : undefined}
-            className={`border-l-2 pl-4 transition-colors duration-300 ${
-              current ? "border-accent" : "border-surface-3"
-            }`}
+            className="relative flex gap-4 pb-5 last:pb-0"
           >
-            <p className={`font-mono text-sm ${current ? "text-ink" : "text-ink-muted"}`}>
-              {leg.label}
-            </p>
-            <p className="mt-1 text-xs text-ink-muted">{leg.note}</p>
+            <span
+              className={`z-10 grid h-7.75 w-7.75 shrink-0 place-items-center rounded-full font-mono text-xs transition-colors duration-300 ${
+                current
+                  ? "border border-accent bg-accent text-on-accent"
+                  : "border border-surface-3 bg-surface text-ink-muted"
+              }`}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div
+              className={`min-w-0 flex-1 rounded-lg pt-1 transition-colors duration-300 ${
+                current ? "-m-2 bg-accent/6 p-2 pt-3" : ""
+              }`}
+            >
+              <p className={`font-mono text-sm ${current ? "text-accent" : "text-ink"}`}>
+                {leg.label}
+              </p>
+              <p className="mt-1 text-xs text-ink-muted">{leg.note}</p>
+            </div>
           </li>
         );
       })}
@@ -256,6 +274,21 @@ export function RouteMap() {
         map,
         { scale: 1, transformOrigin: "50% 50%" },
         { scale: 1.14, ease: "none", duration: TOTAL },
+        0,
+      );
+
+      // Baris daftar rute masuk satu-satu selama fase INTRO, selesai sebelum
+      // leg pertama mulai digambar di peta.
+      timeline.fromTo(
+        "[data-leg-row]",
+        { autoAlpha: 0, y: 14 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          ease: MOTION.ease,
+          duration: INTRO * 0.65,
+          stagger: (INTRO * 0.35) / ROUTE_LEGS.length,
+        },
         0,
       );
 

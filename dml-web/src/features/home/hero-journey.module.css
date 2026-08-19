@@ -1,0 +1,218 @@
+/*
+ * Hero sinematik: satu-satunya seksi yang sengaja tetap gelap setelah
+ * halaman pindah ke tema terang. Warna kayu/kuningan berasal dari aset
+ * gambarnya sendiri, jadi tidak diubah ke token terang. Yang disesuaikan ke
+ * palet situs: warna teks pil booking (var(--color-ink)) dan lingkaran ikon
+ * (var(--color-accent)), supaya elemen interaktifnya tetap terasa satu
+ * keluarga dengan CTA di seksi lain.
+ */
+/* Jangan tambah overflow:hidden di sini: itu jadi scroll container yang
+ * mematahkan position:sticky pada .heroStage (elemen sticky "diam" relatif
+ * ke ancestor overflow:hidden terdekat, bukan viewport). Klipping visual
+ * konten yang di-scale sudah ditangani .heroStage sendiri di bawah. */
+.hero {
+  --hero-gutter: 16px;
+
+  position: relative;
+  z-index: 2;
+  height: 300vh;
+  color: #fff;
+  background: #201914;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    --hero-gutter: 32px;
+  }
+}
+
+.heroStage {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.heroContent,
+.heroBackground {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.heroContent {
+  z-index: 7;
+  pointer-events: none;
+}
+
+.heroBackground {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.heroBack {
+  position: absolute;
+  inset: -14.3%;
+  z-index: 2;
+  width: 128.6%;
+  max-width: none;
+  height: 128.6%;
+  object-fit: cover;
+}
+
+.heroFront,
+.heroFrontOver {
+  position: absolute;
+  inset: -14.3%;
+  width: 128.6%;
+  max-width: none;
+  height: 128.6%;
+  object-fit: cover;
+}
+
+.heroSky {
+  position: absolute;
+  top: 0;
+  right: -6.67%;
+  left: -6.67%;
+  z-index: 0;
+  width: 113.34%;
+  height: 200vh;
+  max-width: none;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.heroFront {
+  z-index: 3;
+}
+
+.heroFrontOver {
+  z-index: 6;
+}
+
+.heroShade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 48%, transparent 16%, rgb(26 18 13 / 10%) 38%, rgb(18 12 8 / 38%) 100%);
+}
+
+.heroContent a,
+.heroContent button {
+  pointer-events: auto;
+}
+
+.heroTitle {
+  position: absolute;
+  z-index: 7;
+  width: min-content;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+}
+
+.heroTitleLeft {
+  top: 17.8%;
+  left: var(--hero-gutter);
+}
+
+.heroTitleRight {
+  right: var(--hero-gutter);
+  bottom: 24%;
+  text-align: right;
+}
+
+.heroSupport {
+  position: absolute;
+  z-index: 7;
+  bottom: 11%;
+  left: var(--hero-gutter);
+  width: min(19vw, 260px);
+  color: #fff;
+}
+
+.heroSupport p {
+  padding-top: 24px;
+  border-top: 1px solid rgb(255 255 255 / 70%);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.scrollCue {
+  position: absolute;
+  z-index: 7;
+  right: var(--hero-gutter);
+  bottom: 11%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 25%;
+  padding-top: 20px;
+  border-top: 1px solid rgb(255 255 255 / 50%);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.scrollCue svg {
+  width: 14px;
+  height: 14px;
+}
+
+.scrollCue span:last-child {
+  margin-left: auto;
+}
+
+.bookingButton {
+  position: fixed;
+  z-index: 150;
+  bottom: 36px;
+  left: calc(50% - 130px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 260px;
+  height: 48px;
+  padding: 4px 6px 4px 20px;
+  color: var(--color-ink);
+  background: #fff;
+  border: 4px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  box-shadow: 0 10px 35px rgb(0 0 0 / 25%);
+  font-size: 13px;
+  transition: opacity 0.35s ease;
+}
+
+.bookingButton span {
+  white-space: nowrap;
+}
+
+.bookingButtonLabel {
+  min-width: 176px;
+}
+
+.bookingButtonIcon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.bookingButtonIcon svg {
+  width: 18px;
+  height: 18px;
+}
