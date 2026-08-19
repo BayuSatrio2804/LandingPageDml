@@ -3,16 +3,15 @@ import { render, screen } from "@testing-library/react";
 import { Hero } from "./hero";
 
 /**
- * Vitest tidak menghormati batas Server Component, jadi HeroCanvas dan
- * HeroHeadline ikut dirender di sini. matches: true memilih jalur reduced
- * motion di keduanya: HeroCanvas berhenti sebelum memasang canvas, dan
- * HeroHeadline mengembalikan heading utuh tanpa memanggil SplitText, yang
- * memang tidak bisa memecah baris di jsdom karena tidak ada layout. Pola stub
- * ini sama dengan business-lines.test.tsx dan certifications.test.tsx.
+ * matches: true memilih jalur reduced motion di HeroJourney: timeline GSAP
+ * dilewati dan elemen di-set langsung ke frame akhir lewat gsap.set, jadi
+ * aman dirender di jsdom tanpa ScrollTrigger maupun layout nyata.
  *
- * Menyandarkan assertion "tidak ada canvas" pada default global di
- * vitest.setup.ts akan membuat test ini diam-diam terbalik kalau default itu
- * berubah, jadi stubnya ditulis eksplisit di sini.
+ * Kontrak lama "tidak ada <img>/<video> di hero" sudah dilepas sejak hero
+ * porthole sinematik dipasang: video langit dan tiga lapis gambar (dinding
+ * kayu, bingkai kuningan, overlay) adalah bagian dari efeknya, bukan
+ * pengganti h1. LCP tetap dijaga lewat video poster + preload="none" dan
+ * img tanpa priority, bukan lewat larangan elemen media di hero.
  */
 beforeEach(() => {
   vi.stubGlobal(
@@ -33,8 +32,8 @@ describe("Hero", () => {
   });
 
   // Disiplin hero master spec: headline maksimal dua baris di desktop.
-  // Versi lama tiga baris. Batas kata adalah proksi yang bisa diuji.
-  it("headline maksimal tujuh kata", () => {
+  // Judul dibagi h1 (kiri) + h2 (kanan); batas kata dijaga di masing-masing.
+  it("headline h1 maksimal tujuh kata", () => {
     render(<Hero />);
     const words = screen.getByRole("heading", { level: 1 }).textContent?.trim().split(/\s+/) ?? [];
     expect(words.length).toBeLessThanOrEqual(7);
@@ -51,19 +50,10 @@ describe("Hero", () => {
     expect(screen.getByRole("link", { name: /hubungi kami/i })).toHaveAttribute("href", "/kontak");
   });
 
-  // Kontrak LCP setelah poster dilepas: kandidat LCP hero adalah teks yang
-  // dicat dari HTML server, bukan gambar yang menunggu jaringan. Assertion-nya
-  // "tidak ada <img> di hero" karena itu yang bisa diam-diam kembali: satu
-  // gambar dekoratif yang ditambahkan nanti akan merebut kembali peran LCP dan
-  // menghidupkan lagi risiko ambang Lighthouse 5000.
-  it("hero tidak merender gambar apa pun di HTML server", () => {
+  it("video langit memakai poster dan tidak memaksa preload penuh", () => {
     const { container } = render(<Hero />);
-    expect(container.querySelector("img")).toBeNull();
-    expect(screen.getByRole("heading", { level: 1 }).textContent?.trim()).not.toHaveLength(0);
-  });
-
-  it("tidak ada canvas di HTML server", () => {
-    const { container } = render(<Hero />);
-    expect(container.querySelector("canvas")).toBeNull();
+    const video = container.querySelector("video");
+    expect(video).toHaveAttribute("poster", "/assets/hero/sky-hero.webp");
+    expect(video).toHaveAttribute("preload", "none");
   });
 });

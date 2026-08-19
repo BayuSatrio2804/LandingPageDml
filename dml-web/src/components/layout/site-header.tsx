@@ -6,7 +6,7 @@ import { MobileMenu } from "./mobile-menu";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 h-16 border-b border-surface-3 bg-surface/85 backdrop-blur md:h-[72px]">
+    <header className="isolate sticky top-0 z-40 h-16 border-b border-surface-3 bg-surface/85 backdrop-blur md:h-[72px]">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-4 md:px-8">
         <Link
           href="/"

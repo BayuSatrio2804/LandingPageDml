@@ -245,7 +245,7 @@ function ClassGroup({
  * sebagai sumbu.
  */
 function ScaleGrid() {
-  return <gridHelper args={[20, 20, "#24404A", "#18292F"]} position={[0, -0.02, 0]} />;
+  return <gridHelper args={[20, 20, "#D8DEE8", "#EDF0F4"]} position={[0, -0.02, 0]} />;
 }
 
 type OrbitTarget = { target: THREE.Vector3 };

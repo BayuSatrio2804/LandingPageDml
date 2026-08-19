@@ -16,4 +16,4 @@ export const DECK_MATERIAL = {
   roughness: 0.8,
 } as const;
 
-export const ACCENT_LINE_COLOR = "#FF5A1F";
+export const ACCENT_LINE_COLOR = "#C62828";

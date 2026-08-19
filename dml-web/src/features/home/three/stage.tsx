@@ -16,7 +16,7 @@ export function Stage() {
         <Lightformer intensity={3.2} position={[0, 6, -8]} scale={[12, 3, 1]} color="#FFE3CC" />
         <Lightformer intensity={2.2} position={[-8, 3, 6]} scale={[10, 3, 1]} color="#9FC4D8" />
         <Lightformer intensity={1.6} position={[8, 2, 5]} scale={[8, 3, 1]} color="#6F94A3" />
-        <Lightformer intensity={0.5} position={[0, -4, 0]} scale={[14, 6, 1]} rotation={[Math.PI / 2, 0, 0]} color="#0A1418" />
+        <Lightformer intensity={0.5} position={[0, -4, 0]} scale={[14, 6, 1]} rotation={[Math.PI / 2, 0, 0]} color="#F5F7FA" />
       </Environment>
       {/*
         Kunci plus isian, bukan kunci saja. Lambung memakai metalness 0,65 di
