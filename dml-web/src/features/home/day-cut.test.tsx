@@ -20,7 +20,7 @@ describe("DayCut", () => {
   it("paragraf duduk di dalam panel scrim", () => {
     render(<DayCut />);
     const panel = screen.getByText(/memindahkan bahan bakar langsung antar kapal/i).closest("div");
-    expect(panel?.className).toMatch(/bg-surface\//);
+    expect(panel?.className).toMatch(/bg-surface(-2)?\/\d/);
   });
 
   it("seksi setinggi viewport dinamis", () => {

@@ -18,7 +18,15 @@ export function TextField({
   error?: string;
 }) {
   const fieldClassName =
-    "w-full rounded-input border border-surface-3 bg-surface-2 px-4 py-2.5 text-ink placeholder:text-ink-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+    [
+      "w-full rounded-input bg-surface-2 px-4 py-2.5 text-ink transition-colors",
+      "placeholder:text-ink-muted",
+      // border-line, bukan border-surface-3: tepi input adalah batas kontrol dan
+      // wajib 3:1 terhadap latarnya. surface-3 dipakai untuk garis pembatas
+      // dekoratif, yang tidak terikat aturan itu.
+      error ? "border border-danger" : "border border-line hover:border-accent",
+      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+    ].join(" ");
 
   return (
     <div>
@@ -31,7 +39,7 @@ export function TextField({
         <input id={id} type={type} className={`mt-2 ${fieldClassName}`} {...register} />
       )}
       {error ? (
-        <p role="alert" className="mt-1.5 text-sm text-accent">
+        <p role="alert" className="mt-1.5 text-sm text-danger">
           {error}
         </p>
       ) : null}

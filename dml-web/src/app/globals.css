@@ -1,15 +1,29 @@
 @import "tailwindcss";
 
+/*
+ * Palet "Navy Selat". Diturunkan dari color scheme pthis.id (Hasnur
+ * Internasional Shipping): navy #164194 sebagai warna utama, bidang halaman
+ * biru-putih #F5F9FD, dan teks hitam lembut #181C24. Nilai di sini wajib
+ * identik dengan src/lib/tokens.ts; kontrasnya dijaga tokens.test.ts.
+ *
+ * Halamannya terang, jadi arah state tombol ikut membalik: hover dan press
+ * lebih GELAP dari aksen, bukan lebih terang. Di halaman gelap yang lama
+ * arahnya kebalikan, dan menyalin arah lama ke sini akan membuat hover
+ * kehilangan kontras terhadap teks putih di atasnya.
+ */
 @theme {
-  --color-surface: #ffffff;
-  --color-surface-2: #f5f7fa;
-  --color-surface-3: #e9edf3;
+  --color-surface: #f5f9fd;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #ced9ea;
+  --color-line: #7a8ca8;
   --color-ink: #181c24;
-  --color-ink-muted: #5b6b82;
-  --color-accent: #c62828;
-  --color-accent-hover: #e5453a;
-  --color-accent-press: #a81f1f;
+  --color-ink-muted: #515661;
+  --color-accent: #164194;
+  --color-accent-hover: #0e3a8a;
+  --color-accent-press: #0a2c6b;
+  --color-accent-soft: #e1eeff;
   --color-on-accent: #ffffff;
+  --color-danger: #c62828;
 
   --radius-card: 12px;
   --radius-input: 8px;
@@ -37,6 +51,16 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Seleksi teks ikut palet, bukan biru default browser. Tanpa ini, sorotan
+ * bawaan Chrome jatuh persis di rentang biru yang sama dengan aksen dan
+ * terbaca seperti tautan yang salah cat.
+ */
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 /* Lenis mengontrol scroll. Tanpa ini, scroll native ikut berjalan. */

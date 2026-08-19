@@ -67,7 +67,7 @@ export default function TentangKamiPage() {
                   {cluster.items.map((item) => (
                     <li
                       key={item.name}
-                      className="rounded-full border border-surface-3 px-3 py-1 text-xs text-ink-muted"
+                      className="rounded-full bg-accent-soft px-3 py-1 text-xs text-accent"
                     >
                       {item.name}
                     </li>

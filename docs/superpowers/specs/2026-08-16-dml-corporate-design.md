@@ -237,46 +237,69 @@ Perusahaan berumur 40 tahun dengan kontrak Pertamina harus terbaca kredibel, buk
 eksperimental, jadi variance tidak dinaikkan ke 9. Density rendah karena fotografi
 drone yang jadi bintangnya, bukan teks.
 
-### 6.2 Palet, "Deep Water", dark-locked
+### 6.2 Palet, "Navy Selat", light-locked
 
-Halaman dikunci gelap. Tidak ada seksi yang berbalik jadi terang di tengah scroll.
-Ini keputusan brand yang disetujui klien, bukan default.
+Diubah pada 18 Agustus 2026. Sampai Plan 5 halaman ini dikunci gelap dengan palet
+"Deep Water" (surface #0A1418, aksen oranye #FF5A1F). Klien kemudian meminta seluruh
+skema warna mengikuti pthis.id, situs PT Hasnur Internasional Shipping, yang memakai
+skema terang bernavy. Bagian ini menggantikan keputusan lama sepenuhnya; catatan
+"dark-locked" di bagian mana pun dokumen ini sudah tidak berlaku.
+
+Halaman dikunci terang. Tidak ada seksi yang berbalik jadi gelap di tengah scroll.
+Satu-satunya bidang berwarna penuh adalah kaki halaman navy, dan itu penutup halaman,
+bukan pergantian tema di tengah jalan. Pola yang sama dipakai pthis.id.
 
 ```css
 @theme {
-  --color-surface:       #0A1418;  /* petrol near-black, latar utama  */
-  --color-surface-2:     #111E24;  /* seksi bertingkat                */
-  --color-surface-3:     #18292F;  /* border, garis pemisah           */
-  --color-ink:           #F2EFE9;  /* bone, teks utama                */
-  --color-ink-muted:     #8FA1A8;  /* teks sekunder                   */
-  --color-accent:        #FF5A1F;  /* signal orange                   */
-  --color-accent-hover:  #FF7A45;  /* hover, lebih terang             */
-  --color-accent-press:  #E04A12;  /* state tertekan                  */
-  --color-on-accent:     #0A1418;  /* teks di atas permukaan oranye   */
+  --color-surface:       #F5F9FD;  /* biru-putih, bidang halaman        */
+  --color-surface-2:     #FFFFFF;  /* kartu, panel, seksi selang-seling */
+  --color-surface-3:     #CED9EA;  /* garis rambut dekoratif            */
+  --color-line:          #7A8CA8;  /* batas kontrol: input, ghost       */
+  --color-ink:           #181C24;  /* hitam lembut, teks utama          */
+  --color-ink-muted:     #515661;  /* teks sekunder                     */
+  --color-accent:        #164194;  /* navy, warna utama                 */
+  --color-accent-hover:  #0E3A8A;  /* hover, lebih gelap                */
+  --color-accent-press:  #0A2C6B;  /* state tertekan                    */
+  --color-accent-soft:   #E1EEFF;  /* isian navy paling tipis           */
+  --color-on-accent:     #FFFFFF;  /* teks di atas permukaan navy       */
+  --color-danger:        #C62828;  /* galat form                        */
 }
 ```
+
+Nilai navy, biru muda, biru-putih, hitam lembut, dan merah diambil langsung dari
+`:root` milik pthis.id (`--c-primary`, `--c-tertiary`, `--c-body`, `--c-black`,
+`--c-red`). Yang tidak ikut disalin ada dua. Pertama, arah state tombol: pthis
+menaikkan terang saat hover, sementara di sini hover dan press turun ke navy yang
+lebih gelap supaya teks putih di atasnya justru menguat. Kedua, `--color-line`, yang
+tidak punya padanan di sana; pthis memakai satu token pembatas untuk garis dekoratif
+dan tepi input sekaligus, dan tepi input jadi tidak pernah mencapai 3:1.
 
 **Aturan token yang wajib dipatuhi, bukan sekadar dicek belakangan:**
 
 | Kombinasi | Rasio | Status |
 |---|---|---|
-| `--color-ink` di atas `--color-surface` | 16,25:1 | Lolos AAA |
-| `--color-accent` di atas `--color-surface` | 5,98:1 | Lolos AA, teks oranye di latar gelap aman |
-| `--color-on-accent` di atas `--color-accent` | 5,98:1 | Lolos AA, ini satu-satunya teks yang boleh di atas tombol oranye |
-| `--color-ink` di atas `--color-accent` | **2,72:1** | **Gagal. Dilarang.** |
+| `--color-ink` di atas `--color-surface` | 16,13:1 | Lolos AAA |
+| `--color-ink-muted` di atas `--color-surface-2` | 7,36:1 | Lolos AA |
+| `--color-accent` di atas `--color-surface` | 8,95:1 | Lolos AA, teks navy di latar terang aman |
+| `--color-on-accent` di atas `--color-accent` | 9,47:1 | Lolos AA, ini satu-satunya teks yang boleh di atas tombol navy |
+| `--color-surface-3` di atas `--color-accent` | 6,64:1 | Lolos AA, teks sekunder di kaki halaman navy |
+| `--color-line` di atas `--color-surface-2` | 3,42:1 | Lolos 1.4.11, batas kontrol |
+| `--color-danger` di atas `--color-surface` | 5,31:1 | Lolos AA |
+| `--color-ink` di atas `--color-accent` | **1,80:1** | **Gagal. Dilarang.** |
 
-Tombol oranye terisi **selalu** memakai `--color-on-accent`, tidak pernah `--color-ink`.
-Ini kesalahan default yang paling mudah terjadi: teks bone di atas tombol oranye
-terlihat wajar tapi gagal AA. Hover menaikkan terang ke `--color-accent-hover`, bukan
-menurunkannya, karena halaman ini gelap.
+Tombol navy terisi **selalu** memakai `--color-on-accent`, tidak pernah `--color-ink`.
+Hover menurunkan terang ke `--color-accent-hover`, bukan menaikkannya, karena halaman
+ini terang. Aturan ini kebalikan dari versi "Deep Water" dan menyalin arah lama ke
+sini akan membuat hover kehilangan kontras terhadap teks putih di atasnya.
 
-Oranye dipilih karena itu warna keselamatan maritim asli: life raft, hi-vis kru,
-marker buoy. Jujur terhadap industrinya, dan bukan navy korporat yang dipakai hampir
-semua perusahaan pelayaran Indonesia. Air biru di foto drone menyala di atas petrol
-gelap, dan oranye jadi satu-satunya titik panas di halaman.
+Navy dipilih bukan karena netral, melainkan karena itu warna induk grup di pthis.id
+dan permintaan eksplisit klien. Konsekuensinya diterima apa adanya: oranye keselamatan
+maritim yang dulu jadi titik panas satu-satunya di halaman hilang sepenuhnya, termasuk
+di garis rute peta, garis ukur blueprint, dan angka metrik.
 
-**Color consistency lock:** aksen oranye dipakai identik di seluruh halaman. Tidak ada
-CTA biru, tidak ada badge teal. Satu aksen, dikunci.
+**Color consistency lock:** aksen navy dipakai identik di seluruh halaman. Tidak ada
+CTA oranye, tidak ada badge teal. Satu aksen, dikunci. `--color-danger` bukan aksen
+kedua: ia hanya boleh muncul pada pesan dan tepi galat form.
 
 **Shape consistency lock:** radius 12px untuk kartu dan panel, 8px untuk input,
 full-pill untuk tombol. Aturan ini berlaku di semua halaman tanpa kecuali.

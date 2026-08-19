@@ -1,4 +1,5 @@
 import type { FleetClass } from "@/content/types";
+import { ACCENT_LINE_COLOR } from "@/features/home/three/materials";
 
 /**
  * Path haluan-buritan sederhana, ditulis tangan per kelas berdasarkan
@@ -20,7 +21,7 @@ export function BlueprintSvg({ fleetClasses }: { fleetClasses: FleetClass[] }) {
         <figure key={fleetClass.slug} className="rounded-card border border-surface-3 bg-surface-2 p-6">
           <svg viewBox="-20 -60 240 120" className="h-auto w-full" role="img" aria-labelledby={`blueprint-${fleetClass.slug}`}>
             <title id={`blueprint-${fleetClass.slug}`}>{fleetClass.altText}</title>
-            <path d={hullPath(fleetClass)} fill="none" stroke="#C62828" strokeWidth={1.5} />
+            <path d={hullPath(fleetClass)} fill="none" stroke={ACCENT_LINE_COLOR} strokeWidth={1.5} />
           </svg>
           <figcaption className="mt-4 text-sm text-ink-muted">
             <span className="text-ink">{fleetClass.name}</span>, {fleetClass.lengthMeters} m, {fleetClass.capacityLabel}
