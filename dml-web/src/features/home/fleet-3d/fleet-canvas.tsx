@@ -9,7 +9,7 @@ import { FLEET_MODEL_BY_SLUG } from "@/content/model-credits";
 import type { FleetClass } from "@/content/types";
 import { Stage } from "../three/stage";
 import { fitCameraDistanceForBox } from "../three/fit-camera";
-import { DECK_MATERIAL, HULL_MATERIAL } from "../three/materials";
+import { DECK_MATERIAL, HULL_MATERIAL, GRID_COLORS } from "../three/materials";
 import { buildHullGeometry, buildHullShape, buildSuperstructureGeometry } from "./hull-geometry";
 import { segmentAt, segmentOpacities } from "@/lib/motion/segments";
 import { refreshScrollTriggers } from "@/lib/motion/gsap";
@@ -245,7 +245,7 @@ function ClassGroup({
  * sebagai sumbu.
  */
 function ScaleGrid() {
-  return <gridHelper args={[20, 20, "#D8DEE8", "#EDF0F4"]} position={[0, -0.02, 0]} />;
+  return <gridHelper args={[20, 20, GRID_COLORS.main, GRID_COLORS.sub]} position={[0, -0.02, 0]} />;
 }
 
 type OrbitTarget = { target: THREE.Vector3 };
