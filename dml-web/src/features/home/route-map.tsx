@@ -234,7 +234,7 @@ function LegList({ activeIndex }: { activeIndex: number }) {
 /** Jalur tanpa pin: peta di atas, daftar lintasan di bawah, semua leg tergambar. */
 function StaticRouteMap() {
   return (
-    <section className="bg-surface-2 py-20 md:py-28">
+    <section className="bg-surface-2-wash py-20 md:py-28">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <SectionHeader
           title="Rute Penyeberangan Ro-Ro"
@@ -335,7 +335,7 @@ export function RouteMap() {
   if (!animated) return <StaticRouteMap />;
 
   return (
-    <section className="relative bg-surface-2">
+    <section className="bg-surface-2-wash relative">
       <div ref={stageRef} className="relative h-[100dvh] overflow-hidden">
         <div className="absolute inset-0 bg-accent-soft">
           <RouteSvg mapRef={mapRef} legRefs={legRefs} activeIndex={activeIndex} drawn={false} />
