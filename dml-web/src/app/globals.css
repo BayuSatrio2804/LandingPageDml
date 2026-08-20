@@ -54,6 +54,37 @@ body {
 }
 
 /*
+ * Latar section bergradasi, pengganti bg-surface/bg-surface-2 solid.
+ * Dua class ini dipakai bergantian antar section (pola zebra-striping
+ * yang sudah ada) supaya iramanya tetap jalan, tapi tiap bidang sendiri
+ * tidak lagi flat. Warnanya tetap dari token @theme di atas, tidak ada
+ * warna baru: cuma cara mencampurnya yang beda dari section ke section.
+ */
+.bg-surface-wash {
+  background:
+    radial-gradient(85% 100% at 92% -6%, var(--color-surface-2) 0%, rgb(255 255 255 / 0%) 60%),
+    linear-gradient(
+      150deg,
+      var(--color-accent-soft) 0%,
+      var(--color-surface) 45%,
+      var(--color-surface) 72%,
+      var(--color-accent-soft) 130%
+    );
+}
+
+.bg-surface-2-wash {
+  background:
+    radial-gradient(85% 100% at 8% -6%, var(--color-accent-soft) 0%, rgb(225 238 255 / 0%) 62%),
+    linear-gradient(
+      150deg,
+      var(--color-surface-2) 0%,
+      var(--color-surface-2) 40%,
+      var(--color-surface) 78%,
+      var(--color-accent-soft) 130%
+    );
+}
+
+/*
  * Seleksi teks ikut palet, bukan biru default browser. Tanpa ini, sorotan
  * bawaan Chrome jatuh persis di rentang biru yang sama dengan aksen dan
  * terbaca seperti tautan yang salah cat.

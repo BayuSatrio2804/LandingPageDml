@@ -30,7 +30,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-[82svh] items-center overflow-hidden bg-surface pt-24 pb-16 md:min-h-[100dvh] md:pb-20"
+      className="bg-surface-wash relative flex min-h-[82svh] items-center overflow-hidden pt-24 pb-16 md:min-h-[100dvh] md:pb-20"
     >
       {/* Cahaya tunggal di belakang artefak. Satu gradien radial, bukan mesh
           berwarna: yang dibutuhkan cuma alasan kenapa sisi kanan lebih terang
