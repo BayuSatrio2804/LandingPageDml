@@ -38,6 +38,9 @@
   --font-display: var(--font-gt-america, ui-sans-serif), system-ui, sans-serif;
   --font-body: var(--font-satoshi, ui-sans-serif), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono, ui-monospace), monospace;
+
+  /* Indikator gulir di hero. */
+  --animate-hero-scroll: hero-scroll 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 html {
@@ -82,6 +85,79 @@ body {
       var(--color-surface) 78%,
       var(--color-accent-soft) 130%
     );
+}
+
+/*
+ * Belahan diagonal hero. --hero-split adalah satu angka yang dianimasikan
+ * dari hero.tsx lewat setProperty, dibaca tiga elemen sekaligus (dua panel +
+ * garis jahitan) supaya semuanya sinkron pada frame yang sama.
+ */
+.hero-panel-a {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(var(--hero-split) - 6%),
+    0 calc(var(--hero-split) + 6%)
+  );
+}
+
+.hero-panel-b {
+  clip-path: polygon(
+    0 calc(var(--hero-split) + 6%),
+    100% calc(var(--hero-split) - 6%),
+    100% 100%,
+    0 100%
+  );
+}
+
+.hero-seam {
+  clip-path: polygon(
+    0 calc(var(--hero-split) + 6%),
+    100% calc(var(--hero-split) - 6%),
+    100% calc(var(--hero-split) - 6% + 1px),
+    0 calc(var(--hero-split) + 6% + 1px)
+  );
+}
+
+@media (min-width: 900px) {
+  .hero-panel-a {
+    clip-path: polygon(
+      0 0,
+      calc(var(--hero-split) + 6%) 0,
+      calc(var(--hero-split) - 6%) 100%,
+      0 100%
+    );
+  }
+
+  .hero-panel-b {
+    clip-path: polygon(
+      calc(var(--hero-split) + 6%) 0,
+      100% 0,
+      100% 100%,
+      calc(var(--hero-split) - 6%) 100%
+    );
+  }
+
+  .hero-seam {
+    clip-path: polygon(
+      calc(var(--hero-split) + 6%) 0,
+      calc(var(--hero-split) + 6% + 1px) 0,
+      calc(var(--hero-split) - 6% + 1px) 100%,
+      calc(var(--hero-split) - 6%) 100%
+    );
+  }
+}
+
+@keyframes hero-scroll {
+  0% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 /*
