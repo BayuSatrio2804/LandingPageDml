@@ -17,9 +17,24 @@ Situs company profile PT Dutabahari Menara Line. Next.js 16.3 App Router, Payloa
    until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
    ```
 4. `bun run payload migrate`
-5. `bun run dev`, buka `http://localhost:3000`
+5. `bun run seed` untuk membuat akun admin pertama beserta tiga artikel awal.
+   Isi `SEED_ADMIN_EMAIL` dan `SEED_ADMIN_PASSWORD` di `.env.local` lebih dulu.
+   Script ini idempoten, jadi menjalankannya ulang aman.
+6. `bun run dev`, buka `http://localhost:3000`
 
 ## Perintah penting
+
+> **Postgres harus hidup sebelum `bun run build`, bukan hanya sebelum
+> `bun run test:e2e`.** Sejak beranda memuat seksi Artikel Terbaru dan
+> `sitemap.ts` menarik slug artikel, build melakukan query database. Di mesin
+> dingin, `bun run check` akan gagal di tahap build dengan galat koneksi yang
+> terbaca seperti bug kode. Jalankan lebih dulu:
+> ```bash
+> docker compose up -d
+> until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
+> ```
+> `sitemap.ts` sendiri menangkap kegagalan query dan tetap memancarkan path
+> statis, jadi build tidak jatuh karenanya. Yang jatuh adalah beranda.
 
 - `bun run check`: lint, typecheck, test, build, doctor, lighthouse berurutan. Gerbang wajib sebelum deploy. Menjalankan `next build && next start` penuh plus satu run Lighthouse CI, jadi berdurasi beberapa menit, bukan loop cepat harian.
 - `bun run test:e2e`: Playwright. **Postgres harus berjalan lebih dulu**, kalau tidak
@@ -69,6 +84,34 @@ Batas sungguhan terhadap penyalahgunaan tetap ada di lapisan infrastruktur.
   komentar; `SourceTag` membedakan `cp-pdf`, `riset-publik`, dan `belum-terverifikasi`.
 - `src/lib/`: token warna, manifest media, util motion, SEO.
 - `scripts/`: pipeline aset sekali-jalan (foto, peta, model 3D, placeholder sertifikasi).
+
+## Artikel dan CMS
+
+Artikel tinggal di koleksi `posts` Payload dan disunting lewat `/admin`.
+Halaman korporat tidak berada di CMS; editor hanya menyentuh artikel.
+
+Publikasi tidak butuh rebuild. Hook `afterChange` dan `afterDelete` memanggil
+`revalidatePath` untuk `/artikel`, `/artikel/<slug>`, `/`, dan `/sitemap.xml`.
+Slug lama ikut disegarkan saat slug berubah, supaya alamat lama tidak hidup
+terus sebagai halaman hantu.
+
+Seluruh query artikel wajib lewat `src/features/articles/queries.ts`. Local
+API `payload.find()` memakai `overrideAccess: true` secara default, jadi
+`access.read` di koleksi `posts` **tidak** melindungi Server Component.
+Penyaringan `_status` ada di kode aplikasi, dan memusatkannya mencegah satu
+pemanggil yang lupa lalu menayangkan draft.
+
+### Tiga artikel awal menunggu review klien
+
+`bun run seed` membuat tiga artikel: operasi ship-to-ship, ISM Code dan
+ISO 9001:2015, serta berdirinya perusahaan pada 1988. Seluruh faktanya berasal
+dari `src/content/` dan dari `assets/CP DML.pdf`, tapi **kalimatnya disusun
+agen, bukan ditulis klien**, jadi teksnya menunggu persetujuan bersama copy
+Visi dan Misi.
+
+Kalau klien menolak, hapus artikelnya dari `/admin`. Hook revalidasi
+membersihkan jejaknya dari `/artikel`, beranda, dan sitemap tanpa deploy
+ulang. Tidak ada teks itu yang tertanam di dalam `src/`.
 
 ## Angka armada yang masih menunggu konfirmasi klien
 
