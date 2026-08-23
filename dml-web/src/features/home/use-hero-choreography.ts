@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { gsap, registerGsap } from "@/lib/motion/gsap";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
 import { useMounted } from "@/lib/motion/use-mounted";
+import { TOKENS } from "@/lib/tokens";
 import { DOORS } from "./hero-doors";
 
 export type HeroRefs = {
@@ -143,12 +144,12 @@ export function useHeroChoreography(refs: HeroRefs): { mounted: boolean; reduced
 
       timeline
         .to(split, { x: 74, duration: 1, ease: "power2.inOut", onUpdate: applySplit }, 0.25)
-        .to(ruleA, { width: 52, backgroundColor: "#ffffff", duration: 0.5, ease: "power2.out" }, 0.25);
+        .to(ruleA, { width: 52, backgroundColor: TOKENS.onAccent, duration: 0.5, ease: "power2.out" }, 0.25);
 
       timeline
         .to(split, { x: 26, duration: 1.2, ease: "power2.inOut", onUpdate: applySplit }, 1.5)
-        .to(ruleA, { width: 22, backgroundColor: "#4C7FD6", duration: 0.5, ease: "power2.out" }, 1.5)
-        .to(ruleB, { width: 52, backgroundColor: "#ffffff", duration: 0.5, ease: "power2.out" }, 1.6);
+        .to(ruleA, { width: 22, backgroundColor: TOKENS.accentLift, duration: 0.5, ease: "power2.out" }, 1.5)
+        .to(ruleB, { width: 52, backgroundColor: TOKENS.onAccent, duration: 0.5, ease: "power2.out" }, 1.6);
 
       timeline.to("[data-hero-scroll]", { autoAlpha: 0, duration: 0.3 }, 0.25);
 

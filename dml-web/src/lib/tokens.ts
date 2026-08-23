@@ -37,6 +37,18 @@ export const TOKENS = {
    * membawa arti itu sama sekali, jadi galat butuh warnanya sendiri.
    */
   danger: "#C62828",
+  /**
+   * Bidang gelap hero. Satu-satunya bidang gelap di situs terang ini, dan
+   * karena itu tidak diturunkan dari surface mana pun. Sebelum Plan 6 nilainya
+   * ditulis sebagai hex mentah di className hero.
+   */
+  heroGround: "#0A1428",
+  /**
+   * Aksen di ATAS bidang gelap. Navy #164194 nyaris tak terlihat di atas
+   * heroGround, jadi penanda pintu hero memakai rona yang diangkat. Ini bukan
+   * pengganti accent di bidang terang, dan tidak boleh dipakai di sana.
+   */
+  accentLift: "#4C7FD6",
 } as const;
 
 export type TokenName = keyof typeof TOKENS;

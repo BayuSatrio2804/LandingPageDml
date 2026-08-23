@@ -82,7 +82,7 @@ export function HeroCopy({
                   ruleRefs.current[index] = el;
                 }}
                 aria-hidden="true"
-                className="h-0.5 w-5.5 bg-[#4C7FD6]"
+                className="h-0.5 w-5.5 bg-accent-lift"
               />
             );
             return (
