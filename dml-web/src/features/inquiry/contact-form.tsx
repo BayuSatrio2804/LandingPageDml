@@ -19,7 +19,18 @@ export function ContactForm({ whatsappNumber }: { whatsappNumber: string }) {
 
   const onSubmit = async (data: InquiryInput) => {
     setFormError(null);
-    const result = await submitInquiry(data, "kontak");
+    // Jaring pengaman kedua. actions.ts sudah menangkap kegagalan Payload,
+    // tapi server action juga bisa gagal sebelum kodenya sempat jalan —
+    // jaringan putus, deploy di tengah jalan, respons bukan-JSON. Tanpa
+    // tangkapan di sini, kegagalan seperti itu tetap senyap.
+    let result: Awaited<ReturnType<typeof submitInquiry>>;
+    try {
+      result = await submitInquiry(data, "kontak");
+    } catch (error) {
+      console.error("submitInquiry gagal", error);
+      setFormError("Pesan gagal terkirim. Periksa koneksi lalu coba lagi.");
+      return;
+    }
     if (!result.ok) {
       setFormError(result.error);
       return;
