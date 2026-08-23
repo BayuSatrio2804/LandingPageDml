@@ -5,12 +5,19 @@ export const Inquiries: CollectionConfig = {
   admin: { useAsTitle: "name", defaultColumns: ["name", "phone", "service", "createdAt"] },
   access: {
     read: ({ req: { user } }) => Boolean(user),
-    // REST/GraphQL di /api mount dengan overrideAccess:false, jadi access
-    // control inilah satu-satunya gerbang untuk request langsung ke luar
-    // submitInquiry. Local API payload.create() di actions.ts default
-    // overrideAccess:true, jadi submitInquiry tetap bisa menulis meski
-    // create dikunci ke admin saja di sini.
-    create: ({ req: { user } }) => Boolean(user),
+    // Nol tulis dari mana pun kecuali submitInquiry. Local API
+    // payload.create() memakai overrideAccess: true secara default
+    // (terverifikasi di tipe Payload 3.88,
+    // node_modules/payload/dist/collections/operations/local/create.d.ts:54
+    // menandainya @default true), jadi server action tetap bisa menulis
+    // meski gerbang ini tertutup rapat.
+    //
+    // Yang berubah: tombol "Create New" hilang dari UI admin. Cek asap
+    // 23 Agustus 2026 menemukan tombol itu masih ada, yang membantah
+    // master spec bagian 10 yang menyebut koleksi ini read-only. Lead
+    // yang diketik manual admin akan tercampur dengan lead sungguhan
+    // dari form, dan kolom `source` yang jadi pembedanya jadi berbohong.
+    create: () => false,
     update: () => false,
     delete: () => false,
   },

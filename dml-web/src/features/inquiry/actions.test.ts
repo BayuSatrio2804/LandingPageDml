@@ -58,4 +58,51 @@ describe("submitInquiry", () => {
     const sixth = await submitInquiry(VALID, "kontak");
     expect(sixth).toEqual({ ok: false, error: "Terlalu banyak percobaan, coba lagi nanti." });
   });
+
+  it("menyimpan company dan service untuk kirim B2B", async () => {
+    const { submitInquiry } = await import("./actions");
+    const result = await submitInquiry(
+      {
+        name: "Budi Santoso",
+        company: "PT Energi Nusantara",
+        phone: "+6281234567890",
+        email: "budi@energi.co.id",
+        service: "transportasi-bbm",
+        message: "Kami butuh pengangkutan solar rutin ke Kalimantan Tengah.",
+      },
+      "permintaan-informasi-bbm",
+    );
+
+    expect(result).toEqual({ ok: true });
+    expect(createMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: "inquiries",
+        data: expect.objectContaining({
+          company: "PT Energi Nusantara",
+          service: "transportasi-bbm",
+          source: "permintaan-informasi-bbm",
+        }),
+      }),
+    );
+  });
+
+  it("kirim dari /kontak tetap tersimpan tanpa company dan service", async () => {
+    const { submitInquiry } = await import("./actions");
+    const result = await submitInquiry(
+      {
+        name: "Siti Rahayu",
+        phone: "+6281234567891",
+        email: "siti@example.com",
+        message: "Saya ingin bertanya tentang jadwal penyeberangan.",
+      },
+      "kontak",
+    );
+
+    expect(result).toEqual({ ok: true });
+    expect(createMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ source: "kontak" }),
+      }),
+    );
+  });
 });

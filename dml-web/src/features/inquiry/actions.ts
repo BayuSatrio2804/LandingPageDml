@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { inquirySchema } from "./schema";
+import { inquirySchema, businessInquirySchema } from "./schema";
 import { createRateLimiter } from "./rate-limit";
 
 const rateLimiter = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
@@ -32,7 +32,11 @@ export async function submitInquiry(
     return { ok: true };
   }
 
-  const parsed = inquirySchema.safeParse(input);
+  // Dua skema, satu action. Form B2B mengirim field tambahan; form /kontak
+  // tidak. Coba skema yang lebih luas dulu, lalu jatuh ke yang dasar, supaya
+  // kiriman /kontak yang tidak punya company tetap lolos apa adanya.
+  const business = businessInquirySchema.safeParse(input);
+  const parsed = business.success ? business : inquirySchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: "Periksa kembali isian form." };
   }
@@ -58,6 +62,9 @@ export async function submitInquiry(
         phone: parsed.data.phone,
         email: parsed.data.email,
         message: parsed.data.message,
+        ...(business.success
+          ? { company: business.data.company, service: business.data.service }
+          : {}),
         source,
       },
     });

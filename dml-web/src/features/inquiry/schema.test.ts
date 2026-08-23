@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inquirySchema } from "./schema";
+import { inquirySchema, businessInquirySchema } from "./schema";
 
 const VALID = {
   name: "Budi Santoso",
@@ -44,5 +44,49 @@ describe("inquirySchema", () => {
     const withoutHoneypot: Record<string, unknown> = { ...VALID };
     delete withoutHoneypot.website;
     expect(inquirySchema.safeParse(withoutHoneypot).success).toBe(true);
+  });
+});
+
+describe("businessInquirySchema", () => {
+  const valid = {
+    name: "Budi Santoso",
+    company: "PT Energi Nusantara",
+    phone: "+6281234567890",
+    email: "budi@energi.co.id",
+    service: "transportasi-bbm" as const,
+    message: "Kami butuh pengangkutan solar rutin ke Kalimantan Tengah.",
+  };
+
+  it("menerima isian lengkap yang valid", () => {
+    expect(businessInquirySchema.safeParse(valid).success).toBe(true);
+  });
+
+  it("menolak nama perusahaan kosong", () => {
+    const result = businessInquirySchema.safeParse({ ...valid, company: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("menolak layanan di luar dua lini yang ada", () => {
+    const result = businessInquirySchema.safeParse({ ...valid, service: "galangan-kapal" });
+    expect(result.success).toBe(false);
+  });
+
+  it("field opsional boleh tidak diisi", () => {
+    const result = businessInquirySchema.safeParse(valid);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.cargoType).toBeUndefined();
+      expect(result.data.volume).toBeUndefined();
+    }
+  });
+
+  it("tetap mewarisi validasi telepon dari inquirySchema", () => {
+    const result = businessInquirySchema.safeParse({ ...valid, phone: "0812" });
+    expect(result.success).toBe(false);
+  });
+
+  it("tetap mewarisi honeypot dari inquirySchema", () => {
+    const result = businessInquirySchema.safeParse({ ...valid, website: "spam" });
+    expect(result.success).toBe(false);
   });
 });

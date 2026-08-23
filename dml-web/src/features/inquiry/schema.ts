@@ -12,3 +12,27 @@ export const inquirySchema = z.object({
 });
 
 export type InquiryInput = z.infer<typeof inquirySchema>;
+
+/**
+ * Form B2B di /bisnis/transportasi-bbm/permintaan-informasi. Memperluas
+ * inquirySchema, bukan menduplikasinya, supaya aturan telepon, email, dan
+ * honeypot cuma hidup di satu tempat.
+ *
+ * `company` dan `service` menutup celah lama: koleksi inquiries sudah punya
+ * kedua kolom itu sejak Plan 2 dan tidak pernah terisi dari form mana pun.
+ *
+ * Tiga field terakhir opsional dengan sengaja. Calon pelanggan yang belum tahu
+ * volume atau rutenya tetap harus bisa mengirim pertanyaan; form yang memaksa
+ * angka yang belum ada justru membuang lead.
+ */
+export const businessInquirySchema = inquirySchema.extend({
+  company: z.string().trim().min(2, { error: "Nama perusahaan wajib diisi" }),
+  service: z.enum(["transportasi-bbm", "penumpang-roro"], {
+    error: "Pilih salah satu lini layanan",
+  }),
+  cargoType: z.string().trim().optional(),
+  route: z.string().trim().optional(),
+  volume: z.string().trim().optional(),
+});
+
+export type BusinessInquiryInput = z.infer<typeof businessInquirySchema>;
