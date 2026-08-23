@@ -11,7 +11,7 @@ export function SectionHeader({
 }) {
   return (
     <div className={className}>
-      <h2 id={id} className="font-display text-3xl font-bold text-ink md:text-5xl">
+      <h2 id={id} className="font-display text-pretty text-3xl font-bold text-ink md:text-5xl">
         {title}
       </h2>
       {description ? <p className="mt-4 max-w-[55ch] text-ink-muted">{description}</p> : null}

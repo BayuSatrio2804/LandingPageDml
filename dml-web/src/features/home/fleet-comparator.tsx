@@ -28,7 +28,7 @@ function SpecBlock() {
   return (
     <section className="bg-surface-wash pb-24 md:pb-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <h3 className="font-display text-xl font-bold text-ink">Spesifikasi per kelas</h3>
+        <h3 className="font-display text-pretty text-xl font-bold text-ink">Spesifikasi per kelas</h3>
         <FleetSpecTable fleetClasses={FLEET_CLASSES} />
         <p className="mt-6 max-w-[70ch] text-xs text-ink-muted">
           Panjang, DWT, dan kapasitas per kelas adalah estimasi proporsional dan masih menunggu

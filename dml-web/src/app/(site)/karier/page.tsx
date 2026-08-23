@@ -19,7 +19,7 @@ export default function KarierPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-      <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Karier</h1>
+      <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Karier</h1>
 
       <div className="mt-8 max-w-[60ch] rounded-card border border-surface-3 bg-surface-2 p-8">
         <p className="text-ink">Belum ada lowongan terbuka saat ini.</p>
