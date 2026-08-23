@@ -46,14 +46,13 @@ describe("Hero", () => {
     expect(subtext.length).toBeLessThanOrEqual(20);
   });
 
-  // Dua pintu, dua tujuan. CTA BBM tetap ke halaman kontak sampai ada halaman
-  // permintaan informasi tersendiri (lihat CTA_BBM_HREF di hero.tsx).
-  it("CTA BBM mengarah ke kontak", () => {
+  it("CTA BBM menunjuk halaman permintaan informasi, bukan kontak umum", () => {
+    // Ditutup di Plan 9 setelah Plan 8 membangun halamannya. Label CTA-nya
+    // memang sudah "Permintaan Informasi BBM" sejak Plan 4.
     render(<Hero />);
-    expect(screen.getByRole("link", { name: /permintaan informasi bbm/i })).toHaveAttribute(
-      "href",
-      "/kontak",
-    );
+    expect(
+      screen.getByRole("link", { name: /Permintaan Informasi BBM/i }),
+    ).toHaveAttribute("href", "/bisnis/transportasi-bbm/permintaan-informasi");
   });
 
   it("CTA ro-ro mengarah ke pemesanan tiket", () => {

@@ -5,8 +5,10 @@ import { CtaLink } from "@/components/ui/cta-link";
 import { CERT_BADGES } from "@/content/certifications";
 import { DOORS } from "./hero-doors";
 
-// TODO(dml): ganti kalau ada halaman permintaan informasi BBM tersendiri.
-const CTA_BBM_HREF = "/kontak";
+// Halaman tujuan dibangun Plan 8. Label CTA-nya sudah "Permintaan Informasi
+// BBM" sejak awal, jadi ini bukan perubahan desain, melainkan penutupan TODO
+// yang menunggu halamannya ada.
+const CTA_BBM_HREF = "/bisnis/transportasi-bbm/permintaan-informasi";
 
 export function HeroCopy({
   mounted,
