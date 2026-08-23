@@ -107,12 +107,24 @@ function RouteSvg({
    * yang membuat versi mobil punya label sebesar sekitar 11 piksel.
    */
   markerScale = 1,
+  /**
+   * Override labelSide per port id, dipakai varian panggung (desktop) saja.
+   *
+   * Bakauheni duduk persis di tepi barat peta, tempat kartu ringkasan rute
+   * melayang di atasnya. Posisi "atas" (tengah horizontal, dari ports.ts)
+   * aman di kotak aspect-3/2 mobile, tapi di panggung penuh-lebar sebagian
+   * kata itu jatuh di luar tepi kiri kartu dan nongol sendirian ("Ba...") di
+   * atas laut. Override ini mendorongnya ke kanan marker supaya seluruh
+   * label jatuh di bawah kartu, bukan menyembul di sampingnya.
+   */
+  labelSideOverrides,
 }: {
   mapRef?: React.RefObject<SVGSVGElement | null>;
   legRefs?: React.RefObject<(SVGPathElement | null)[]>;
   activeIndex: number;
   drawn: boolean;
   markerScale?: number;
+  labelSideOverrides?: Partial<Record<string, NonNullable<(typeof PORTS)[number]["labelSide"]>>>;
 }) {
   const activeLeg = ROUTE_LEGS[activeIndex];
   const litPorts = useMemo(
@@ -161,7 +173,7 @@ function RouteSvg({
         const { x, y } = project(port);
         const lit = litPorts.has(port.id);
         const office = port.kind === "kantor";
-        const side = port.labelSide ?? "kanan";
+        const side = labelSideOverrides?.[port.id] ?? port.labelSide ?? "kanan";
         const gap = 10 * markerScale;
         const anchor = side === "kiri" ? "end" : side === "kanan" ? "start" : "middle";
         const labelX = side === "kiri" ? x - gap : side === "kanan" ? x + gap : x;
@@ -344,7 +356,13 @@ export function RouteMap() {
     <section className="bg-surface-2-wash relative">
       <div ref={stageRef} className="relative h-[100dvh] overflow-hidden">
         <div className="absolute inset-0 bg-accent-soft">
-          <RouteSvg mapRef={mapRef} legRefs={legRefs} activeIndex={activeIndex} drawn={false} />
+          <RouteSvg
+            mapRef={mapRef}
+            legRefs={legRefs}
+            activeIndex={activeIndex}
+            drawn={false}
+            labelSideOverrides={{ bakauheni: "kanan" }}
+          />
         </div>
 
         <div className="relative z-10 mx-auto grid h-full max-w-[1400px] grid-cols-12 content-center px-4 md:px-8">
