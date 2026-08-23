@@ -246,12 +246,23 @@ secara natur bukan token (warna lampu, garis pantai geografis) tetap hex lokal
 - **`three/materials.ts`** — lambung `#33475C`, `#22303F`, sub `#E3EBF5`.
   Diperdalam sedikit supaya kapal tidak melayang di atas bidang yang lebih
   gelap.
-- **`route-map.tsx`** — `coast: #B6C6DC`, `portDim: #94A6C0`. Diturunkan
-  seirama. Jika salah satu dipakai membawa makna (pelabuhan tidak aktif),
-  rasio kontrasnya terhadap bidang peta diverifikasi ≥ 3:1 sebagai batas
-  komponen non-teks.
+- **`route-map.tsx`** — `coast: #B6C6DC`, `portDim: #94A6C0`. Keduanya diam
+  sementara laut (`accentSoft`) bergerak mendekat, jadi rasionya **turun**
+  kalau dibiarkan. Terukur: `coast` 1,48 → 1,30 terhadap laut, `portDim` 2,11
+  → 1,86. `coast` diturunkan ke `#A9BACF` (kembali ke 1,48). `portDim`
+  membawa makna — ia berubah jadi `portLit` saat rute mencapainya, jadi WCAG
+  1.4.11 menuntut 3:1 terhadap latar, dan nilai lamanya tidak pernah memenuhi
+  itu bahkan di palet lama. Setiap nilai yang lolos 3:1 di atas laut baru
+  ternyata segelap `TOKENS.line`, jadi `portDim` **jatuh ke token itu**
+  (3,17:1) alih-alih memakai hex kembar. Satu warna keras hilang, satu cacat
+  1.4.11 lama tertutup.
+- Efek samping yang menguntungkan: `routeMitra` (= `TOKENS.line`) naik dari
+  2,91 ke 3,17 terhadap laut, jadi ia lolos 1.4.11 tanpa perubahan apa pun.
+  Dipasangi asersi supaya tidak hilang lagi.
 
-Verifikasi bagian ini **visual, bukan numerik** — kecuali `portDim`.
+Verifikasi bagian ini **visual, bukan numerik** — kecuali empat rasio peta di
+atas, yang dikunci asersi di `route-map.test.tsx` dan menuntut `MAP` diekspor
+(berkas itu sudah mengekspor `activeLegIndex` ke tes, jadi polanya ada).
 Screenshot beranda sebelum dan sesudah, bandingkan.
 
 ## 8. Penjaga dan risiko
