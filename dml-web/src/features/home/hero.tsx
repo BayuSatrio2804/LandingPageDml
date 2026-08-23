@@ -70,7 +70,7 @@ export function Hero() {
   });
 
   return (
-    <section ref={sectionRef} className="relative -mt-18 h-[250vh] bg-[#0A1428]">
+    <section ref={sectionRef} className="relative -mt-18 h-[250vh] bg-hero-ground">
       <div ref={stageRef} className="sticky top-0 h-svh overflow-hidden">
         <div ref={mediaRef} className="absolute inset-0">
           {/* Lihat KONTRAK LCP di atas: panel foto tidak boleh ikut HTML server. */}

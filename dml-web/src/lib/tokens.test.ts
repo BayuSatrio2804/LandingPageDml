@@ -60,4 +60,15 @@ describe("kontras token Navy Selat", () => {
       relativeLuminance(TOKENS.accentHover),
     );
   });
+
+  // Penanda pintu hero adalah elemen non-teks. WCAG 1.4.11 menuntut 3:1 untuk
+  // itu, bukan 4,5:1. Navy dasar tidak lolos di atas bidang gelap hero, dan
+  // itulah alasan accentLift ada sebagai token terpisah.
+  it("aksen terangkat lolos 3:1 di atas bidang gelap hero", () => {
+    expect(contrastRatio(TOKENS.accentLift, TOKENS.heroGround)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("teks putih lolos AAA di atas bidang gelap hero", () => {
+    expect(contrastRatio(TOKENS.onAccent, TOKENS.heroGround)).toBeGreaterThanOrEqual(7);
+  });
 });
