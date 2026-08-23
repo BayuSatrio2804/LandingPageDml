@@ -4,6 +4,7 @@ import { ImageResponse } from "next/og";
 import { OgCard, OG_SIZE, OG_CONTENT_TYPE, loadOgFont, toOgSafeImageDataUri } from "@/lib/seo/og-template";
 import { findPublishedPost } from "@/features/articles/queries";
 import { resolveMedia, CATEGORY_LABELS } from "@/features/articles/article-list";
+import { MEDIA_STATIC_DIR } from "@/payload/collections/Media";
 
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
@@ -23,16 +24,17 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   const cover = post ? resolveMedia(post.coverImage) : null;
   /**
-   * Dibaca langsung dari disk (staticDir default Payload, "media/" di akar
-   * proyek), bukan lewat fetch ke /api/media/file/<nama>. generateStaticParams
-   * artikel berjalan saat next build, sebelum ada server HTTP yang bisa
-   * dituju; fetch ke diri sendiri saat itu tidak bisa diandalkan. Satori
-   * juga tidak bisa mendekode WebP (lihat og-template.tsx), jadi byte-nya
-   * tetap harus lewat toOgSafeImageDataUri apa pun sumbernya.
+   * Dibaca langsung dari disk lewat MEDIA_STATIC_DIR (Task 18), bukan path
+   * ditulis ulang di sini atau lewat fetch ke /api/media/file/<nama>.
+   * generateStaticParams artikel berjalan saat next build, sebelum ada
+   * server HTTP yang bisa dituju; fetch ke diri sendiri saat itu tidak bisa
+   * diandalkan. Satori juga tidak bisa mendekode WebP (lihat
+   * og-template.tsx), jadi byte-nya tetap harus lewat toOgSafeImageDataUri
+   * apa pun sumbernya.
    */
   const imageUrl = cover?.filename
     ? await toOgSafeImageDataUri(
-        await readFile(path.join(process.cwd(), "media", cover.filename)),
+        await readFile(path.join(MEDIA_STATIC_DIR, cover.filename)),
       )
     : undefined;
 

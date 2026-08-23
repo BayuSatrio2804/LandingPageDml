@@ -52,8 +52,5 @@ next-env.d.ts
 # bundel sementara bun run seed, lihat komentar di package.json
 /.seed-bundle.js
 
-# Upload Payload (Media.upload, staticDir default). Konten dari admin
-# panel dan dari bun run seed, bukan aset sumber; produksi memakainya
-# lewat volume persisten, bukan lewat git. Lihat Task 18 Plan 9 untuk
-# staticDir eksplisit.
-/media/
+# upload runtime Payload, tidak pernah dikomit
+/uploads/
