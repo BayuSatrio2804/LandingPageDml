@@ -22,7 +22,8 @@
     "check": "bun run lint && bun run typecheck && bun run test && bun run build && bun run doctor && bun run lighthouse",
     "payload": "PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts payload",
     "generate:types": "PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts payload generate:types",
-    "generate:importmap": "PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts payload generate:importmap"
+    "generate:importmap": "PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts payload generate:importmap",
+    "seed": "bun build scripts/seed.ts --target=bun --outfile=.seed-bundle.js && PAYLOAD_CONFIG_PATH=src/payload/payload.config.ts bun .seed-bundle.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.0",
