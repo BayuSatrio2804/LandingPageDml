@@ -2,9 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   articleJsonLd,
   breadcrumbJsonLd,
+  localBusinessJsonLd,
   organizationJsonLd,
   safeJsonLdString,
+  serviceJsonLd,
 } from "./json-ld";
+import { COMPANY } from "@/content/company";
+import { absoluteUrl } from "./metadata";
 
 describe("organizationJsonLd", () => {
   const data = organizationJsonLd() as Record<string, unknown>;
@@ -108,5 +112,46 @@ describe("articleJsonLd", () => {
       title: 'Judul </script><script>alert(1)</script>',
     });
     expect(safeJsonLdString(data)).not.toContain("</script>");
+  });
+});
+
+describe("serviceJsonLd", () => {
+  const data = serviceJsonLd({
+    name: "Transportasi BBM",
+    description: "Distribusi bahan bakar cair ke pelabuhan dan pulau utama Indonesia.",
+    path: "/bisnis/transportasi-bbm",
+  }) as Record<string, unknown>;
+
+  it("memakai tipe Service", () => {
+    expect(data["@type"]).toBe("Service");
+    expect(data.name).toBe("Transportasi BBM");
+  });
+
+  it("provider menunjuk organisasi yang sama dengan JSON-LD root", () => {
+    expect(data.provider).toMatchObject({
+      "@type": "Organization",
+      name: COMPANY.legalName,
+    });
+  });
+
+  it("url absolut", () => {
+    expect(String(data.url)).toBe(absoluteUrl("/bisnis/transportasi-bbm"));
+  });
+});
+
+describe("localBusinessJsonLd", () => {
+  const data = localBusinessJsonLd() as Record<string, unknown>;
+
+  it("memakai tipe LocalBusiness", () => {
+    expect(data["@type"]).toBe("LocalBusiness");
+  });
+
+  it("membawa kedua kantor dari COMPANY.offices", () => {
+    expect(Array.isArray(data.address)).toBe(true);
+    expect((data.address as unknown[]).length).toBe(COMPANY.offices.length);
+  });
+
+  it("membawa telepon", () => {
+    expect(data.telephone).toBe(COMPANY.phone);
   });
 });

@@ -5,7 +5,7 @@ import { COMPANY } from "@/content/company";
 import { MAIN_LINES } from "@/content/business-lines";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { buildMetadata } from "@/lib/seo/metadata";
-import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
+import { breadcrumbJsonLd, safeJsonLdString, serviceJsonLd } from "@/lib/seo/json-ld";
 import { SectionHeader } from "@/components/ui/section-header";
 import { CtaLink } from "@/components/ui/cta-link";
 import { FleetSpecTable } from "@/features/fleet/spec-table";
@@ -56,6 +56,11 @@ export default function TransportasiBbmPage() {
   ]);
   const line = MAIN_LINES.find((entry) => entry.id === "transportasi-bbm");
   const hero = MEDIA["bisnis"].find((frame) => frame.id === "lini-bbm") ?? null;
+  const service = serviceJsonLd({
+    name: "Transportasi BBM",
+    description: line?.summary ?? "",
+    path: "/bisnis/transportasi-bbm",
+  });
 
   return (
     <div>
@@ -178,6 +183,10 @@ export default function TransportasiBbmPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLdString(trail) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLdString(service) }}
       />
     </div>
   );
