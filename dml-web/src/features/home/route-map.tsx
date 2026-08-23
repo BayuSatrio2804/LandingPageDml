@@ -18,20 +18,26 @@ const PORT_BY_ID = new Map(PORTS.map((port) => [port.id, port]));
  * isian navy paling tipis dan daratan memakai putih, arah yang sama dengan
  * peta cetak: bidang berwarna adalah air, bidang kosong adalah tanah.
  *
- * Garis pantai punya nilainya sendiri, #B6C6DC, dan itu bukan token yang
- * malas dipilih. Beda terang antara putih dan laut cuma 1,1:1, jadi yang
+ * Garis pantai punya nilainya sendiri, #A9BACF, dan itu bukan token yang
+ * malas dipilih. Beda terang antara darat dan laut cuma 1,3:1, jadi yang
  * benar-benar menggambar bentuk pulau adalah goresannya, bukan isiannya.
  * Token surface3 terlalu pucat untuk pekerjaan itu di atas laut.
+ *
+ * portDim sebaliknya JATUH ke token line di Plan 7. Nilai lamanya #94A6C0
+ * cuma 2,11:1 di atas laut, di bawah 3:1 yang dituntut WCAG 1.4.11 untuk
+ * objek grafis bermakna, dan penanda pelabuhan memang bermakna: ia berubah
+ * jadi portLit begitu rute sampai. Setiap nilai yang lolos 3:1 di atas laut
+ * ternyata segelap line, jadi hex kembar tidak ada gunanya.
  */
-const MAP = {
+export const MAP = {
   sea: TOKENS.accentSoft,
   land: TOKENS.surface2,
-  coast: "#B6C6DC",
+  coast: "#A9BACF",
   routeDml: TOKENS.accent,
   routeMitra: TOKENS.line,
   portOffice: TOKENS.inkMuted,
   portLit: TOKENS.accent,
-  portDim: "#94A6C0",
+  portDim: TOKENS.line,
   labelLit: TOKENS.ink,
   labelDim: TOKENS.inkMuted,
 } as const;
