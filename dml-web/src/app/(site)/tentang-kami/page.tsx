@@ -5,6 +5,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { AnchorNav } from "@/components/layout/anchor-nav";
 import { Reveal } from "@/components/motion/reveal";
+import { SectionHeader } from "@/components/ui/section-header";
 import { GroupStructure } from "@/features/about/group-structure";
 
 export const metadata: Metadata = buildMetadata({
@@ -20,65 +21,71 @@ export default function TentangKamiPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-      <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Tentang Kami</h1>
+    <div>
+      <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
+        <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Tentang Kami</h1>
 
-      <AnchorNav
-        items={[
-          { id: "silsilah", label: "Silsilah" },
-          { id: "profil", label: "Profil" },
-          { id: "grup", label: "Grup" },
-        ]}
-      />
+        <AnchorNav
+          items={[
+            { id: "silsilah", label: "Silsilah" },
+            { id: "profil", label: "Profil" },
+            { id: "grup", label: "Grup" },
+          ]}
+        />
+      </div>
 
-      <section id="silsilah" className="mt-16 scroll-mt-24">
-        <h2 className="font-display text-2xl font-bold">Silsilah</h2>
-        <Reveal className="mt-8 space-y-8 border-l border-surface-3 pl-6">
-          {TIMELINE.map((entry) => (
-            <div key={entry.year}>
-              <p className="font-display font-bold text-accent">{entry.year}</p>
-              <p className="mt-1 max-w-[60ch] text-ink-muted">{entry.label}</p>
-            </div>
-          ))}
-        </Reveal>
-      </section>
-
-      <section id="profil" className="mt-24 scroll-mt-24">
-        <h2 className="font-display text-2xl font-bold">Profil Perusahaan</h2>
-        <Reveal className="mt-8 grid gap-10 md:grid-cols-2">
-          <div>
-            {/* draft: visi-misi belum direview klien, konfirmasi sebelum situs live */}
-            <h3 className="font-display font-bold text-ink">Visi</h3>
-            <p className="mt-2 max-w-[50ch] text-ink-muted">
-              Menjadi mitra pelayaran terpercaya di perairan Kalimantan, menghubungkan energi
-              dan orang dengan aman dan andal.
-            </p>
-            <h3 className="mt-6 font-display font-bold text-ink">Misi</h3>
-            <p className="mt-2 max-w-[50ch] text-ink-muted">
-              Mengoperasikan armada transportasi BBM, penyeberangan ro-ro, dan galangan kapal
-              dengan standar keselamatan dan kualitas tertinggi.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-display font-bold text-ink">Legalitas dan Sertifikasi</h3>
-            <p className="mt-2 text-ink-muted">{COMPANY.legalName}, bagian dari {COMPANY.parent}.</p>
-            {COMPANY.standards.map((cluster) => (
-              <div key={cluster.label} className="mt-4">
-                <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
-                <ul className="mt-2 flex flex-wrap gap-2">
-                  {cluster.items.map((item) => (
-                    <li
-                      key={item.name}
-                      className="rounded-full bg-accent-soft px-3 py-1 text-xs text-accent"
-                    >
-                      {item.name}
-                    </li>
-                  ))}
-                </ul>
+      <section id="silsilah" className="scroll-mt-24 bg-surface-wash py-20 md:py-28">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+          <SectionHeader title="Silsilah" />
+          <Reveal className="mt-8 space-y-8 border-l border-surface-3 pl-6">
+            {TIMELINE.map((entry) => (
+              <div key={entry.year}>
+                <p className="font-display font-bold text-accent">{entry.year}</p>
+                <p className="mt-1 max-w-[60ch] text-ink-muted">{entry.label}</p>
               </div>
             ))}
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
+      </section>
+
+      <section id="profil" className="scroll-mt-24 bg-surface-2-wash py-20 md:py-28">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+          <SectionHeader title="Profil Perusahaan" />
+          <Reveal className="mt-8 grid gap-10 md:grid-cols-2">
+            <div>
+              {/* draft: visi-misi belum direview klien, konfirmasi sebelum situs live */}
+              <h3 className="font-display font-bold text-ink">Visi</h3>
+              <p className="mt-2 max-w-[50ch] text-ink-muted">
+                Menjadi mitra pelayaran terpercaya di perairan Kalimantan, menghubungkan energi
+                dan orang dengan aman dan andal.
+              </p>
+              <h3 className="mt-6 font-display font-bold text-ink">Misi</h3>
+              <p className="mt-2 max-w-[50ch] text-ink-muted">
+                Mengoperasikan armada transportasi BBM, penyeberangan ro-ro, dan galangan kapal
+                dengan standar keselamatan dan kualitas tertinggi.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-display font-bold text-ink">Legalitas dan Sertifikasi</h3>
+              <p className="mt-2 text-ink-muted">{COMPANY.legalName}, bagian dari {COMPANY.parent}.</p>
+              {COMPANY.standards.map((cluster) => (
+                <div key={cluster.label} className="mt-4">
+                  <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
+                  <ul className="mt-2 flex flex-wrap gap-2">
+                    {cluster.items.map((item) => (
+                      <li
+                        key={item.name}
+                        className="rounded-full bg-accent-soft px-3 py-1 text-xs text-accent"
+                      >
+                        {item.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       <GroupStructure />
