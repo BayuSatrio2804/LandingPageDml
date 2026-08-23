@@ -18,6 +18,14 @@ export function buildMetadata({
 }): Metadata {
   const url = absoluteUrl(path);
   return {
+    /**
+     * Tanpa metadataBase, gambar OG berpath relatif diresolusi terhadap
+     * localhost:3000 dan Next memperingatkannya saat build. Canonical sudah
+     * absolut lewat absoluteUrl(), jadi masalahnya cuma menyentuh gambar,
+     * dan justru gambar yang paling tidak terlihat rusak sampai ada yang
+     * membagikan tautannya.
+     */
+    metadataBase: new URL(SITE_URL),
     title,
     description,
     alternates: { canonical: url },
