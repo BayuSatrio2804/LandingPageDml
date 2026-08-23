@@ -9,7 +9,12 @@ export function FleetSpecTable({ fleetClasses }: { fleetClasses: FleetClass[] })
    * samping, bukan cuma tabelnya. Diverifikasi di checkpoint mobile Plan 5.
    */
   return (
-    <div className="mt-8 overflow-x-auto">
+    <div
+      className="mt-8 overflow-x-auto"
+      tabIndex={0}
+      role="region"
+      aria-label="Tabel spesifikasi armada"
+    >
       <table className="w-full min-w-[34rem] border-collapse text-left font-mono text-sm">
       <caption className="sr-only">Spesifikasi lima kelas kapal armada PT Dutabahari Menara Line</caption>
       <thead>

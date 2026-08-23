@@ -20,16 +20,6 @@ for (const viewport of VIEWPORTS) {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
     for (const path of ROUTES) {
       test(`tanpa pelanggaran axe di ${path}`, async ({ page }) => {
-        // Temuan 1 di audit.md: tabel spesifikasi armada (FleetSpecTable,
-        // dirender di seksi FleetComparator di "/") punya pembungkus
-        // overflow-x-auto yang tidak bisa menerima fokus keyboard. Cuma
-        // muncul saat lebar layar memaksa scroll horizontal (mobile).
-        // Menunggu keputusan scope pemilik repo, bukan diperbaiki diam-diam
-        // di task audit ini.
-        test.fixme(
-          viewport.name === "mobile" && path === "/",
-          "Temuan 1 (audit.md): tabel spesifikasi armada tidak keyboard-focusable di mobile",
-        );
         await page.goto(path);
         await runAxeCheck(page);
       });
