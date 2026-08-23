@@ -22,6 +22,12 @@ const RAW_SOURCE: Record<string, string> = {
   "/media/lini-bisnis/transportasi-bbm": "sts-sri-yuliani/DJI_0660.JPG",
   "/media/lini-bisnis/penumpang-roro": "kapal-kapal/DJI_0322.JPG",
   "/media/lini-bisnis/operasi-sts": "sts-sri-yuliani/DJI_0750.JPG",
+  "/media/bisnis/hub-bisnis": "kapal-kapal/DJI_0295.JPG",
+  "/media/bisnis/lini-bbm": "sts-sri-yuliani/DJI_0704.JPG",
+  "/media/bisnis/lini-roro": "kapal-kapal/DJI_0310.JPG",
+  "/media/alur-sts/alur-sts-1": "sts-06-juli/DJI_0002.JPG",
+  "/media/alur-sts/alur-sts-2": "sts-06-juli/DJI_0020.JPG",
+  "/media/alur-sts/alur-sts-3": "sts-06-juli/DJI_0044.JPG",
 };
 
 async function processAsset(asset: MediaAsset): Promise<void> {
