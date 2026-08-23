@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
 
 const EMAIL = process.env.SEED_ADMIN_EMAIL ?? "";
 const PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "";
@@ -9,8 +9,47 @@ const PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "";
 const STAMP = String(Date.now());
 const JUDUL = `Uji publikasi ${STAMP}`;
 const SLUG = `uji-publikasi-${STAMP}`;
+const SLUG_DRAFT = `uji-draft-${STAMP}`;
 
 test.describe.configure({ mode: "serial" });
+
+/**
+ * Tanpa ini, setiap run spec ini meninggalkan dua post permanen di database
+ * dev/CI: satu published, satu draft. Terakumulasi lewat run berulang, dua
+ * post published palsu ini naik ke atas "Artikel Terbaru" di beranda (sort
+ * -publishedAt) dan cukup untuk mendorong Largest Contentful Paint Lighthouse
+ * dari ~3400ms ke atas 7000ms lewat beban hidrasi tambahan -- ditemukan
+ * lewat investigasi gerbang Task 12, bukan dugaan.
+ */
+test.afterAll(async ({ request }) => {
+  if (!EMAIL || !PASSWORD) return;
+  const token = await loginDanAmbilToken(request);
+  if (!token) return;
+  await hapusPostBySlug(request, token, SLUG);
+  await hapusPostBySlug(request, token, SLUG_DRAFT);
+});
+
+async function loginDanAmbilToken(request: APIRequestContext): Promise<string | null> {
+  const response = await request.post("/api/users/login", {
+    data: { email: EMAIL, password: PASSWORD },
+  });
+  if (!response.ok()) return null;
+  const body = (await response.json()) as { token?: string };
+  return body.token ?? null;
+}
+
+async function hapusPostBySlug(request: APIRequestContext, token: string, slug: string) {
+  const cari = await request.get(`/api/posts?where[slug][equals]=${slug}&depth=0`, {
+    headers: { Authorization: `JWT ${token}` },
+  });
+  if (!cari.ok()) return;
+  const { docs } = (await cari.json()) as { docs: Array<{ id: number }> };
+  for (const doc of docs) {
+    await request.delete(`/api/posts/${doc.id}`, {
+      headers: { Authorization: `JWT ${token}` },
+    });
+  }
+}
 
 test("kredensial seed tersedia", () => {
   // Gagal lebih awal dengan pesan yang jelas, bukan gagal di form login
@@ -84,7 +123,7 @@ test("artikel yang dipublikasikan lewat admin muncul tanpa rebuild", async ({ pa
 });
 
 test("artikel berstatus draft tidak pernah tampil ke publik", async ({ page, request }) => {
-  const slugDraft = `uji-draft-${STAMP}`;
+  const slugDraft = SLUG_DRAFT;
 
   await page.goto("/admin");
   await page.getByLabel("Email").fill(EMAIL);
