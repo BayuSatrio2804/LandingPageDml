@@ -6,6 +6,7 @@ export function TextField({
   id,
   label,
   type = "text",
+  autoComplete,
   multiline = false,
   register,
   error,
@@ -13,6 +14,7 @@ export function TextField({
   id: string;
   label: string;
   type?: string;
+  autoComplete?: string;
   multiline?: boolean;
   register: UseFormRegisterReturn;
   error?: string;
@@ -34,9 +36,21 @@ export function TextField({
         {label}
       </label>
       {multiline ? (
-        <textarea id={id} rows={4} className={`mt-2 ${fieldClassName}`} {...register} />
+        <textarea
+          id={id}
+          rows={4}
+          autoComplete={autoComplete}
+          className={`mt-2 ${fieldClassName}`}
+          {...register}
+        />
       ) : (
-        <input id={id} type={type} className={`mt-2 ${fieldClassName}`} {...register} />
+        <input
+          id={id}
+          type={type}
+          autoComplete={autoComplete}
+          className={`mt-2 ${fieldClassName}`}
+          {...register}
+        />
       )}
       {error ? (
         <p role="alert" className="mt-1.5 text-sm text-danger">
