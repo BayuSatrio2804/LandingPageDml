@@ -38,7 +38,8 @@
 | `src/app/globals.css` | blok `@theme` cermin dari tokens.ts, plus dua class wash dengan resep baru |
 | `src/lib/tokens.test.ts` | tambah satu asersi penjaga `surface3`/`accent` |
 | `src/components/layout/site-header.tsx` | pita navy penuh, teks di atasnya memakai pasangan yang lolos AA |
-| `src/components/layout/mobile-menu.tsx` | bayangan panel memakai aksen baru |
+| `src/components/layout/mobile-menu.tsx` | panel memasang warna teksnya sendiri, bayangan memakai aksen baru |
+| `src/components/layout/skip-link.tsx` | pil fokus dibalik supaya tidak navy di atas pita navy |
 | `src/features/home/route-map.tsx` | `MAP` diekspor untuk diuji; `coast` diperdalam; `portDim` jatuh ke token |
 | `src/features/home/route-map.test.tsx` | tambah asersi kontras penanda peta |
 | `src/features/home/three/stage.tsx` | delapan warna lampu dan bayangan disetel ke bidang yang lebih dalam |
@@ -107,7 +108,17 @@ Task ini punya langkah merah yang **sungguhan**: `tokens-parity.test.ts` akan ga
 
 - [ ] **Step 1: Sunting `src/lib/tokens.ts` — nilai saja, jangan docblock dulu**
 
-Ganti isi objek `TOKENS` menjadi persis ini, komentar per-token yang sudah ada dipertahankan di tempatnya:
+Ganti isi objek `TOKENS` menjadi persis ini. Komentar per-token dipertahankan di tempatnya **kecuali tiga yang jadi berbohong** — perbaiki ketiganya di step ini juga, dengan alasan yang sama yang dipakai Step 5 untuk dua docblock besar: komentar yang berbohong lebih buruk daripada tidak ada komentar.
+
+| Komentar | Kenapa jadi salah | Ganti jadi |
+| --- | --- | --- |
+| `surface` — "Biru-putih, bukan putih murni, supaya kartu putih punya tempat berdiri." | kartunya tidak putih murni lagi | `/** Bidang halaman. Biru-abu, cukup dalam supaya kartu surface2 punya tempat berdiri tanpa harus jadi putih murni. */` |
+| `surface2` — tidak berkomentar, tapi nilainya berhenti jadi `#FFFFFF` | — | tambahkan `/** Bidang terangkat: kartu, panel scrim, seksi selang-seling. Bukan putih murni; putih murni membunuh kedalaman dan tidak menyisakan ruang naik. */` |
+| `line` — "...dan #CED9EA cuma mencapai 1,4:1 di atas putih" | `#CED9EA` tidak ada lagi di berkas ini, dan bidangnya bukan putih | ganti klausa itu jadi `...dan surface3 cuma mencapai 1,5:1 di atas bidang terangkat` |
+
+Komentar `accentLift` menyebut "Navy #164194 nyaris tak terlihat di atas heroGround" — perbarui angkanya jadi `#183163`. Komentar `danger` menyebut palet oranye yang lama; itu catatan sejarah yang masih benar, biarkan.
+
+Nilainya:
 
 ```ts
   surface: "#E9EEF5",
@@ -374,9 +385,17 @@ git commit -m "style: resep wash seksi tidak lagi menyala dari dua sudut"
 
 Task ini punya langkah merah yang sungguhan lewat e2e.
 
+**Akar dua cacat turunan, baca sebelum mulai.** `text-on-accent` dipasang di elemen `<header>` supaya wordmark dan ikon hamburger ikut putih. Tapi warna teks **diwariskan**, dan tidak semua keturunan header duduk di atas navy:
+
+- `MobileMenu` dirender **di dalam** `<header>` (`site-header.tsx:41`), dan panelnya `bg-surface-2` — bidang terang. Tautan di dalamnya (`mobile-menu.tsx:60,68`) tidak punya warna sendiri, jadi mereka akan mewarisi putih dan hilang di atas panel nyaris putih. `contrast-tokens.spec.ts` **tidak bisa** menangkap ini: `collectOnAccent` hanya menyimpan elemen yang latar efektifnya sama dengan `accent`, dan panel itu berhenti di `surface-2`. Axe juga tidak, selama panel `hidden`.
+- `SkipLink` bukan keturunan header, tapi kena tabrakan yang serumpun: ia `focus:fixed focus:top-4 focus:z-50 focus:bg-accent`. Header `sticky top-0` setinggi 64/72px, jadi pil fokus mendarat **di dalam** pita navy dan dicat di atasnya — aksen di atas aksen, 1:1. Ini regresi WCAG 2.4.7, bukan sesuatu yang cukup "diperiksa secara visual".
+
+Dua-duanya ditutup di task ini sebagai langkah, bukan sebagai catatan. Kalau nanti ada elemen lain dipindahkan ke dalam `<header>`, pertanyaannya selalu sama: apakah ia benar-benar duduk di atas navy? Kalau tidak, ia butuh warna teksnya sendiri.
+
 **Files:**
 - Modify: `src/components/layout/site-header.tsx:9-11` dan `:25-38`
-- Modify: `src/components/layout/mobile-menu.tsx:35` dan `:50`
+- Modify: `src/components/layout/mobile-menu.tsx:50`
+- Modify: `src/components/layout/skip-link.tsx:5`
 
 **Interfaces:**
 - Consumes: token dari Task 2; pola teks-di-atas-navy yang sudah dipakai `site-footer.tsx:24,51,56`.
@@ -447,25 +466,57 @@ Tambahkan komentar di atas `<header>`:
 Run: `bun run test:e2e tests/e2e/contrast-tokens.spec.ts`
 Expected: PASS kedua tes, termasuk `expect(checked).toBeGreaterThan(0)` yang membuktikan penelusuran latar benar-benar menemukan elemen.
 
-- [ ] **Step 5: Selaraskan mobile menu**
+- [ ] **Step 5: Kembalikan warna teks panel mobile menu**
 
-Panel menu tetap terang — ia turun dari header navy seperti laci, dan itu memang pola ptdml. Dua hal yang perlu berubah.
+Tombol pemicu di `mobile-menu.tsx:35` memang **harus** mewarisi `text-on-accent` dari Step 3 — ia duduk di atas navy. Panelnya tidak, dan tanpa langkah ini seluruh nav mobile jadi putih di atas `#FBFCFE`.
 
-Di `src/components/layout/mobile-menu.tsx:35`, tombol pemicu berada di dalam header navy dan sudah mewarisi `text-on-accent` dari Step 3; tidak perlu diubah. Verifikasi saja secara visual bahwa ikonnya putih.
-
-Di `src/components/layout/mobile-menu.tsx:50`, `rgba(22,65,148,0.08)` adalah aksen **lama** (`#164194`). Ganti ke aksen baru (`#183163` → `24,49,99`) dan perbarui komentar di atasnya yang menyebut pthis.id:
+Di `src/components/layout/mobile-menu.tsx:50`, tambahkan `text-ink` dan ganti `rgba(22,65,148,0.08)` — itu aksen **lama** (`#164194`) — ke aksen baru (`#183163` → `24,49,99`). Ganti juga komentar di atasnya yang menyebut pthis.id:
 
 ```tsx
-        // Panel putih di atas bidang biru-abu, bukan bidang yang sama dengan
+        // Panel terang di atas bidang biru-abu, bukan bidang yang sama dengan
         // halaman. Kalau panelnya bg-surface ia menyatu dengan latar dan menu
         // terbaca seperti halaman yang tiba-tiba menumpuk teks. Sejak Plan 7
         // panel ini turun dari header navy, jadi ia dibaca sebagai laci — pola
-        // yang sama dengan ptdml.com. Bayangannya ditintakan ke aksen baru,
-        // bukan hitam murni, supaya tidak terbaca sebagai lubang.
-        className="fixed inset-x-0 top-16 border-b border-surface-3 bg-surface-2 px-4 pb-8 pt-4 shadow-[0_6px_18px_rgba(24,49,99,0.08)]"
+        // yang sama dengan ptdml.com.
+        //
+        // text-ink WAJIB eksplisit di sini. Panel ini dirender di dalam
+        // <header> yang memasang text-on-accent, dan warna teks diwariskan,
+        // jadi tautan di bawah akan jadi putih di atas panel nyaris putih
+        // kalau dibiarkan mewarisi. contrast-tokens.spec.ts tidak akan pernah
+        // menangkapnya: latar efektif panel ini surface-2, bukan accent, jadi
+        // collectOnAccent membuangnya sebelum sempat diperiksa.
+        //
+        // Bayangannya ditintakan ke aksen, bukan hitam murni, supaya tidak
+        // terbaca sebagai lubang.
+        className="fixed inset-x-0 top-16 border-b border-surface-3 bg-surface-2 px-4 pb-8 pt-4 text-ink shadow-[0_6px_18px_rgba(24,49,99,0.08)]"
 ```
 
-- [ ] **Step 6: Verifikasi visual empat rute**
+- [ ] **Step 6: Balik pil skip link supaya tidak navy di atas navy**
+
+`skip-link.tsx` memakai `focus:top-4` dengan `focus:z-50`, sementara header `sticky top-0` setinggi 64/72px dan `z-40`. Pil fokus mendarat di dalam pita navy dan dicat di atasnya. Setelah Step 1, `focus:bg-accent` berarti navy di atas navy — 1:1, dan tautan lewati-navigasi lenyap total untuk pengguna keyboard.
+
+Ganti baris `className` di `src/components/layout/skip-link.tsx` jadi:
+
+```tsx
+      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-surface-2 focus:px-5 focus:py-2 focus:text-accent focus:ring-2 focus:ring-accent"
+```
+
+Tambahkan komentar di atas `<a>`:
+
+```tsx
+    /*
+     * Pil dibalik sejak Plan 7: bidang terang, teks navy. Sebelumnya bg-accent,
+     * dan begitu kepala halaman jadi pita navy pil itu jadi navy di atas navy —
+     * top-4 dengan z-50 mendaratkannya persis di dalam pita setinggi 64/72px.
+     *
+     * Cincinnya bukan hiasan. Pil ini fixed dan halaman bergulir di bawahnya,
+     * jadi ia harus terbaca di dua latar: di atas navy, bidang terangnya sendiri
+     * yang membedakan (12,3:1); di atas bidang halaman terang, bedanya cuma
+     * 1,1:1 dan yang menggambar tepinya semata-mata cincin navy itu.
+     */
+```
+
+- [ ] **Step 7: Verifikasi visual empat rute**
 
 ```bash
 bun run dev
@@ -474,10 +525,11 @@ bun run dev
 Periksa `/`, `/kontak`, `/karier`, `/tentang-kami`:
 - Header navy solid, wordmark putih, tautan nav abu-terang yang memutih saat hover.
 - Di `/`, pita navy bertemu hero gelap tanpa jahitan terang di antaranya.
-- Di lebar mobile, ikon hamburger putih dan panel menu turun sebagai bidang terang dengan bayangan bertinta navy.
-- Fokus keyboard: Tab dari `SkipLink` harus tetap terlihat di atas navy.
+- Di lebar mobile, ikon hamburger putih, panel menu turun sebagai bidang terang, dan **teks tautan di dalamnya gelap dan terbaca** — ini verifikasi untuk Step 5 dan tidak dijaga tes mana pun.
+- Tekan Tab dari halaman baru dimuat: pil skip link muncul sebagai bidang terang bercincin navy di dalam pita header, bukan lenyap.
+- `/tentang-kami` memakai `AnchorNav` di dalam `<main>` (`page.tsx:28`), bukan di dalam header, jadi `text-accent`/`text-ink-muted` di sana tetap berada di atas bidang terang dan tidak terpengaruh. Verifikasi sekilas saja.
 
-- [ ] **Step 7: Gerbang penuh**
+- [ ] **Step 8: Gerbang penuh**
 
 ```bash
 bun run lint && bun run typecheck && bun run test && bun run build
@@ -485,14 +537,14 @@ bun run test:e2e
 ```
 Expected: semua hijau. Selain `contrast-tokens.spec.ts`, perhatikan `a11y-viewport.spec.ts` dan `no-js.spec.ts`.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
-git add src/components/layout/site-header.tsx src/components/layout/mobile-menu.tsx
+git add src/components/layout/site-header.tsx src/components/layout/mobile-menu.tsx src/components/layout/skip-link.tsx
 git commit -m "style: kepala halaman jadi pita navy, sepasang dengan kaki halaman"
 ```
 
-**Gerbang Fase 3:** seluruh perintah di Step 7 hijau.
+**Gerbang Fase 3:** seluruh perintah di Step 8 hijau.
 
 ---
 
@@ -768,7 +820,7 @@ git commit -m "style: panggung 3D dan material lambung disetel ke bidang baru"
 - [ ] **Step 1: Pastikan tidak ada nilai palet lama yang tertinggal**
 
 ```bash
-grep -rn --include='*.tsx' --include='*.ts' --include='*.css' -iE '#164194|#F5F9FD|#CED9EA|#7A8CA8|#181C24|#515661|#E1EEFF|#C62828|#0A1428|#4C7FD6|22,65,148|#94A6C0|#B6C6DC|#E3EBF5|#33475C|#22303F|#1E3352' src/
+grep -rn --include='*.tsx' --include='*.ts' --include='*.css' -iE '#164194|#F5F9FD|#CED9EA|#7A8CA8|#181C24|#515661|#E1EEFF|#C62828|#0A1428|#4C7FD6|22,65,148|#94A6C0|#B6C6DC|#E3EBF5|#33475C|#22303F|#1E3352|#D8E6F5|#AFC4DB|#E5EDF6|#DCE7F2|#BFD4E8' src/
 ```
 Expected: nol baris.
 

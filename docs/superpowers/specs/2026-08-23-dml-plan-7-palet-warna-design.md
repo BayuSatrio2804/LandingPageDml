@@ -218,9 +218,21 @@ Konsekuensi yang harus ikut dikerjakan:
   `22,65,148` adalah aksen **lama** (`#164194`). Perbarui ke aksen baru
   (`24,49,99`). Panel menu sendiri tetap terang — ia turun dari header navy
   seperti laci, dan itu memang pola ptdml.
-- `anchor-nav.tsx` memakai `text-accent` / `text-ink-muted` di atas bidang
-  terang, tidak terpengaruh. Verifikasi saja bahwa ia tidak pernah dirender
-  di dalam header.
+- **Dua cacat turunan yang tidak dijaga tes mana pun.** `text-on-accent`
+  dipasang di elemen `<header>`, dan warna teks diwariskan. `MobileMenu`
+  dirender di dalam header itu tapi panelnya `bg-surface-2`, jadi tautannya
+  akan jadi putih di atas bidang nyaris putih kalau tidak diberi `text-ink`
+  eksplisit. `contrast-tokens.spec.ts` tidak bisa menangkapnya — latar efektif
+  panel itu `surface-2`, bukan `accent`, jadi ia dibuang sebelum diperiksa.
+  Terpisah tapi serumpun: `skip-link.tsx` memakai `focus:top-4 focus:z-50
+  focus:bg-accent`, dan pita header setinggi 64/72px membuat pil fokus itu
+  mendarat di dalamnya — navy di atas navy, 1:1, regresi WCAG 2.4.7. Pilnya
+  dibalik jadi bidang terang bertulisan navy dengan cincin navy: 12,3:1 di
+  atas header, dan cincin itu yang menggambar tepinya di atas bidang halaman
+  terang yang cuma berbeda 1,1:1.
+- `anchor-nav.tsx` memakai `text-accent` / `text-ink-muted`. Sudah diperiksa:
+  ia hanya dirender di `tentang-kami/page.tsx:28`, di dalam `<main>`, tidak
+  pernah di dalam header. Tidak terpengaruh.
 
 Halaman dalam (`/kontak`, `/karier`, `/tentang-kami`) mulai dari bidang
 terang, jadi header navy di sana langsung terbaca sebagai pita ptdml. Di
