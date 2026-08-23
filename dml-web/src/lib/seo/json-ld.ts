@@ -38,6 +38,39 @@ export function breadcrumbJsonLd(
 }
 
 /**
+ * JSON-LD artikel. Field opsional dihilangkan sepenuhnya kalau tidak ada,
+ * bukan diisi string kosong: validator structured data memperlakukan
+ * properti kosong sebagai kesalahan, sementara properti yang absen memang
+ * boleh absen untuk tipe Article.
+ */
+export function articleJsonLd(input: {
+  title: string;
+  description: string;
+  path: string;
+  publishedAt: string;
+  imageUrl?: string;
+  authorName?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: input.title,
+    description: input.description,
+    mainEntityOfPage: absoluteUrl(input.path),
+    datePublished: input.publishedAt,
+    publisher: {
+      "@type": "Organization",
+      name: COMPANY.legalName,
+      url: SITE_URL,
+    },
+    ...(input.imageUrl ? { image: input.imageUrl } : {}),
+    ...(input.authorName
+      ? { author: { "@type": "Person", name: input.authorName } }
+      : {}),
+  };
+}
+
+/**
  * JSON.stringify biasa tidak meng-escape "<", jadi field string apa pun yang
  * kebetulan memuat "</script>" bisa menutup tag lebih awal dan menyuntik
  * markup. COMPANY sekarang statis dan aman, tapi Plan 4 akan memakai fungsi
