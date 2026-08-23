@@ -66,3 +66,11 @@ menelan sinyalnya di sini. Meski begitu, ini tetap pengukuran build-time di
 satu mesin sandbox dengan load yang naik antar run; angka yang dipakai untuk
 keputusan produksi (menaikkan kembali ambang assertion, misalnya) tetap harus
 datang dari CI, bukan ledger ini.
+
+## Perbandingan akhir Fase 3 (Task 19)
+
+Satu run setelah seluruh Task 15-19 selesai (token/manifest hero, wash
+day-cut, seksi grup Tentang Kami, audit): LCP 3209 ms, CLS 0,0003, SEO 1,00,
+performance 0,89. Berada di rentang yang sama dengan baseline Task 14
+(3342-3898 ms) — malah sedikit lebih baik, bukan regresi. Tidak ada
+pergeseran yang perlu dicatat lebih jauh.
