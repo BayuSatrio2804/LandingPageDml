@@ -168,7 +168,7 @@ function RouteSvg({
               cy={y}
               r={(office ? 3.5 : lit ? 7 : 5) * markerScale}
               fill={office ? MAP.portOffice : lit ? MAP.portLit : MAP.portDim}
-              className="transition-all duration-300"
+              className="transition-[r,fill] duration-300"
             />
             <text
               x={labelX}
