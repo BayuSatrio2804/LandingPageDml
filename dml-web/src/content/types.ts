@@ -3,8 +3,13 @@
  * 5 Agustus 2026) adalah sumber utama sejak Plan 5; sisa fakta yang masih
  * berasal dari riset publik Plan 1 ditandai berbeda supaya klien tahu persis
  * baris mana yang belum punya dasar dokumen resmi.
+ *
+ * "belum-terverifikasi" dipakai untuk fakta yang masuk ke situs lewat jalur
+ * lain — misalnya ditulis langsung di komponen oleh kolaborator — dan belum
+ * punya dasar di PDF maupun di riset Plan 1. Bedanya dengan "riset-publik":
+ * riset-publik punya sumber yang bisa ditunjuk, ini tidak.
  */
-export type SourceTag = "cp-pdf" | "riset-publik";
+export type SourceTag = "cp-pdf" | "riset-publik" | "belum-terverifikasi";
 
 export type Office = {
   label: string;
