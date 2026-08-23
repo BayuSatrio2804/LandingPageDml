@@ -65,7 +65,7 @@ Asersi ini **hijau sejak menit pertama** (6,64:1 dengan nilai lama). Itu memang 
 - Consumes: `TOKENS` dan `contrastRatio` dari `src/lib/tokens.ts` dan `src/lib/color.ts` — sudah diimpor di berkas itu, tidak perlu impor baru.
 - Produces: tidak ada; ini penjaga murni.
 
-- [ ] **Step 1: Tulis asersi penjaga**
+- [x] **Step 1: Tulis asersi penjaga**
 
 ```ts
   /*
@@ -80,12 +80,12 @@ Asersi ini **hijau sejak menit pertama** (6,64:1 dengan nilai lama). Itu memang 
   });
 ```
 
-- [ ] **Step 2: Jalankan dan pastikan HIJAU**
+- [x] **Step 2: Jalankan dan pastikan HIJAU**
 
 Run: `bun run test src/lib/tokens.test.ts`
 Expected: PASS. Nilai terukur 6,64. Kalau merah, ada yang sudah mengubah token sebelum plan ini dijalankan — berhenti dan laporkan.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/lib/tokens.test.ts
@@ -106,7 +106,7 @@ Task ini punya langkah merah yang **sungguhan**: `tokens-parity.test.ts` akan ga
 - Consumes: penjaga dari Task 1.
 - Produces: `TOKENS` dengan 13 nilai baru. Nama token **tidak berubah** — seluruh berkas lain (`materials.ts`, `route-map.tsx`, `prepare-cert-placeholders.ts`) tetap membaca `TOKENS.accent`, `TOKENS.surface3`, dan seterusnya tanpa perubahan impor.
 
-- [ ] **Step 1: Sunting `src/lib/tokens.ts` — nilai saja, jangan docblock dulu**
+- [x] **Step 1: Sunting `src/lib/tokens.ts` — nilai saja, jangan docblock dulu**
 
 Ganti isi objek `TOKENS` menjadi persis ini. Komentar per-token dipertahankan di tempatnya **kecuali tiga yang jadi berbohong** — perbaiki ketiganya di step ini juga, dengan alasan yang sama yang dipakai Step 5 untuk dua docblock besar: komentar yang berbohong lebih buruk daripada tidak ada komentar.
 
@@ -137,12 +137,12 @@ Nilainya:
   accentLift: "#5B84C8",
 ```
 
-- [ ] **Step 2: Jalankan tes dan pastikan MERAH karena paritas**
+- [x] **Step 2: Jalankan tes dan pastikan MERAH karena paritas**
 
 Run: `bun run test src/lib/`
 Expected: FAIL. `tokens-parity.test.ts` melaporkan `--color-surface berbeda dari TOKENS.surface` (dan 12 lainnya). `tokens.test.ts` sendiri **hijau** — seluruh rasio baru sudah diukur lolos. Kalau `tokens.test.ts` ikut merah, salah ketik salah satu hex; bandingkan huruf per huruf dengan daftar di Step 1.
 
-- [ ] **Step 3: Sunting blok `@theme` di `src/app/globals.css`**
+- [x] **Step 3: Sunting blok `@theme` di `src/app/globals.css`**
 
 Ganti empat belas baris `--color-*` menjadi persis ini. Perhatikan huruf kecil: pembaca paritas melakukan `.toLowerCase()` pada dua sisi, jadi kapitalisasi bebas, tapi konsistensi dengan gaya berkas yang sudah ada adalah huruf kecil.
 
@@ -163,7 +163,7 @@ Ganti empat belas baris `--color-*` menjadi persis ini. Perhatikan huruf kecil: 
   --color-accent-lift: #5b84c8;
 ```
 
-- [ ] **Step 4: Jalankan tes dan pastikan HIJAU**
+- [x] **Step 4: Jalankan tes dan pastikan HIJAU**
 
 Run: `bun run test src/lib/`
 Expected: PASS, termasuk 10 asersi di `tokens.test.ts` (9 lama + 1 dari Task 1) dan 2 asersi paritas.
@@ -172,7 +172,7 @@ Yang paling perlu diperhatikan kalau ada yang merah:
 - `"teks ink di atas permukaan aksen GAGAL, ini yang dilarang spec"` adalah asersi **negatif** — ia menuntut rasio **di bawah** 4,5. Nilai baru 1,38. Kalau ini merah, `accent` terlalu terang atau `ink` terlalu gelap.
 - `"garis kontrol lolos 3:1"` adalah yang paling rawan saat bidang diperdalam. Nilai baru 3,63 dan 4,12.
 
-- [ ] **Step 5: Perbarui docblock di kedua berkas**
+- [x] **Step 5: Perbarui docblock di kedua berkas**
 
 Docblock di repo ini adalah rasionale of record, bukan hiasan. Dua-duanya sekarang menyatakan paletnya diturunkan dari pthis.id (Hasnur Internasional Shipping); setelah Step 4 pernyataan itu salah.
 
@@ -214,12 +214,12 @@ Di `src/app/globals.css`, ganti docblock di atas blok `@theme` jadi:
  */
 ```
 
-- [ ] **Step 6: Gerbang penuh**
+- [x] **Step 6: Gerbang penuh**
 
 Run: `bun run lint && bun run typecheck && bun run test && bun run build`
 Expected: keempatnya hijau.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/lib/tokens.ts src/app/globals.css
@@ -239,17 +239,17 @@ git commit -m "style: palet diturunkan dari ptdml.com, bidang halaman diperdalam
 - Consumes: `TOKENS` hasil Task 2.
 - Produces: tidak ada antarmuka kode.
 
-- [ ] **Step 1: Jalankan script**
+- [x] **Step 1: Jalankan script**
 
 Run: `bun run prepare:cert-placeholders`
 Expected: satu baris `<nama standar> -> /.../public/assets/cert/<berkas>.png` per badge di `CERT_BADGES`.
 
-- [ ] **Step 2: Pastikan berkas benar-benar berubah**
+- [x] **Step 2: Pastikan berkas benar-benar berubah**
 
 Run: `git status --short public/assets/cert/`
 Expected: setiap PNG muncul sebagai `M`. Kalau tidak ada yang berubah, script membaca token lama — pastikan Task 2 sudah di-commit dan tidak ada cache build yang ikut campur.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add public/assets/cert/
@@ -281,7 +281,7 @@ Tiga aturan struktural adalah kontraknya. Angka stop boleh disetel; tiga aturan 
 - Consumes: `--color-surface`, `--color-surface-2`, `--color-surface-3`, `--color-accent-soft` hasil Task 2.
 - Produces: dua nama class yang tidak berubah (`bg-surface-wash`, `bg-surface-2-wash`), jadi 15 titik pakai di 8 berkas tidak perlu disentuh.
 
-- [ ] **Step 1: Ganti kedua blok class**
+- [x] **Step 1: Ganti kedua blok class**
 
 Ganti dua blok `.bg-surface-wash` dan `.bg-surface-2-wash` beserta komentar di atasnya menjadi:
 
@@ -338,7 +338,7 @@ Ganti dua blok `.bg-surface-wash` dan `.bg-surface-2-wash` beserta komentar di a
 }
 ```
 
-- [ ] **Step 2: Verifikasi 15 titik pakai secara visual**
+- [x] **Step 2: Verifikasi 15 titik pakai secara visual**
 
 Nyalakan Postgres lalu dev server:
 
@@ -356,7 +356,7 @@ Buka dan periksa tiap seksi berikut. Yang dicari: seksi bersebelahan masih terba
 
 Kalau dua seksi bersebelahan jadi tidak terbedakan, yang disetel adalah stop `surface`/`surface-2` di tengah gradien linear, **bukan** menambahkan kembali `accent-soft` di ujung kedua.
 
-- [ ] **Step 3: Gerbang penuh termasuk e2e**
+- [x] **Step 3: Gerbang penuh termasuk e2e**
 
 ```bash
 bun run lint && bun run typecheck && bun run test && bun run build
@@ -364,7 +364,7 @@ bun run test:e2e
 ```
 Expected: semua hijau. `a11y-viewport.spec.ts` dan pemeriksaan axe di spec lain adalah yang paling mungkin bereaksi kalau ada teks yang jatuh ke bidang yang salah.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/app/globals.css
@@ -401,7 +401,7 @@ Dua-duanya ditutup di task ini sebagai langkah, bukan sebagai catatan. Kalau nan
 - Consumes: token dari Task 2; pola teks-di-atas-navy yang sudah dipakai `site-footer.tsx:24,51,56`.
 - Produces: tidak ada antarmuka kode baru. `SiteHeader` dan `MobileMenu` mempertahankan signature props-nya.
 
-- [ ] **Step 1: Ubah bidang header jadi navy, tautan nav SENGAJA belum disentuh**
+- [x] **Step 1: Ubah bidang header jadi navy, tautan nav SENGAJA belum disentuh**
 
 Di `src/components/layout/site-header.tsx`, ganti baris `<header ...>`:
 
@@ -411,7 +411,7 @@ Di `src/components/layout/site-header.tsx`, ganti baris `<header ...>`:
 
 Jangan sentuh apa pun yang lain di berkas ini pada step ini.
 
-- [ ] **Step 2: Jalankan e2e dan pastikan MERAH**
+- [x] **Step 2: Jalankan e2e dan pastikan MERAH**
 
 ```bash
 docker compose up -d
@@ -421,7 +421,7 @@ Expected: FAIL pada tes `"tidak ada teks ink di atas latar aksen"`. Daftar pelan
 
 Ini bukti penjaganya hidup. Kalau justru hijau, `bg-accent` tidak benar-benar terpasang — periksa apakah kelas lama masih ada di baris yang sama.
 
-- [ ] **Step 3: Pindahkan teks header ke pasangan yang lolos AA**
+- [x] **Step 3: Pindahkan teks header ke pasangan yang lolos AA**
 
 Di `src/components/layout/site-header.tsx`:
 
@@ -461,12 +461,12 @@ Tambahkan komentar di atas `<header>`:
      */
 ```
 
-- [ ] **Step 4: Jalankan e2e dan pastikan HIJAU**
+- [x] **Step 4: Jalankan e2e dan pastikan HIJAU**
 
 Run: `bun run test:e2e tests/e2e/contrast-tokens.spec.ts`
 Expected: PASS kedua tes, termasuk `expect(checked).toBeGreaterThan(0)` yang membuktikan penelusuran latar benar-benar menemukan elemen.
 
-- [ ] **Step 5: Kembalikan warna teks panel mobile menu**
+- [x] **Step 5: Kembalikan warna teks panel mobile menu**
 
 Tombol pemicu di `mobile-menu.tsx:35` memang **harus** mewarisi `text-on-accent` dari Step 3 — ia duduk di atas navy. Panelnya tidak, dan tanpa langkah ini seluruh nav mobile jadi putih di atas `#FBFCFE`.
 
@@ -491,7 +491,7 @@ Di `src/components/layout/mobile-menu.tsx:50`, tambahkan `text-ink` dan ganti `r
         className="fixed inset-x-0 top-16 border-b border-surface-3 bg-surface-2 px-4 pb-8 pt-4 text-ink shadow-[0_6px_18px_rgba(24,49,99,0.08)]"
 ```
 
-- [ ] **Step 6: Balik pil skip link supaya tidak navy di atas navy**
+- [x] **Step 6: Balik pil skip link supaya tidak navy di atas navy**
 
 `skip-link.tsx` memakai `focus:top-4` dengan `focus:z-50`, sementara header `sticky top-0` setinggi 64/72px dan `z-40`. Pil fokus mendarat di dalam pita navy dan dicat di atasnya. Setelah Step 1, `focus:bg-accent` berarti navy di atas navy — 1:1, dan tautan lewati-navigasi lenyap total untuk pengguna keyboard.
 
@@ -516,7 +516,7 @@ Tambahkan komentar di atas `<a>`:
      */
 ```
 
-- [ ] **Step 7: Verifikasi visual empat rute**
+- [x] **Step 7: Verifikasi visual empat rute**
 
 ```bash
 bun run dev
@@ -529,7 +529,7 @@ Periksa `/`, `/kontak`, `/karier`, `/tentang-kami`:
 - Tekan Tab dari halaman baru dimuat: pil skip link muncul sebagai bidang terang bercincin navy di dalam pita header, bukan lenyap.
 - `/tentang-kami` memakai `AnchorNav` di dalam `<main>` (`page.tsx:28`), bukan di dalam header, jadi `text-accent`/`text-ink-muted` di sana tetap berada di atas bidang terang dan tidak terpengaruh. Verifikasi sekilas saja.
 
-- [ ] **Step 8: Gerbang penuh**
+- [x] **Step 8: Gerbang penuh**
 
 ```bash
 bun run lint && bun run typecheck && bun run test && bun run build
@@ -537,7 +537,7 @@ bun run test:e2e
 ```
 Expected: semua hijau. Selain `contrast-tokens.spec.ts`, perhatikan `a11y-viewport.spec.ts` dan `no-js.spec.ts`.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/components/layout/site-header.tsx src/components/layout/mobile-menu.tsx src/components/layout/skip-link.tsx
@@ -568,11 +568,11 @@ Nilai apa pun yang lolos 3:1 di atas laut baru ternyata segelap `TOKENS.line`. D
 - Consumes: `TOKENS` hasil Task 2.
 - Produces: `export const MAP` dari `src/features/home/route-map.tsx` — objek `as const` dengan kunci `sea`, `land`, `coast`, `routeDml`, `routeMitra`, `portOffice`, `portLit`, `portDim`, `labelLit`, `labelDim`, semuanya bertipe `string`. Berkas itu sudah mengekspor `activeLegIndex` ke tes, jadi ini mengikuti pola yang ada.
 
-- [ ] **Step 1: Ekspor `MAP` supaya bisa diuji**
+- [x] **Step 1: Ekspor `MAP` supaya bisa diuji**
 
 Di `src/features/home/route-map.tsx`, ubah `const MAP = {` menjadi `export const MAP = {`. Tidak ada perubahan lain pada step ini.
 
-- [ ] **Step 2: Tulis asersi kontras yang gagal**
+- [x] **Step 2: Tulis asersi kontras yang gagal**
 
 Di `src/features/home/route-map.test.tsx`, tambahkan dua impor **di blok impor paling atas berkas** (bukan di akhir — `MAP` datang dari modul yang sudah diimpor di baris 3, jadi cukup menambah namanya di situ):
 
@@ -633,7 +633,7 @@ describe("kontras penanda peta", () => {
 });
 ```
 
-- [ ] **Step 3: Jalankan dan pastikan MERAH**
+- [x] **Step 3: Jalankan dan pastikan MERAH**
 
 Run: `bun run test src/features/home/route-map.test.tsx`
 Expected: FAIL pada **dua** tes, dengan tiga asersi yang gagal:
@@ -648,7 +648,7 @@ Dua tes lainnya hijau: `"rute mitra"` pada 3,17 dan `"penanda redup dan menyala"
 
 Kalau `"rute mitra"` ikut merah, Task 2 belum selesai: `line` masih bernilai lama.
 
-- [ ] **Step 4: Perbaiki `MAP`**
+- [x] **Step 4: Perbaiki `MAP`**
 
 Di `src/features/home/route-map.tsx`, ganti dua nilai dan perbarui paragraf terakhir docblock:
 
@@ -683,12 +683,12 @@ export const MAP = {
 } as const;
 ```
 
-- [ ] **Step 5: Jalankan dan pastikan HIJAU**
+- [x] **Step 5: Jalankan dan pastikan HIJAU**
 
 Run: `bun run test src/features/home/route-map.test.tsx`
 Expected: PASS semua, termasuk tes komponen yang sudah ada di berkas itu.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/features/home/route-map.tsx src/features/home/route-map.test.tsx
@@ -711,7 +711,7 @@ Verifikasi task ini **visual, bukan numerik**. Tidak ada ambang WCAG yang berlak
 - Consumes: `TOKENS` hasil Task 2 (`materials.ts` sudah mengimpornya untuk `ACCENT_LINE_COLOR` dan `GRID_COLORS.main`).
 - Produces: `HULL_MATERIAL`, `DECK_MATERIAL`, `ACCENT_LINE_COLOR`, `GRID_COLORS` — nama dan bentuk tidak berubah, hanya nilainya.
 
-- [ ] **Step 1: Setel warna panggung**
+- [x] **Step 1: Setel warna panggung**
 
 Di `src/features/home/three/stage.tsx`, ganti delapan nilai warna:
 
@@ -738,7 +738,7 @@ Ganti paragraf kedua docblock berkas itu (baris 12-16) jadi:
  * halaman lain. Bayangan kontak ikut pindah ke keluarga navy yang baru.
 ```
 
-- [ ] **Step 2: Setel material lambung**
+- [x] **Step 2: Setel material lambung**
 
 Di `src/features/home/three/materials.ts`, ganti tiga nilai:
 
@@ -775,7 +775,7 @@ Tambahkan satu paragraf di akhir docblock `materials.ts`:
  * garis pembagi terbaca sebagai sorot, bukan sebagai grid.
 ```
 
-- [ ] **Step 3: Verifikasi visual sebelum dan sesudah**
+- [x] **Step 3: Verifikasi visual sebelum dan sesudah**
 
 ```bash
 docker compose up -d
@@ -790,7 +790,7 @@ Buka `/` dan gulir ke seksi armada 3D serta comparator. Yang dicari:
 
 Kalau salah satu meleset, setel **intensitas** lampu di `stage.tsx`, bukan `metalness` di `materials.ts`.
 
-- [ ] **Step 4: Gerbang penuh**
+- [x] **Step 4: Gerbang penuh**
 
 ```bash
 bun run lint && bun run typecheck && bun run test && bun run build
@@ -799,7 +799,7 @@ bun run doctor
 ```
 Expected: empat perintah pertama hijau. `bun run doctor` tetap exit 1 dengan **tepat satu** temuan: `effect-needs-cleanup` di `hero.tsx`, false-positive permanen yang sudah didokumentasikan sejak Plan 6. Temuan lain apa pun berasal dari plan ini dan harus ditutup.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/features/home/three/stage.tsx src/features/home/three/materials.ts
@@ -817,7 +817,7 @@ git commit -m "style: panggung 3D dan material lambung disetel ke bidang baru"
 - Consumes: seluruh hasil Task 1-7.
 - Produces: tidak ada.
 
-- [ ] **Step 1: Pastikan tidak ada nilai palet lama yang tertinggal**
+- [x] **Step 1: Pastikan tidak ada nilai palet lama yang tertinggal**
 
 ```bash
 grep -rn --include='*.tsx' --include='*.ts' --include='*.css' -iE '#164194|#F5F9FD|#CED9EA|#7A8CA8|#181C24|#515661|#E1EEFF|#C62828|#0A1428|#4C7FD6|22,65,148|#94A6C0|#B6C6DC|#E3EBF5|#33475C|#22303F|#1E3352|#D8E6F5|#AFC4DB|#E5EDF6|#DCE7F2|#BFD4E8' src/
@@ -826,14 +826,14 @@ Expected: nol baris.
 
 Kalau ada hasil, itu titik yang terlewat — tutup dan ulangi. Satu pengecualian yang perlu diketahui walau tidak muncul di grep ini: `src/lib/color.test.ts` memakai `#FF5A1F` dan `#0A1418` sebagai fixture aritmetika kontras, bukan sebagai warna situs. Jangan pernah menyentuh fixture itu, termasuk kalau grep yang lebih longgar menemukannya.
 
-- [ ] **Step 2: Pastikan tidak ada docblock yang masih menyebut pthis.id**
+- [x] **Step 2: Pastikan tidak ada docblock yang masih menyebut pthis.id**
 
 ```bash
 grep -rn --include='*.tsx' --include='*.ts' --include='*.css' -i 'pthis' src/
 ```
 Expected: nol baris. Tiga tempat menyebutnya sebelum plan ini: `tokens.ts`, `globals.css`, dan `mobile-menu.tsx:49`. Ketiganya sudah ditangani di Task 2 dan Task 5.
 
-- [ ] **Step 3: Gerbang lengkap**
+- [x] **Step 3: Gerbang lengkap**
 
 ```bash
 docker compose up -d
@@ -844,7 +844,7 @@ bun run lighthouse
 ```
 Expected: semua hijau kecuali `doctor` yang exit 1 dengan satu temuan permanen. `bun run lighthouse` diketahui labil di mesin ini (dicatat sejak Plan 4) — kalau ia gagal, jalankan ulang sekali; kalau tetap gagal, laporkan angkanya, jangan diamkan dan jangan pula menyetel ulang palet untuk mengejarnya.
 
-- [ ] **Step 4: Tandai plan selesai**
+- [x] **Step 4: Tandai plan selesai**
 
 ```bash
 git add docs/superpowers/plans/2026-08-23-dml-plan-7-palet-warna.md
