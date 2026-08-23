@@ -7,6 +7,7 @@ import { buildConfig } from "payload";
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Inquiries } from "./collections/Inquiries";
+import { Posts } from "./collections/Posts";
 import { migrations } from "../migrations";
 
 const filename = fileURLToPath(import.meta.url);
@@ -32,7 +33,7 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   sharp,
-  collections: [Users, Media, Inquiries],
+  collections: [Users, Media, Inquiries, Posts],
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
