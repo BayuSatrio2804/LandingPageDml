@@ -106,6 +106,18 @@ export type FleetClass = {
 };
 
 /**
+ * Satu kapal bernama dari daftar armada company profile halaman 04.
+ * `classSlug` menunjuk FleetClass.slug di fleet.ts; `routeId` hanya diisi
+ * untuk kapal ro-ro, menunjuk RouteLeg.id di features/route-map/ports.ts.
+ */
+export type Vessel = {
+  name: string;
+  classSlug: string;
+  routeId?: string;
+  source: SourceTag;
+};
+
+/**
  * Satu lini bisnis di beranda. `kind` memisahkan lini yang dijalankan DML
  * sendiri dari perusahaan afiliasi, karena keduanya tidak boleh diklaim
  * dengan kalimat yang sama.
