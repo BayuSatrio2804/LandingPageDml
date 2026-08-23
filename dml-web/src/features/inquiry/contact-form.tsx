@@ -50,11 +50,18 @@ export function ContactForm({ whatsappNumber }: { whatsappNumber: string }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-      <TextField id="name" label="Nama" register={register("name")} error={errors.name?.message} />
+      <TextField
+        id="name"
+        label="Nama"
+        autoComplete="name"
+        register={register("name")}
+        error={errors.name?.message}
+      />
       <TextField
         id="phone"
         label="Nomor telepon"
         type="tel"
+        autoComplete="tel"
         register={register("phone")}
         error={errors.phone?.message}
       />
@@ -62,6 +69,7 @@ export function ContactForm({ whatsappNumber }: { whatsappNumber: string }) {
         id="email"
         label="Email"
         type="email"
+        autoComplete="email"
         register={register("email")}
         error={errors.email?.message}
       />
