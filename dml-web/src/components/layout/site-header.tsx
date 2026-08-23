@@ -6,7 +6,20 @@ import { MobileMenu } from "./mobile-menu";
 
 export function SiteHeader() {
   return (
-    <header className="isolate sticky top-0 z-40 h-16 border-b border-surface-3 bg-surface/85 backdrop-blur md:h-[72px]">
+    /*
+     * Pita navy penuh, sepasang dengan kaki halaman. Solid, bukan bg-accent/90:
+     * contrast-tokens.spec.ts membandingkan latar efektif dengan nilai accent
+     * persis, dan varian beropasitas menghasilkan rgba(...) yang tidak cocok,
+     * jadi seluruh header akan dilewati diam-diam oleh pemeriksaan itu.
+     *
+     * text-on-accent dipasang di elemen header, bukan per-anak, supaya wordmark
+     * dan ikon hamburger ikut putih. Ikon bukan simpul teks, jadi e2e tidak
+     * akan pernah menangkapnya kalau ia tertinggal mewarisi ink.
+     *
+     * Tautan nav memakai surface-3 dan menguat ke on-accent saat hover. Dua
+     * warna itu, dan cuma dua itu, yang ada di allowlist e2e.
+     */
+    <header className="isolate sticky top-0 z-40 h-16 border-b border-on-accent/20 bg-accent text-on-accent md:h-[72px]">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-4 md:px-8">
         <Link
           href="/"
@@ -23,12 +36,12 @@ export function SiteHeader() {
                   <ExternalLink
                     href={item.href}
                     label={item.label}
-                    className="inline-flex items-center gap-1 text-sm text-ink-muted transition-colors hover:text-ink"
+                    className="inline-flex items-center gap-1 text-sm text-surface-3 transition-colors hover:text-on-accent"
                   />
                 ) : (
                   <Link
                     href={item.href}
-                    className="text-sm text-ink-muted transition-colors hover:text-ink"
+                    className="text-sm text-surface-3 transition-colors hover:text-on-accent"
                   >
                     {item.label}
                   </Link>
