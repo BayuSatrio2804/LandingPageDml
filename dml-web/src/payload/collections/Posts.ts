@@ -25,13 +25,30 @@ export function slugify(input: string): string {
  * Empat permukaan, dan cuma empat, yang memuat artikel:
  * daftar, detail, beranda (seksi Artikel Terbaru), dan sitemap.
  */
-function revalidasiArtikel(slugs: Array<string | undefined>) {
-  revalidatePath("/artikel");
-  for (const slug of new Set(slugs.filter(Boolean))) {
-    revalidatePath(`/artikel/${slug}`);
+/**
+ * revalidatePath melempar "Invariant: static generation store missing"
+ * kalau dipanggil di luar konteks request/build Next.js. scripts/seed.ts
+ * memanggil payload.create() langsung dari proses bun mandiri, tanpa
+ * server Next yang berjalan, sehingga hook ini tetap terpicu tapi tidak
+ * ada apa pun yang perlu disegarkan (belum ada halaman yang sempat
+ * di-cache). Menangkap galat itu di sini, bukan di seed.ts, supaya
+ * pemanggil manapun di luar konteks Next tetap aman, bukan cuma seed.
+ */
+function amanRevalidatePath(path: string) {
+  try {
+    revalidatePath(path);
+  } catch (error) {
+    console.warn(`revalidasi dilewati (di luar konteks Next): ${path}`, error);
   }
-  revalidatePath("/");
-  revalidatePath("/sitemap.xml");
+}
+
+function revalidasiArtikel(slugs: Array<string | undefined>) {
+  amanRevalidatePath("/artikel");
+  for (const slug of new Set(slugs.filter(Boolean))) {
+    amanRevalidatePath(`/artikel/${slug}`);
+  }
+  amanRevalidatePath("/");
+  amanRevalidatePath("/sitemap.xml");
 }
 
 export const Posts: CollectionConfig = {

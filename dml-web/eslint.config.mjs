@@ -19,6 +19,9 @@ const eslintConfig = defineConfig([
     // Decoder Draco vendor, disalin apa adanya dari
     // node_modules/three/examples/jsm/libs/draco/gltf/, bukan kode tulisan tangan:
     "public/draco/**",
+    // Bundel sementara bun run seed, lihat komentar di package.json dan
+    // scripts/seed.ts. Ditulis ulang tiap run, bukan kode tulisan tangan.
+    ".seed-bundle.js",
   ]),
 ]);
 
