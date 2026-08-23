@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 /*
- * Palet "Navy Selat". Diturunkan dari color scheme pthis.id (Hasnur
- * Internasional Shipping): navy #164194 sebagai warna utama, bidang halaman
- * biru-putih #F5F9FD, dan teks hitam lembut #181C24. Nilai di sini wajib
- * identik dengan src/lib/tokens.ts; kontrasnya dijaga tokens.test.ts.
+ * Palet "Navy Selat". Diturunkan dari color scheme ptdml.com: navy #183163
+ * sebagai warna utama, bidang halaman biru-abu #E9EEF5, dan teks hitam lembut
+ * #151A22. Nilai di sini wajib identik dengan src/lib/tokens.ts — alasan
+ * lengkap tiap keputusan ada di docblock berkas itu; kesamaannya dijaga
+ * tokens-parity.test.ts dan kontrasnya dijaga tokens.test.ts.
  *
  * Halamannya terang, jadi arah state tombol ikut membalik: hover dan press
  * lebih GELAP dari aksen, bukan lebih terang. Di halaman gelap yang lama
@@ -12,20 +13,20 @@
  * kehilangan kontras terhadap teks putih di atasnya.
  */
 @theme {
-  --color-surface: #f5f9fd;
-  --color-surface-2: #ffffff;
-  --color-surface-3: #ced9ea;
-  --color-line: #7a8ca8;
-  --color-ink: #181c24;
-  --color-ink-muted: #515661;
-  --color-accent: #164194;
-  --color-accent-hover: #0e3a8a;
-  --color-accent-press: #0a2c6b;
-  --color-accent-soft: #e1eeff;
+  --color-surface: #e9eef5;
+  --color-surface-2: #fbfcfe;
+  --color-surface-3: #c3cede;
+  --color-line: #6e7c93;
+  --color-ink: #151a22;
+  --color-ink-muted: #4c525c;
+  --color-accent: #183163;
+  --color-accent-hover: #12274f;
+  --color-accent-press: #0c1b39;
+  --color-accent-soft: #d6e0ee;
   --color-on-accent: #ffffff;
-  --color-danger: #c62828;
-  --color-hero-ground: #0a1428;
-  --color-accent-lift: #4c7fd6;
+  --color-danger: #b32222;
+  --color-hero-ground: #0b1424;
+  --color-accent-lift: #5b84c8;
 
   --radius-card: 12px;
   --radius-input: 8px;
