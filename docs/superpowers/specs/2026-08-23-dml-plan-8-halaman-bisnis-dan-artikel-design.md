@@ -165,9 +165,13 @@ Tersedia dan belum pernah dipakai: 53 foto drone kapal di
 `scripts/prepare-assets.ts` yang sudah ada, terdaftar di `MEDIA` manifest, dan
 disajikan sebagai AVIF empat lebar seperti aset lain.
 
-Set media baru: `armada-bbm`, `armada-roro`, `alur-sts`. Setiap frame wajib punya
-alt text bahasa Indonesia yang menyebut apa yang benar-benar terlihat, bukan
-kalimat pemasaran.
+Dua set media baru: `bisnis` (tiga frame: `hub-bisnis`, `lini-bbm`, `lini-roro`)
+dan `alur-sts` (tiga frame bernomor). Setiap frame wajib punya alt text bahasa
+Indonesia yang menyebut apa yang benar-benar terlihat, bukan kalimat pemasaran.
+
+Empat frame yang sudah dipakai beranda tidak boleh dipakai ulang di subhalaman.
+Foto yang sama di dua tempat membuat subhalaman terbaca sebagai pengulangan,
+yang persis lawan dari pembagian tugas di bagian 12.
 
 ---
 
@@ -726,13 +730,28 @@ disentuh dua kali. Mitigasinya ada di bagian 18.
 Spec ini menggambarkan satu kesatuan desain, tapi dieksekusi sebagai dua plan
 berurutan. Keputusan diambil pemilik repo 23 Agustus 2026.
 
-**Plan 8 — cabang bisnis, legalitas, dan sapuan.** Bagian 4.1, 4.3, 4.4, 5, 6, 7,
-8, 9, 11, 12, 13, 14. Sekitar 14 sampai 16 task. Keluarannya: seluruh cabang
-`/bisnis` hidup, tabel legalitas terisi, dan tidak ada lagi tautan internal yang
-menuju halaman tidak ada, kecuali `/artikel` yang masih menunggu Plan 9.
+**Plan 8 — cabang bisnis, legalitas, dan sapuan.** Bagian 4 seluruhnya (4.1
+sampai 4.4), 5, 6, 7, 8, 9, 11 kecuali 11.6, lalu 12, 13, 14, dan 15 kecuali
+spec admin-publish. Tujuh belas task, ditulis di
+`docs/superpowers/plans/2026-08-23-dml-plan-8-cabang-bisnis.md`. Keluarannya:
+seluruh cabang `/bisnis` hidup, tabel legalitas terisi, dan tidak ada lagi
+tautan internal yang menuju halaman tidak ada, kecuali `/artikel` yang masih
+menunggu Plan 9.
 
 **Plan 9 — artikel.** Bagian 10 seluruhnya, ditambah entri sitemap dinamis dari
-bagian 11.1 dan spec admin-publish dari bagian 15. Sekitar 8 sampai 10 task.
+bagian 11.1, bagian 11.6, dan spec admin-publish dari bagian 15. Sekitar 8
+sampai 10 task.
+
+**Bagian 11.6 milik Plan 9, bukan Plan 8, meski ia duduk di dalam bagian 11.**
+Verifikasi `/admin` lewat browser sungguhan dikerjakan oleh spec admin-publish,
+dan spec itu butuh koleksi `posts` untuk bisa mempublikasikan apa pun. Butir 1
+dari lima item Plan 2 karena itu tetap terbuka sepanjang Plan 8, dan itu keadaan
+yang diketahui, bukan kelalaian.
+
+**Bagian 15 dibelah, bukan diberikan utuh ke salah satu plan.** Tes unit, sweep
+axe, spec E2E cabang bisnis, dan seluruh gerbang akhir (`bun run check` plus
+`test:e2e`) dikerjakan Plan 8 untuk permukaan yang dibangunnya. Yang menunggu
+Plan 9 hanya spec admin-publish beserta bagian gerbang yang menyentuh artikel.
 
 **Kenapa dipecah.** Dua puluh empat task akan jadi plan terbesar di repo ini,
 melewati Plan 2 (16 task) dan Plan 6 (19 task). Kedua cabang tidak punya

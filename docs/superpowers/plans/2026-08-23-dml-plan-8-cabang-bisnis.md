@@ -10,7 +10,14 @@
 
 **Spec:** `docs/superpowers/specs/2026-08-23-dml-plan-8-halaman-bisnis-dan-artikel-design.md`
 
-Plan ini mengerjakan bagian 4.1, 4.3, 4.4, 5, 6, 7, 8, 9, 11, 12, 13, 14, dan 18 dari spec itu. Bagian 10 (artikel) sengaja **tidak** dikerjakan di sini; ia jadi Plan 9. Alasan pemecahan ada di bagian 18 spec.
+Plan ini mengerjakan bagian **4 seluruhnya** (4.1 sampai 4.4), 5, 6, 7, 8, 9, **11 kecuali 11.6**, lalu 12, 13, 14, dan **15 kecuali spec admin-publish** dari spec itu.
+
+Dua hal yang sengaja **tidak** dikerjakan di sini, keduanya jadi Plan 9:
+
+- **Bagian 10, artikel.** Seluruhnya, termasuk koleksi `posts`, kedua route, hook `revalidatePath`, seksi Artikel Terbaru di beranda, dan entri sitemap dinamis dari bagian 11.1.
+- **Bagian 11.6, verifikasi `/admin` lewat browser sungguhan.** Ia duduk di dalam bagian 11 tapi dikerjakan oleh spec admin-publish, dan spec itu butuh koleksi `posts` untuk bisa mempublikasikan apa pun. Butir 1 dari lima item Plan 2 karena itu tetap terbuka sepanjang plan ini, dan itu keadaan yang diketahui, bukan kelalaian.
+
+Alasan pemecahan, beserta tiga berkas yang disentuh kedua plan, ada di bagian 18 spec.
 
 ---
 
@@ -2515,6 +2522,8 @@ Ganti seluruh `<section className="mt-16 ...">` menjadi:
 ```
 
 Tambahkan `import Link from "next/link";` di bagian atas berkas kalau belum ada.
+
+**Jebakan nama, jangan "diperbaiki".** `BUSINESS_LINES` di berkas ini adalah konstanta **lokal** di baris 9, diturunkan dari `FOOTER_GROUPS` dan bertipe `NavItem[]` (`{ label, href }`). Ada juga `BUSINESS_LINES` yang diekspor `@/content/business-lines`, bertipe `BusinessLine[]` (`{ id, title, summary, ... }`) — nama sama, bentuk berbeda. Kode di atas memakai `line.label` dan `line.href`, jadi ia benar terhadap yang lokal. Jangan tergoda menambahkan import dari `@/content/business-lines`: itu menaungi konstanta lokalnya dan memecahkan seksi ini dengan `undefined` di setiap kartu.
 
 - [ ] **Step 2: Perbaiki Misi di `src/app/(site)/tentang-kami/page.tsx`**
 
