@@ -71,6 +71,57 @@ export function articleJsonLd(input: {
 }
 
 /**
+ * Satu Service per lini bisnis. Fieldnya diambil dari business-lines.ts yang
+ * sudah ada; tidak ada data perusahaan baru yang lahir di berkas ini.
+ *
+ * areaServed sengaja tidak diisi. Cakupan wilayah yang tepat tidak ada di
+ * company profile, dan menuliskan "Indonesia" adalah klaim yang tidak
+ * berdasar untuk data terstruktur yang justru dibaca mesin.
+ */
+export function serviceJsonLd(input: {
+  name: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl(input.path),
+    provider: {
+      "@type": "Organization",
+      name: COMPANY.legalName,
+      url: SITE_URL,
+    },
+  };
+}
+
+/**
+ * LocalBusiness berdampingan dengan Organization di root, sesuai master spec
+ * bagian 12. Keduanya mendeskripsikan badan yang sama dari sudut berbeda:
+ * Organization untuk identitas korporat dan induknya, LocalBusiness untuk
+ * tempat yang bisa didatangi beserta teleponnya.
+ */
+export function localBusinessJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: COMPANY.legalName,
+    url: SITE_URL,
+    telephone: COMPANY.phone,
+    address: COMPANY.offices.map((office) => ({
+      "@type": "PostalAddress",
+      streetAddress: office.street,
+      addressLocality: office.city,
+      ...(office.postalCode ? { postalCode: office.postalCode } : {}),
+      addressRegion: office.province,
+      addressCountry: "ID",
+    })),
+  };
+}
+
+/**
  * JSON.stringify biasa tidak meng-escape "<", jadi field string apa pun yang
  * kebetulan memuat "</script>" bisa menutup tag lebih awal dan menyuntik
  * markup. COMPANY sekarang statis dan aman, tapi Plan 4 akan memakai fungsi

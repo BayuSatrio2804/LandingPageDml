@@ -5,7 +5,7 @@ import { SmoothScrollProvider } from "@/components/motion/smooth-scroll-provider
 import { SkipLink } from "@/components/layout/skip-link";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
+import { localBusinessJsonLd, organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import "../globals.css";
 
 export const metadata: Metadata = buildMetadata({
@@ -42,6 +42,12 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: safeJsonLdString(organizationJsonLd()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: safeJsonLdString(localBusinessJsonLd()),
           }}
         />
       </body>

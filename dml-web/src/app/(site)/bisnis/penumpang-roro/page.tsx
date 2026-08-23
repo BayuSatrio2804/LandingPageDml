@@ -5,7 +5,7 @@ import { MAIN_LINES } from "@/content/business-lines";
 import { COMPANY } from "@/content/company";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { buildMetadata } from "@/lib/seo/metadata";
-import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
+import { breadcrumbJsonLd, safeJsonLdString, serviceJsonLd } from "@/lib/seo/json-ld";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ExternalLink } from "@/components/layout/external-link";
 import { RouteTable } from "@/features/fleet/route-table";
@@ -30,6 +30,11 @@ export default function PenumpangRoroPage() {
   ]);
   const line = MAIN_LINES.find((entry) => entry.id === "penumpang-roro");
   const hero = MEDIA["bisnis"].find((frame) => frame.id === "lini-roro") ?? null;
+  const service = serviceJsonLd({
+    name: "Penyeberangan Ro-Ro",
+    description: line?.summary ?? "",
+    path: "/bisnis/penumpang-roro",
+  });
 
   return (
     <div>
@@ -106,6 +111,10 @@ export default function PenumpangRoroPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLdString(trail) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLdString(service) }}
       />
     </div>
   );
