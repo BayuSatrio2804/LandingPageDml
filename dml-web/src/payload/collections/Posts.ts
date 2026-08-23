@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidatePath } from "next/cache";
 
 /**
  * Turunkan slug dari judul. Diekspor supaya bisa diuji langsung dan supaya
@@ -11,6 +12,26 @@ export function slugify(input: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * revalidatePath, bukan revalidateTag. Di Next 16 revalidateTag(tag) satu
+ * argumen sudah deprecated, dan unstable_cache ditandai digantikan `use
+ * cache`, yang hanya tersedia kalau cacheComponents menyala. cacheComponents
+ * dimatikan untuk rilis ini karena dukungan Payload belum dijamin, dan
+ * karena menyalakannya juga menghilangkan dynamicParams yang jadi tumpuan
+ * alur publish. Alasan lengkap ada di spec Plan 8 bagian 10.2.
+ *
+ * Empat permukaan, dan cuma empat, yang memuat artikel:
+ * daftar, detail, beranda (seksi Artikel Terbaru), dan sitemap.
+ */
+function revalidasiArtikel(slugs: Array<string | undefined>) {
+  revalidatePath("/artikel");
+  for (const slug of new Set(slugs.filter(Boolean))) {
+    revalidatePath(`/artikel/${slug}`);
+  }
+  revalidatePath("/");
+  revalidatePath("/sitemap.xml");
 }
 
 export const Posts: CollectionConfig = {
@@ -57,6 +78,19 @@ export const Posts: CollectionConfig = {
           data.slug = slugify(data.title);
         }
         return data;
+      },
+    ],
+    afterChange: [
+      ({ doc, previousDoc }) => {
+        // Slug lama ikut disegarkan. Kalau tidak, artikel yang slug-nya
+        // diubah akan tetap hidup di alamat lama sebagai halaman hantu
+        // yang isinya versi basi.
+        revalidasiArtikel([doc?.slug, previousDoc?.slug]);
+      },
+    ],
+    afterDelete: [
+      ({ doc }) => {
+        revalidasiArtikel([doc?.slug]);
       },
     ],
   },
