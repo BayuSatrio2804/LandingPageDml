@@ -7,6 +7,7 @@ import { AnchorNav } from "@/components/layout/anchor-nav";
 import { Reveal } from "@/components/motion/reveal";
 import { SectionHeader } from "@/components/ui/section-header";
 import { GroupStructure } from "@/features/about/group-structure";
+import { LegalTable } from "@/features/about/legal-table";
 
 export const metadata: Metadata = buildMetadata({
   title: "Tentang Kami | PT Dutabahari Menara Line",
@@ -85,6 +86,7 @@ export default function TentangKamiPage() {
               ))}
             </div>
           </Reveal>
+          <LegalTable />
         </div>
       </section>
 
