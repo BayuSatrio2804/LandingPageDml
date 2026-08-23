@@ -6,6 +6,7 @@ import { gsap, registerGsap } from "@/lib/motion/gsap";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
 import { useMounted } from "@/lib/motion/use-mounted";
 import { CtaLink } from "@/components/ui/cta-link";
+import { CERT_BADGES } from "@/content/certifications";
 
 /*
  * Hero "dua pintu". Menggantikan hero.tsx lama sepenuhnya; hero-canvas.tsx dan
@@ -72,12 +73,6 @@ const DOORS = [
     alt: "Kapal penyeberangan ro-ro",
   },
 ] as const;
-
-const CERTS = [
-  { src: "/assets/cert/iso-9001.png", alt: "Tersertifikasi ISO 9001:2015" },
-  { src: "/assets/cert/ism-code.png", alt: "ISM Code" },
-  { src: "/assets/cert/hsse.png", alt: "Utamakan Keselamatan dan Kesehatan Kerja" },
-];
 
 // TODO(dml): ganti kalau ada halaman permintaan informasi BBM tersendiri.
 const CTA_BBM_HREF = "/kontak";
@@ -361,8 +356,15 @@ export function Hero() {
                 Tersertifikasi
               </span>
               {mounted
-                ? CERTS.map((cert) => (
-                    <img key={cert.src} src={cert.src} alt={cert.alt} className="block h-14.5 w-auto" />
+                ? CERT_BADGES.map((badge) => (
+                    <Image
+                      key={badge.assetPath}
+                      src={badge.assetPath}
+                      alt={badge.alt}
+                      width={87}
+                      height={58}
+                      className="block h-14.5 w-auto"
+                    />
                   ))
                 : null}
             </div>

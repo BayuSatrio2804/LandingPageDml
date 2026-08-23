@@ -23,7 +23,7 @@ reference-jeskojets/
 # CATATAN: assets/CP DML.pdf adalah sumber data perusahaan yang dirujuk komentar
 # di src/content/ dan spec Plan 5. Berkas itu tidak ikut di repo, jadi ia harus
 # dibagikan lewat kanal terpisah supaya rujukan itu tetap bisa ditelusuri.
-assets/
+/assets/
 
 # arsip font mentah, hanya turunannya yang dipakai
 fonts/*.zip
