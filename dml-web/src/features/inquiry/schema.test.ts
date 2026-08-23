@@ -41,7 +41,8 @@ describe("inquirySchema", () => {
   });
 
   it("menerima honeypot yang tidak dikirim sama sekali", () => {
-    const { website: _website, ...withoutHoneypot } = VALID;
+    const withoutHoneypot: Record<string, unknown> = { ...VALID };
+    delete withoutHoneypot.website;
     expect(inquirySchema.safeParse(withoutHoneypot).success).toBe(true);
   });
 });

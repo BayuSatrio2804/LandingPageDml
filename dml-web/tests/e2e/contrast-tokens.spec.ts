@@ -13,7 +13,7 @@ const ALLOWED_ON_ACCENT = [hexToRgbString(TOKENS.onAccent), hexToRgbString(TOKEN
 
 const ROUTES = ["/", "/kontak", "/tentang-kami", "/karier"];
 
-function collectOnAccent(accent: string) {
+function collectOnAccent() {
   return ({ accent: accentColor }: { accent: string }) => {
     // background-color tidak diwariskan di CSS. Elemen berlatar transparan
     // di dalam kontainer beraksen tetap tampil di atas aksen secara visual,
@@ -54,7 +54,7 @@ function collectOnAccent(accent: string) {
 test("tidak ada teks ink di atas latar aksen", async ({ page }) => {
   for (const path of ROUTES) {
     await page.goto(path);
-    const onAccent = await page.evaluate(collectOnAccent(ACCENT), { accent: ACCENT });
+    const onAccent = await page.evaluate(collectOnAccent(), { accent: ACCENT });
     const violations = onAccent.filter((entry) => entry.color === INK).map((entry) => entry.selector);
     // Kombinasi ini 1,80:1 dan gagal WCAG AA. Lihat spec bagian 6.2.
     expect(violations, `route ${path}`).toEqual([]);
@@ -71,7 +71,7 @@ test("teks di atas latar aksen memakai warna yang lolos AA, bukan putih beropasi
   let checked = 0;
   for (const path of ROUTES) {
     await page.goto(path);
-    const onAccent = await page.evaluate(collectOnAccent(ACCENT), { accent: ACCENT });
+    const onAccent = await page.evaluate(collectOnAccent(), { accent: ACCENT });
     checked += onAccent.length;
     const violations = onAccent
       .filter((entry) => !ALLOWED_ON_ACCENT.includes(entry.color))
