@@ -3155,7 +3155,13 @@ kill %1
 ```
 Expected: delapan `200`, lalu `404` untuk `/artikel`.
 
-`/artikel` masih 404 adalah keadaan yang diketahui dan diterima; ia ditutup Plan 9. `sitemap.ts` sudah tidak mengiklankannya (Task 11), jadi mesin pencari tidak diberi tahu tentang halaman yang tidak ada. Yang masih menaut ke sana adalah `NAV_ITEMS`. **Laporkan ini ke pemilik repo di akhir plan** sebagai satu-satunya tautan internal mati yang tersisa, dan tanyakan apakah item navigasi `/artikel` sebaiknya dicabut sementara sampai Plan 9 selesai, atau dibiarkan karena jeda antar plan diperkirakan pendek.
+`/artikel` masih 404 adalah keadaan yang diketahui dan diterima; ia ditutup Plan 9.
+
+**Item navigasi `/artikel` sengaja dibiarkan, dan ini keputusan pemilik repo tertanggal 23 Agustus 2026, bukan kelalaian.** Plan 9 dikerjakan langsung setelah plan ini, jadi jeda 404-nya pendek dan mencabut lalu memasang kembali item nav dalam dua plan berurutan cuma menghasilkan dua commit yang saling membatalkan. **Jangan menyentuh `NAV_ITEMS` di `src/content/navigation.ts`.**
+
+Yang menahan dampaknya adalah dua hal yang sudah ada di plan ini: `sitemap.ts` tidak lagi mengiklankan `/artikel` (Task 11), jadi mesin pencari tidak diberi tahu tentang halaman yang tidak ada; dan `src/app/not-found.tsx` yang sudah ada sejak sebelum plan ini menangani 404 dengan halaman bergaya, bukan layar kosong.
+
+Karena itu, satu `404` di keluaran perintah di atas adalah **hasil yang benar dan diharapkan**, bukan kegagalan gerbang. Kalau `/artikel` justru mengembalikan `200` di titik ini, berarti ada task yang membangun sesuatu di luar scope plan ini — hentikan dan laporkan.
 
 - [ ] **Step 7: Audit design dan SEO**
 
@@ -3182,7 +3188,7 @@ test:e2e."
 
 **Yang tersisa terbuka, dilaporkan ke pemilik repo:**
 
-1. `/artikel` masih 404 dan `NAV_ITEMS` masih menautinya. Ditutup Plan 9. Lihat Task 17 Step 6 untuk pertanyaan yang perlu dijawab.
+1. `/artikel` masih 404 dan `NAV_ITEMS` masih menautinya. **Sudah diputuskan: dibiarkan**, karena Plan 9 menyusul langsung. Bukan pertanyaan terbuka, dan bukan alasan menahan penyelesaian plan ini. Lihat Task 17 Step 6.
 2. Selisih 64 vs 66 kapal, `OB Sahoya 0` yang terpotong, dan dimensi kapal yang masih estimasi. Menunggu klien.
 3. Logo sertifikasi asli dan status HSSE. Menunggu klien; prosedur tukar sudah di README sejak Plan 6.
 4. Logo klien "Trusted by Leading Companies". Di PDF ia satu raster gepeng yang logo-logonya tidak bisa dipisah, dan butuh izin dari masing-masing pemilik merek.
