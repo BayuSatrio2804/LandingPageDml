@@ -1,11 +1,11 @@
 import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 
-export const cabinetGrotesk = localFont({
-  src: "../fonts/CabinetGrotesk-Variable.woff2",
-  variable: "--font-cabinet-grotesk",
+export const gtAmerica = localFont({
+  src: "../fonts/GTAmerica-ExtendedBold.woff2",
+  variable: "--font-gt-america",
   display: "swap",
-  weight: "100 900",
+  weight: "700",
 });
 
 export const satoshi = localFont({
@@ -18,7 +18,7 @@ export const satoshi = localFont({
 export const geistMono = GeistMono;
 
 export const fontVariables = [
-  cabinetGrotesk.variable,
+  gtAmerica.variable,
   satoshi.variable,
   geistMono.variable,
 ].join(" ");

@@ -49,7 +49,7 @@ export function Certifications() {
   const years = yearsOperating(COMPANY.foundedIso, new Date());
 
   return (
-    <section className="bg-surface-2 py-24 md:py-32">
+    <section className="bg-surface-2-wash py-24 md:py-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <div className="grid grid-cols-2 border-y border-surface-3 md:grid-cols-4">
           <Metric value={COMPANY.fleetSummary.vessels} label="Kapal" />

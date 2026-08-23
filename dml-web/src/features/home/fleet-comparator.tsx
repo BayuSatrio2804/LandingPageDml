@@ -26,7 +26,7 @@ const PIN_LENGTH = "+=340%";
 
 function SpecBlock() {
   return (
-    <section className="bg-surface pb-24 md:pb-32">
+    <section className="bg-surface-wash pb-24 md:pb-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <h3 className="font-display text-xl font-bold text-ink">Spesifikasi per kelas</h3>
         <FleetSpecTable fleetClasses={FLEET_CLASSES} />
@@ -42,7 +42,7 @@ function SpecBlock() {
 /** Jalur tanpa 3D: blueprint dua kolom, tidak ada yang dipaku. */
 function StaticFleet() {
   return (
-    <section className="bg-surface py-20 md:py-28">
+    <section className="bg-surface-wash py-20 md:py-28">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <SectionHeader
           title="Perbandingan Armada"
@@ -87,7 +87,7 @@ export function FleetComparator() {
 
   return (
     <>
-      <section className="relative bg-surface">
+      <section className="bg-surface-wash relative">
         {/*
           Yang dipaku adalah panggung setinggi tepat satu viewport. Sebelumnya
           seluruh <section> yang dipaku, dan section itu memuat tabel

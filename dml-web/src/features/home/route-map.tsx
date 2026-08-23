@@ -190,22 +190,40 @@ function RouteSvg({
 
 function LegList({ activeIndex }: { activeIndex: number }) {
   return (
-    <ol className="mt-8 space-y-4">
+    <ol className="relative mt-8">
+      <li
+        aria-hidden="true"
+        className="absolute top-3.75 bottom-3.75 left-3.75 w-px bg-surface-3"
+      />
       {ROUTE_LEGS.map((leg: RouteLeg, index) => {
         const current = index === activeIndex;
         return (
           <li
             key={leg.id}
             data-testid="label-leg"
+            data-leg-row
             aria-current={current ? "true" : undefined}
-            className={`border-l-2 pl-4 transition-colors duration-300 ${
-              current ? "border-accent" : "border-surface-3"
-            }`}
+            className="relative flex gap-4 pb-5 last:pb-0"
           >
-            <p className={`font-mono text-sm ${current ? "text-ink" : "text-ink-muted"}`}>
-              {leg.label}
-            </p>
-            <p className="mt-1 text-xs text-ink-muted">{leg.note}</p>
+            <span
+              className={`z-10 grid h-7.75 w-7.75 shrink-0 place-items-center rounded-full font-mono text-xs transition-colors duration-300 ${
+                current
+                  ? "border border-accent bg-accent text-on-accent"
+                  : "border border-surface-3 bg-surface text-ink-muted"
+              }`}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div
+              className={`min-w-0 flex-1 rounded-lg pt-1 transition-colors duration-300 ${
+                current ? "-m-2 bg-accent/6 p-2 pt-3" : ""
+              }`}
+            >
+              <p className={`font-mono text-sm ${current ? "text-accent" : "text-ink"}`}>
+                {leg.label}
+              </p>
+              <p className="mt-1 text-xs text-ink-muted">{leg.note}</p>
+            </div>
           </li>
         );
       })}
@@ -216,7 +234,7 @@ function LegList({ activeIndex }: { activeIndex: number }) {
 /** Jalur tanpa pin: peta di atas, daftar lintasan di bawah, semua leg tergambar. */
 function StaticRouteMap() {
   return (
-    <section className="bg-surface-2 py-20 md:py-28">
+    <section className="bg-surface-2-wash py-20 md:py-28">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <SectionHeader
           title="Rute Penyeberangan Ro-Ro"
@@ -283,6 +301,21 @@ export function RouteMap() {
         0,
       );
 
+      // Baris daftar rute masuk satu-satu selama fase INTRO, selesai sebelum
+      // leg pertama mulai digambar di peta.
+      timeline.fromTo(
+        "[data-leg-row]",
+        { autoAlpha: 0, y: 14 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          ease: MOTION.ease,
+          duration: INTRO * 0.65,
+          stagger: (INTRO * 0.35) / ROUTE_LEGS.length,
+        },
+        0,
+      );
+
       legs.forEach((leg, index) => {
         timeline.to(
           leg,
@@ -302,7 +335,7 @@ export function RouteMap() {
   if (!animated) return <StaticRouteMap />;
 
   return (
-    <section className="relative bg-surface-2">
+    <section className="bg-surface-2-wash relative">
       <div ref={stageRef} className="relative h-[100dvh] overflow-hidden">
         <div className="absolute inset-0 bg-accent-soft">
           <RouteSvg mapRef={mapRef} legRefs={legRefs} activeIndex={activeIndex} drawn={false} />

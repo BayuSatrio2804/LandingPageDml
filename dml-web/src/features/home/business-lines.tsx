@@ -83,7 +83,7 @@ function LineMedia({ line, priority }: { line: BusinessLine; priority: boolean }
 /** Jalur tanpa animasi: dua blok biasa, berurutan, tidak ada yang ditumpuk. */
 function StaticBusinessLines() {
   return (
-    <section className="bg-surface">
+    <section className="bg-surface-wash">
       {MAIN_LINES.map((line) => (
         <div
           key={line.id}
@@ -184,7 +184,7 @@ export function BusinessLines() {
   if (!animated) return <StaticBusinessLines />;
 
   return (
-    <section className="relative bg-surface">
+    <section className="bg-surface-wash relative">
       {/*
         Yang dipaku adalah panggung setinggi tepat satu viewport, bukan
         <section> pembungkusnya. Memaku elemen yang lebih tinggi dari viewport
