@@ -118,6 +118,18 @@ export type Vessel = {
 };
 
 /**
+ * Satu baris tabel dokumen legal dari company profile halaman 06.
+ * Nomor dan penerbit disalin apa adanya; kapitalisasi dinormalkan dari
+ * huruf besar semua.
+ */
+export type LegalDocument = {
+  document: string;
+  number: string;
+  issuer: string;
+  source: SourceTag;
+};
+
+/**
  * Satu lini bisnis di beranda. `kind` memisahkan lini yang dijalankan DML
  * sendiri dari perusahaan afiliasi, karena keduanya tidak boleh diklaim
  * dengan kalimat yang sama.
