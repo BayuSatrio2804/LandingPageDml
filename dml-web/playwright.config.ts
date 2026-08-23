@@ -34,5 +34,6 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    env: { ...process.env, E2E_UJI_GALAT: "1" } as Record<string, string>,
   },
 });
