@@ -1,4 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+// vi.mock dihoisting ke atas berkas oleh vitest, sebelum deklarasi const
+// biasa mana pun jalan. vi.hoisted memastikan revalidatePath sudah ada
+// saat factory di bawah ini dieksekusi.
+const { revalidatePath } = vi.hoisted(() => ({ revalidatePath: vi.fn() }));
+vi.mock("next/cache", () => ({ revalidatePath }));
 import { Posts } from "./Posts";
 
 function fieldNamed(name: string) {
@@ -79,5 +84,35 @@ describe("Posts", () => {
       data: { title: "Judul Baru", slug: "slug-lama" },
     } as never) as { slug?: string };
     expect(result.slug).toBe("slug-lama");
+  });
+});
+
+describe("revalidasi", () => {
+  beforeEach(() => revalidatePath.mockReset());
+
+  it("menyegarkan empat permukaan saat artikel berubah", async () => {
+    const hook = Posts.hooks?.afterChange?.[0];
+    await hook!({ doc: { slug: "baru" }, previousDoc: { slug: "baru" } } as never);
+    const dipanggil = revalidatePath.mock.calls.map(([path]) => path);
+    expect(dipanggil).toEqual(
+      expect.arrayContaining(["/artikel", "/artikel/baru", "/", "/sitemap.xml"]),
+    );
+  });
+
+  it("menyegarkan slug lama DAN baru saat slug berubah", async () => {
+    // Tanpa ini halaman di alamat lama hidup terus sebagai hantu.
+    const hook = Posts.hooks?.afterChange?.[0];
+    await hook!({ doc: { slug: "baru" }, previousDoc: { slug: "lama" } } as never);
+    const dipanggil = revalidatePath.mock.calls.map(([path]) => path);
+    expect(dipanggil).toEqual(expect.arrayContaining(["/artikel/lama", "/artikel/baru"]));
+  });
+
+  it("menyegarkan juga saat artikel dihapus", async () => {
+    const hook = Posts.hooks?.afterDelete?.[0];
+    await hook!({ doc: { slug: "dihapus" } } as never);
+    const dipanggil = revalidatePath.mock.calls.map(([path]) => path);
+    expect(dipanggil).toEqual(
+      expect.arrayContaining(["/artikel", "/artikel/dihapus", "/", "/sitemap.xml"]),
+    );
   });
 });
