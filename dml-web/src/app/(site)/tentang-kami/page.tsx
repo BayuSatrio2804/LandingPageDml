@@ -5,6 +5,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { AnchorNav } from "@/components/layout/anchor-nav";
 import { Reveal } from "@/components/motion/reveal";
+import { GroupStructure } from "@/features/about/group-structure";
 
 export const metadata: Metadata = buildMetadata({
   title: "Tentang Kami | PT Dutabahari Menara Line",
@@ -26,6 +27,7 @@ export default function TentangKamiPage() {
         items={[
           { id: "silsilah", label: "Silsilah" },
           { id: "profil", label: "Profil" },
+          { id: "grup", label: "Grup" },
         ]}
       />
 
@@ -78,6 +80,8 @@ export default function TentangKamiPage() {
           </div>
         </Reveal>
       </section>
+
+      <GroupStructure />
 
       <script
         type="application/ld+json"
