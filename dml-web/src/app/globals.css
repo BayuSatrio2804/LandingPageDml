@@ -60,33 +60,53 @@ body {
 }
 
 /*
- * Latar section bergradasi, pengganti bg-surface/bg-surface-2 solid.
- * Dua class ini dipakai bergantian antar section (pola zebra-striping
- * yang sudah ada) supaya iramanya tetap jalan, tapi tiap bidang sendiri
- * tidak lagi flat. Warnanya tetap dari token @theme di atas, tidak ada
- * warna baru: cuma cara mencampurnya yang beda dari section ke section.
+ * Latar section bergradasi, pengganti bg-surface/bg-surface-2 solid. Dua class
+ * ini dipakai bergantian antar section (pola zebra-striping yang sudah ada)
+ * supaya iramanya tetap jalan, tapi tiap bidang sendiri tidak lagi flat.
+ *
+ * Resepnya diganti di Plan 7, bukan cuma bahannya. Versi sebelumnya menaruh
+ * accent-soft di stop 0% DAN 130% lalu menumpuk radial putih di atasnya, jadi
+ * bidang menyala dari dua sudut sekaligus dan tidak punya tepi yang membumi.
+ * Memperdalam token tidak menyembuhkan itu; yang menyembuhkan adalah tiga
+ * aturan berikut, dan ketiganya kontrak, bukan selera:
+ *
+ *   1. accent-soft cuma boleh di SATU ujung gradien linear.
+ *   2. Radial sorot tidak memakai warna solid di stop 0%.
+ *   3. Ujung yang tidak memakai accent-soft dibumikan dengan campuran
+ *      surface-3, tidak dibiarkan luruh ke surface.
+ *
+ * Angka stop di bawah boleh disetel; tiga aturan di atas tidak. Tidak ada
+ * warna baru di sini — semuanya campuran dari token @theme.
  */
 .bg-surface-wash {
   background:
-    radial-gradient(85% 100% at 92% -6%, var(--color-surface-2) 0%, rgb(255 255 255 / 0%) 60%),
+    radial-gradient(
+      78% 88% at 88% -8%,
+      color-mix(in srgb, var(--color-surface-2) 65%, transparent) 0%,
+      transparent 56%
+    ),
     linear-gradient(
       150deg,
       var(--color-accent-soft) 0%,
-      var(--color-surface) 45%,
-      var(--color-surface) 72%,
-      var(--color-accent-soft) 130%
+      var(--color-surface) 34%,
+      var(--color-surface) 74%,
+      color-mix(in srgb, var(--color-surface-3) 50%, var(--color-surface)) 100%
     );
 }
 
 .bg-surface-2-wash {
   background:
-    radial-gradient(85% 100% at 8% -6%, var(--color-accent-soft) 0%, rgb(225 238 255 / 0%) 62%),
+    radial-gradient(
+      78% 88% at 10% -8%,
+      color-mix(in srgb, var(--color-accent-soft) 70%, transparent) 0%,
+      transparent 58%
+    ),
     linear-gradient(
       150deg,
       var(--color-surface-2) 0%,
-      var(--color-surface-2) 40%,
+      var(--color-surface-2) 36%,
       var(--color-surface) 78%,
-      var(--color-accent-soft) 130%
+      color-mix(in srgb, var(--color-surface-3) 45%, var(--color-surface)) 100%
     );
 }
 
