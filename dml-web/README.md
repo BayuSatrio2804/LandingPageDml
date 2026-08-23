@@ -17,7 +17,16 @@ Situs company profile PT Dutabahari Menara Line. Next.js 16.3 App Router, Payloa
 ## Perintah penting
 
 - `bun run check`: lint, typecheck, test, build, doctor, lighthouse berurutan. Gerbang wajib sebelum deploy. Menjalankan `next build && next start` penuh plus satu run Lighthouse CI, jadi berdurasi beberapa menit, bukan loop cepat harian.
-- `bun run test:e2e`: Playwright, butuh `bun run build && bun run start` (otomatis lewat `playwright.config.ts`).
+- `bun run test:e2e`: Playwright. **Postgres harus berjalan lebih dulu**, kalau tidak
+  `kontak.spec.ts` gagal dengan timeout yang terbaca seperti bug UI padahal server
+  action-nya yang tidak bisa menyentuh database:
+  ```bash
+  docker compose up -d
+  until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
+  bun run test:e2e
+  ```
+  Build dan start dijalankan otomatis oleh `playwright.config.ts`, jadi tidak perlu
+  menjalankannya sendiri.
 - `bun run lighthouse`: Lighthouse CI mobile-preset terhadap `/`. Ambang `largest-contentful-paint` di `lighthouserc.json` diset 5000ms, bukan target ideal 2500ms dari rencana awal, karena sudah diverifikasi langsung (Plan 3 Task 17) bahwa 2500ms tidak tercapai bahkan dengan seluruh 9 frame crossfade hero dihilangkan (LCP dasar halaman ini ~4100ms di lingkungan sandbox build-time yang dipakai untuk pengujian, dengan throttling mobile-slow-4G simulasi lhci). Artinya bottleneck bukan animasi hero, melainkan lantai performa halaman/lingkungan itu sendiri. Kalau nanti diukur ulang di infra produksi sungguhan dan hasilnya jauh lebih baik, ambang ini boleh diperketat kembali.
 - `bun run payload migrate`: jalankan migrasi Payload. Jangan pernah mengandalkan dev-mode schema push, lihat `payload.config.ts` (`push: false`).
 

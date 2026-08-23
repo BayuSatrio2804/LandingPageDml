@@ -44,17 +44,27 @@ export async function submitInquiry(
     return { ok: false, error: "Terlalu banyak percobaan, coba lagi nanti." };
   }
 
-  const payload = await getPayload({ config });
-  await payload.create({
-    collection: "inquiries",
-    data: {
-      name: parsed.data.name,
-      phone: parsed.data.phone,
-      email: parsed.data.email,
-      message: parsed.data.message,
-      source,
-    },
-  });
+  // getPayload dan payload.create sama-sama melempar saat Postgres tidak bisa
+  // dihubungi. Tanda tangan fungsi ini menjanjikan hasil, bukan lemparan; kalau
+  // ia melempar, promise onSubmit di client menolak dan jalur galat form yang
+  // sudah ada tidak pernah tercapai. Pengguna melihat tombol ditekan tanpa
+  // apa pun terjadi.
+  try {
+    const payload = await getPayload({ config });
+    await payload.create({
+      collection: "inquiries",
+      data: {
+        name: parsed.data.name,
+        phone: parsed.data.phone,
+        email: parsed.data.email,
+        message: parsed.data.message,
+        source,
+      },
+    });
+  } catch (error) {
+    console.error("gagal menyimpan inquiry", error);
+    return { ok: false, error: "Pesan gagal terkirim. Coba lagi sebentar lagi." };
+  }
 
   return { ok: true };
 }
