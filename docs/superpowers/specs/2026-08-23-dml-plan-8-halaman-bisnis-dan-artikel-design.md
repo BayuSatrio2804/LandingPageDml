@@ -85,6 +85,13 @@ export type Vessel = {
 };
 ```
 
+**Cara ekstraksi, bukan cara transkripsi.** Keluaran `pdftotext -layout` untuk
+halaman ini menyisipkan teks tagline ("From Zero to / Hero with / Continuous /
+Improvement") di tengah kolom Oil Barge dan SPOB, karena tagline itu memang
+tergambar melintang di latar halaman. Ekstraksi dilakukan per kolom dari keluaran
+`pdftotext`, bukan diketik ulang dari layar, dan baris tagline dibuang secara
+sadar. Tes jumlah per kelas yang jadi wasitnya.
+
 Isi menurut PDF halaman 04:
 
 | Kelas | Jumlah | Catatan |
@@ -366,13 +373,51 @@ Perubahan draft ke published dan sebaliknya sama-sama memicu hook. Kalau slug
 berubah, path lama **dan** path baru sama sama direvalidasi, kalau tidak halaman
 di slug lama akan hidup terus sebagai hantu.
 
+**`revalidatePath("/sitemap.xml")` belum terverifikasi.** Dokumen
+`revalidatePath` di Next 16 tidak menyebut metadata route sama sekali. Jadi
+pemanggilan itu tetap dipasang, tapi task yang mengerjakannya wajib membuktikan
+secara empiris bahwa sitemap benar-benar ikut segar setelah publish, bukan
+menganggapnya berhasil. Kalau ternyata tidak, cadangannya sudah ditentukan di
+muka: `sitemap.ts` diberi `export const revalidate = 3600`, sehingga ia sembuh
+sendiri dalam satu jam tanpa bergantung pada hook. Sitemap yang telat satu jam
+tidak merugikan siapa pun; sitemap yang tidak pernah berubah merugikan.
+
+**`dynamicParams` wajib tetap `true`, dan ini bukan detail.** Saat `next build`
+berjalan di lingkungan tes, koleksi artikel masih kosong, jadi
+`generateStaticParams` mengembalikan array kosong. Artikel yang dipublikasikan
+sesudah build hanya bisa muncul karena `dynamicParams` bernilai `true` secara
+default, yang membuat segment dinamis di luar hasil `generateStaticParams`
+dirender saat request. Menambahkan `export const dynamicParams = false` demi
+"kerapian" akan mematikan persis alur yang jadi alasan keberadaan seluruh
+pipeline ini, dan matinya senyap: build tetap hijau, tes unit tetap hijau, hanya
+spec admin-publish yang gagal. Larangan ini ditulis sebagai komentar di
+`/artikel/[slug]/page.tsx`, bukan hanya di spec ini.
+
+Catatan terkait: `dynamicParams` **tidak tersedia** saat `cacheComponents`
+menyala. Itu satu alasan tambahan, di luar risiko Payload, kenapa keputusan 4
+menjauh dari `cacheComponents` untuk rilis ini.
+
 Situs ini punya tepat empat permukaan yang perlu disegarkan. Sistem tag membeli
 fleksibilitas yang tidak dipakai, dengan ongkos menanam API yang sudah ditandai
 usang. Kalau suatu saat permukaan artikel bertambah banyak, atau
 `cacheComponents` sudah aman dipakai bersama Payload, pindah ke `use cache` +
 `cacheTag` adalah peningkatan yang jelas dan dicatat di sini sebagai kandidat.
 
-Route korporat tetap statis penuh dan tidak pernah direvalidasi CMS.
+Route korporat lain tetap statis penuh dan tidak pernah direvalidasi CMS:
+`/tentang-kami`, `/bisnis` beserta seluruh cabangnya, `/karier`, dan `/kontak`
+tidak memuat konten CMS sama sekali, jadi publish artikel tidak menyentuhnya.
+
+Beranda adalah pengecualiannya, dan pengecualian itu disengaja. Sejak seksi
+Artikel Terbaru masuk, `/` memuat konten CMS, jadi ia **wajib** ikut
+direvalidasi. Master spec bagian 10.1 menyebut route korporat tidak pernah
+direvalidasi; sejak seksi artikel ada di beranda, kalimat itu tidak lagi
+mencakup `/`.
+
+**Konsekuensi build yang harus dicatat di README.** Begitu `/` melakukan query
+artikel, `bun run build` membutuhkan Postgres hidup, bukan hanya `test:e2e`.
+README saat ini hanya memperingatkan untuk `test:e2e`, padahal `bun run check`
+menjalankan build. Tanpa baris tambahan itu, anggota tim pertama yang menjalankan
+`check` di mesin dingin mendapat kegagalan yang terbaca seperti bug kode.
 
 ### 10.3 `/artikel` dan `/artikel/[slug]`
 
@@ -631,6 +676,13 @@ Dinyatakan terbuka, bukan diselesaikan diam-diam:
 9. **`cacheComponents`.** Kandidat peningkatan setelah live dan stabil, lihat
    bagian 10.2.
 10. **Koleksi lowongan kerja.** `/karier` tetap empty state, lihat keputusan 2.
+
+**Sudah selesai, dicoret dari daftar terbuka:** butir 3 dari lima item Plan 2
+(nomor WhatsApp punya dua sumber kebenaran) ternyata sudah tertutup. Tidak ada
+lagi variabel lingkungan WhatsApp di repo; `/kontak` dan `/karier` sama sama
+membaca `COMPANY.whatsapp`, dan `company.test.ts` sudah memakukannya ke
+`COMPANY.phone`. Form B2B baru di plan ini menjadi konsumen `wa.me` ketiga dan
+wajib membaca sumber yang sama, bukan menerima nomor lewat prop dari tempat lain.
 
 ---
 
