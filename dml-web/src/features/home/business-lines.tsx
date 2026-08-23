@@ -44,7 +44,7 @@ function LineCopy({ line }: { line: BusinessLine }) {
   return (
     <>
       <p className="font-mono text-sm text-accent">{line.number}</p>
-      <h2 className="mt-4 font-display text-3xl font-bold text-ink md:text-5xl">{line.title}</h2>
+      <h2 className="mt-4 font-display text-pretty text-3xl font-bold text-ink md:text-5xl">{line.title}</h2>
       <p className="mt-3 font-mono text-xs text-ink-muted">{line.operator}</p>
       <p className="mt-6 max-w-[46ch] text-ink">{line.summary}</p>
       <ul className="mt-8 flex flex-wrap gap-x-4 gap-y-2 font-mono text-xs text-ink-muted">

@@ -14,7 +14,7 @@ export function Affiliates() {
     <section className="bg-surface-2-wash py-20 md:py-28">
       <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-8 px-4 md:px-8">
         <div className="col-span-12 md:col-span-4">
-          <h2 className="font-display text-2xl font-bold text-ink md:text-3xl">
+          <h2 className="font-display text-pretty text-2xl font-bold text-ink md:text-3xl">
             Perusahaan afiliasi
           </h2>
           <p className="mt-4 max-w-[32ch] text-sm text-ink-muted">

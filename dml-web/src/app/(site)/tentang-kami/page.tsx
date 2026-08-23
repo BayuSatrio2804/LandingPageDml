@@ -21,7 +21,7 @@ export default function TentangKamiPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-      <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Tentang Kami</h1>
+      <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Tentang Kami</h1>
 
       <AnchorNav
         items={[

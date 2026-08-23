@@ -22,7 +22,7 @@ export default function KontakPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-      <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Kontak</h1>
+      <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Kontak</h1>
       <p className="mt-4 max-w-[55ch] text-ink-muted">
         Isi form di bawah untuk pertanyaan umum. Tim kami akan menghubungi lewat WhatsApp.
       </p>
@@ -55,7 +55,7 @@ export default function KontakPage() {
       </div>
 
       <section className="mt-16 border-t border-surface-3 pt-10">
-        <h2 className="font-display text-xl font-bold">Kontak per Divisi</h2>
+        <h2 className="font-display text-pretty text-xl font-bold">Kontak per Divisi</h2>
         <p className="mt-2 max-w-[60ch] text-sm text-ink-muted">
           Ketiga lini bisnis kami saat ini melayani lewat satu nomor kontak yang sama.
           Halaman detail tiap lini menyusul di plan berikutnya.
