@@ -62,8 +62,8 @@ export default function TentangKamiPage() {
               </p>
               <h3 className="mt-6 font-display font-bold text-ink">Misi</h3>
               <p className="mt-2 max-w-[50ch] text-ink-muted">
-                Mengoperasikan armada transportasi BBM, penyeberangan ro-ro, dan galangan kapal
-                dengan standar keselamatan dan kualitas tertinggi.
+                Mengoperasikan armada transportasi BBM dan penyeberangan ro-ro dengan
+                standar keselamatan dan kualitas tertinggi.
               </p>
             </div>
             <div>

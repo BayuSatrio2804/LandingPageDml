@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { COMPANY } from "@/content/company";
 import { FOOTER_GROUPS } from "@/content/navigation";
 import { buildMetadata } from "@/lib/seo/metadata";
@@ -55,16 +56,22 @@ export default function KontakPage() {
       </div>
 
       <section className="mt-16 border-t border-surface-3 pt-10">
-        <h2 className="font-display text-pretty text-xl font-bold">Kontak per Divisi</h2>
+        <h2 className="font-display text-pretty text-xl font-bold">Kontak per Lini Bisnis</h2>
         <p className="mt-2 max-w-[60ch] text-sm text-ink-muted">
-          Ketiga lini bisnis kami saat ini melayani lewat satu nomor kontak yang sama.
-          Halaman detail tiap lini menyusul di plan berikutnya.
+          Kedua lini bisnis kami saat ini melayani lewat satu nomor kontak yang sama.
+          Detail armada, lintasan, dan standar operasi ada di halaman masing-masing lini.
         </p>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
           {BUSINESS_LINES.map((line) => (
             <li key={line.label} className="rounded-card border border-surface-3 bg-surface-2 p-5">
               <p className="font-display font-bold text-ink">{line.label}</p>
               <p className="mt-2 text-sm text-ink-muted">{COMPANY.phone}</p>
+              <Link
+                href={line.href}
+                className="mt-3 inline-flex text-sm text-accent transition-colors hover:text-accent-hover"
+              >
+                Lihat detail lini
+              </Link>
             </li>
           ))}
         </ul>
