@@ -76,6 +76,7 @@ export default async function ArtikelDetailPage({
     description: post.seo?.metaDescription ?? post.excerpt,
     path: `/artikel/${post.slug}`,
     publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt,
     ...(cover?.url ? { imageUrl: absoluteUrl(cover.url) } : {}),
     ...(author?.name ? { authorName: author.name } : {}),
   });

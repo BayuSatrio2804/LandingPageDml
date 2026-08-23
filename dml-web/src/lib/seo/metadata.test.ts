@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildMetadata, absoluteUrl, SITE_URL } from "./metadata";
 
 describe("buildMetadata", () => {
@@ -50,5 +50,32 @@ describe("buildMetadata", () => {
     });
     expect(own.openGraph?.images).toBeUndefined();
     expect(own.twitter?.images).toBeUndefined();
+  });
+});
+
+describe("SITE_URL", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("string kosong (ARG Docker yang lupa diisi) gagal keras dengan pesan yang menyebut nama variabel", async () => {
+    // Task 21: --build-arg NEXT_PUBLIC_SITE_URL yang lupa diisi membuat ARG
+    // terdefinisi sebagai string kosong (bukan undefined), yang lolos dari
+    // ??. Tanpa guard ini, kegagalannya baru muncul jauh di new URL("") saat
+    // build metadata, dengan pesan yang tidak menyebut nama variabel sama
+    // sekali.
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
+    await expect(async () => {
+      vi.resetModules();
+      await import("./metadata");
+    }).rejects.toThrow(/NEXT_PUBLIC_SITE_URL/);
+  });
+
+  it("undefined jatuh ke localhost untuk dev lokal", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", undefined);
+    vi.resetModules();
+    const mod = await import("./metadata");
+    expect(mod.SITE_URL).toBe("http://localhost:3000");
   });
 });

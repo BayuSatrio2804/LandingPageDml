@@ -134,6 +134,68 @@ Dimensi kapal (panjang, lebar, DWT) tidak ada di company profile sama sekali
 dan seluruhnya masih estimasi proporsional. Halaman lini BBM menyatakan ini di
 bawah tabel spesifikasinya, bukan cuma di komentar kode.
 
+## Deployment
+
+Aplikasi dibungkus image Docker multi-stage berbasis bun, memakai keluaran
+`standalone` Next. Coolify menjalankan `docker-compose.prod.yml`.
+
+### Yang wajib diisi
+
+Compose membaca `.env` di `dml-web/`. Yang berbeda dari pengembangan:
+
+- `NEXT_PUBLIC_SITE_URL` adalah **build arg**, bukan sekadar env runtime.
+  Nilai `NEXT_PUBLIC_` diinlinekan ke bundle saat build. Menyetelnya hanya
+  sebagai env runtime menghasilkan seluruh canonical dan URL gambar OG
+  menunjuk localhost, sementara situsnya sendiri tetap terlihat normal. Kalau
+  domain berubah, **image harus dibangun ulang**, bukan cuma di-restart.
+- `DATABASE_URI` memakai nama service `postgres`, bukan `localhost`.
+- `PAYLOAD_UPLOAD_DIR` diset compose ke `/app/uploads` dan dipetakan ke volume
+  `payload-uploads`. Jangan mengubahnya tanpa mengubah pemetaan volumenya.
+
+### Urutan deploy
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Service `migrate` berjalan lebih dulu sebagai job satu kali dan harus keluar
+dengan status nol sebelum `app` naik. Kalau migrasi gagal, aplikasi tidak
+pernah start. Itu perilaku yang disengaja: aplikasi yang hidup di atas skema
+yang salah jauh lebih berbahaya daripada container yang menolak start dengan
+log yang jelas.
+
+Migrasi berjalan lewat `bun run migrate` (`scripts/migrate.ts`), BUKAN CLI
+resmi `payload migrate`. CLI-nya gagal deterministik di image
+`oven/bun:1.3.14-slim` karena bug tsx yang tidak tertambal di bawah runtime
+bun (payloadcms/payload#16949); `scripts/migrate.ts` memanggil API terprogram
+Payload langsung dan dijalankan lewat bundel satu berkas, menghindari bug itu
+sekaligus race sirkular `@lexical/react` yang sama dengan `scripts/seed.ts`.
+
+### Seed pertama kali
+
+Di instalasi baru, buka `/admin` dan buat akun pertama lewat
+`create-first-user`, atau jalankan `bun run seed` dari dalam image builder
+dengan `SEED_ADMIN_EMAIL` dan `SEED_ADMIN_PASSWORD` terisi.
+
+### Backup volume upload
+
+Basis data punya jalur backup sendiri lewat `pg_dump`. Upload tidak, dan ia
+tidak pernah ada di git:
+
+```bash
+docker run --rm -v dml-web_payload-uploads:/data -v "$PWD":/backup \
+  alpine tar czf /backup/uploads-$(date +%F).tar.gz -C /data .
+```
+
+### Pindah ke S3 kalau klien menyediakan bucket
+
+**Ini dokumentasi, bukan jalur yang pernah dijalankan di repo ini.** Langkahnya:
+pasang `@payloadcms/storage-s3`, daftarkan plugin-nya di `payload.config.ts`
+dengan `collections: { media: true }`, isi kredensial bucket lewat environment,
+lalu pindahkan isi volume `payload-uploads` ke bucket sebelum mematikan
+pemetaan volumenya. Selama migrasi belum tuntas, jangan mencabut volumenya:
+dokumen media menyimpan nama berkas, bukan isinya.
+
 ## Menukar placeholder sertifikasi dengan logo resmi
 
 Tiga berkas di `public/assets/cert/` saat ini adalah placeholder yang dibangkitkan

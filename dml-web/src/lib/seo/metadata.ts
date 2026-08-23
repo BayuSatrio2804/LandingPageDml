@@ -1,7 +1,32 @@
 import type { Metadata } from "next";
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+/**
+ * process.env.NEXT_PUBLIC_SITE_URL tidak terdefinisi di dev lokal (fallback
+ * ke localhost), tapi di build Docker ia adalah ARG yang WAJIB diisi --
+ * ARG yang lupa diisi jadi string kosong yang TERDEFINISI, bukan undefined,
+ * jadi ?? tidak menangkapnya. Task 21 mengalami ini sendiri: lupa
+ * --build-arg membuat SITE_URL = "", lalu new URL("") gagal dengan galat
+ * kriptik yang tidak menyebut nama variabel sama sekali ('"/" cannot be
+ * parsed as a URL'), meruntuhkan seluruh next build di titik yang jauh dari
+ * akar masalahnya. String kosong SENGAJA tidak di-fallback ke localhost --
+ * situs akan tetap terlihat "jalan" saat build tapi setiap canonical/OG URL
+ * diam-diam menunjuk ke localhost, jauh lebih berbahaya daripada build yang
+ * gagal keras dan jelas.
+ */
+function resolveSiteUrl(raw: string | undefined): string {
+  if (raw === undefined) return "http://localhost:3000";
+  try {
+    new URL(raw);
+    return raw;
+  } catch {
+    throw new Error(
+      `NEXT_PUBLIC_SITE_URL berisi URL tidak valid: ${JSON.stringify(raw)}. ` +
+        "Kalau ini build Docker, cek --build-arg NEXT_PUBLIC_SITE_URL sudah diisi.",
+    );
+  }
+}
+
+export const SITE_URL = resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 export function absoluteUrl(path: string): string {
   return new URL(path, SITE_URL).toString();
