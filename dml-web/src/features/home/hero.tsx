@@ -211,9 +211,17 @@ export function Hero() {
 
       timeline.to("[data-hero-scroll]", { autoAlpha: 0, duration: 0.3 }, 0.25);
 
-      // ── Parallax kursor berlapis
+      // will-change dipasang hanya selama parallax kursor hidup. Sebagai
+      // utility permanen di className, ia memaksa browser menahan layer
+      // komposit untuk kedua elemen sepanjang umur halaman, termasuk jauh
+      // setelah hero tergulir keluar layar.
       const media = mediaRef.current;
       const content = contentRef.current;
+      if (media && content) {
+        gsap.set([media, content], { willChange: "transform" });
+      }
+
+      // ── Parallax kursor berlapis
       if (media && content) {
         const mx = gsap.quickTo(media, "x", { duration: 1.1, ease: "power3.out" });
         const my = gsap.quickTo(media, "y", { duration: 1.1, ease: "power3.out" });
@@ -228,7 +236,10 @@ export function Hero() {
           cy(ny * 8);
         };
         stage.addEventListener("mousemove", onMove);
-        return () => stage.removeEventListener("mousemove", onMove);
+        return () => {
+          stage.removeEventListener("mousemove", onMove);
+          gsap.set([media, content], { willChange: "auto" });
+        };
       }
     }, sectionRef);
 
@@ -275,7 +286,7 @@ export function Hero() {
   return (
     <section ref={sectionRef} className="relative -mt-18 h-[250vh] bg-[#0A1428]">
       <div ref={stageRef} className="sticky top-0 h-svh overflow-hidden">
-        <div ref={mediaRef} className="absolute inset-0 will-change-transform">
+        <div ref={mediaRef} className="absolute inset-0">
           {/* Lihat KONTRAK LCP di atas: panel foto tidak boleh ikut HTML server. */}
           {mounted
             ? DOORS.map((door, index) => (
@@ -340,7 +351,7 @@ export function Hero() {
 
         <div
           ref={contentRef}
-          className="absolute inset-0 mx-auto grid max-w-[1400px] grid-rows-[auto_auto_auto] content-between gap-5 px-5 pt-21 pb-13 will-change-transform min-[900px]:gap-6 min-[900px]:px-8 min-[900px]:pt-22 min-[900px]:pb-15"
+          className="absolute inset-0 mx-auto grid max-w-[1400px] grid-rows-[auto_auto_auto] content-between gap-5 px-5 pt-21 pb-13 min-[900px]:gap-6 min-[900px]:px-8 min-[900px]:pt-22 min-[900px]:pb-15"
         >
           <div className="flex items-start justify-between gap-8">
             <p
