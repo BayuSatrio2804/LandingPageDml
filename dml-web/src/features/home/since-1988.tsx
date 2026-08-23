@@ -36,7 +36,7 @@ export function Since1988() {
   const frame = MEDIA["lini-bisnis"].find((asset) => asset.id === "operasi-sts");
 
   return (
-    <section className="bg-surface py-24 md:py-32">
+    <section className="bg-surface-wash py-24 md:py-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-12 md:col-span-6">

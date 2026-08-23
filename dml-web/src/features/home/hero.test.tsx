@@ -1,14 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { Hero } from "./hero";
 
 /**
- * Vitest tidak menghormati batas Server Component, jadi HeroCanvas dan
- * HeroHeadline ikut dirender di sini. matches: true memilih jalur reduced
- * motion di keduanya: HeroCanvas berhenti sebelum memasang canvas, dan
- * HeroHeadline mengembalikan heading utuh tanpa memanggil SplitText, yang
- * memang tidak bisa memecah baris di jsdom karena tidak ada layout. Pola stub
- * ini sama dengan business-lines.test.tsx dan certifications.test.tsx.
+ * matches: true memilih jalur reduced motion, jadi tidak ada GSAP yang jalan di
+ * jsdom. Pola stub ini sama dengan business-lines.test.tsx dan
+ * certifications.test.tsx.
  *
  * Menyandarkan assertion "tidak ada canvas" pada default global di
  * vitest.setup.ts akan membuat test ini diam-diam terbalik kalau default itu
@@ -33,7 +31,9 @@ describe("Hero", () => {
   });
 
   // Disiplin hero master spec: headline maksimal dua baris di desktop.
-  // Versi lama tiga baris. Batas kata adalah proksi yang bisa diuji.
+  // Batas kata adalah proksi yang bisa diuji. Headline sekarang tepat tujuh
+  // kata, jadi menambah satu kata saja akan menggagalkan test ini — memang itu
+  // gunanya.
   it("headline maksimal tujuh kata", () => {
     render(<Hero />);
     const words = screen.getByRole("heading", { level: 1 }).textContent?.trim().split(/\s+/) ?? [];
@@ -46,24 +46,54 @@ describe("Hero", () => {
     expect(subtext.length).toBeLessThanOrEqual(20);
   });
 
-  it("CTA primer mengarah ke kontak", () => {
+  // Dua pintu, dua tujuan. CTA BBM tetap ke halaman kontak sampai ada halaman
+  // permintaan informasi tersendiri (lihat CTA_BBM_HREF di hero.tsx).
+  it("CTA BBM mengarah ke kontak", () => {
     render(<Hero />);
-    expect(screen.getByRole("link", { name: /hubungi kami/i })).toHaveAttribute("href", "/kontak");
+    expect(screen.getByRole("link", { name: /permintaan informasi bbm/i })).toHaveAttribute(
+      "href",
+      "/kontak",
+    );
   });
 
-  // Kontrak LCP setelah poster dilepas: kandidat LCP hero adalah teks yang
-  // dicat dari HTML server, bukan gambar yang menunggu jaringan. Assertion-nya
-  // "tidak ada <img> di hero" karena itu yang bisa diam-diam kembali: satu
-  // gambar dekoratif yang ditambahkan nanti akan merebut kembali peran LCP dan
-  // menghidupkan lagi risiko ambang Lighthouse 5000.
+  it("CTA ro-ro mengarah ke pemesanan tiket", () => {
+    render(<Hero />);
+    expect(screen.getByRole("link", { name: /pesan tiket ro-ro/i })).toHaveAttribute(
+      "href",
+      "https://dutabahari.id",
+    );
+  });
+
+  // Kontrak LCP: kandidat LCP hero adalah teks yang dicat dari HTML server,
+  // bukan gambar yang menunggu jaringan. Hero dua pintu MEMANG memakai foto,
+  // tapi foto itu dipasang setelah hidrasi — lihat cabang `mounted` di
+  // hero.tsx. Assertion ini yang menjaga batas itu: memindahkan panel keluar
+  // dari cabang `mounted` akan merebut kembali peran LCP dan menghidupkan lagi
+  // risiko ambang Lighthouse 5000.
+  //
+  // `render()` dari Testing Library bukan HTML server: act() di dalamnya
+  // memflush useEffect secara sinkron sebelum return, jadi `mounted` sudah
+  // `true` dan gambarnya sudah kepasang begitu render() selesai — assertion
+  // "tidak ada <img>" lewat container itu jadi selalu gagal apa pun isi
+  // komponennya, bukan cuma saat kontraknya benar-benar dilanggar.
+  // renderToStaticMarkup meniru render server sungguhan (tidak pernah
+  // menjalankan efek sama sekali), jadi itu yang dipakai di sini.
   it("hero tidak merender gambar apa pun di HTML server", () => {
-    const { container } = render(<Hero />);
-    expect(container.querySelector("img")).toBeNull();
-    expect(screen.getByRole("heading", { level: 1 }).textContent?.trim()).not.toHaveLength(0);
+    const html = renderToStaticMarkup(<Hero />);
+    expect(html).not.toMatch(/<img[\s>]/);
+    expect(html).toMatch(/<h1[^>]*>.+?<\/h1>/);
   });
 
   it("tidak ada canvas di HTML server", () => {
     const { container } = render(<Hero />);
     expect(container.querySelector("canvas")).toBeNull();
+  });
+
+  // Kedua pintu harus setara sejak mendarat: tidak ada opacity kontainer yang
+  // meredupkan salah satunya, karena itu mengalikan turun ke tombol.
+  it("kedua label lini bisnis ada", () => {
+    render(<Hero />);
+    expect(screen.getByText(/transportasi bbm/i)).toBeInTheDocument();
+    expect(screen.getByText(/penyeberangan ro-ro/i)).toBeInTheDocument();
   });
 });
