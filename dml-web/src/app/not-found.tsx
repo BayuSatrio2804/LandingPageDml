@@ -2,6 +2,21 @@ import Link from "next/link";
 import { fontVariables } from "@/lib/fonts";
 import "./globals.css";
 
+/**
+ * Ini fallback GLOBAL untuk URL yang tidak cocok segmen mana pun (mis.
+ * /halaman-yang-tidak-ada), bukan untuk notFound() yang dilempar dari dalam
+ * (site)/**. Repo ini tidak punya satu app/layout.tsx tunggal -- (payload)
+ * dan (site) masing-masing punya root layout sendiri -- jadi persis skenario
+ * yang didokumentasikan Next 16 (not-found.md) untuk kenapa file ini tetap
+ * mendefinisikan <html>/<body> sendiri: tidak ada satu layout yang bisa
+ * membungkusnya untuk path yang benar-benar tidak cocok segmen mana pun.
+ *
+ * notFound() yang dilempar dari dalam (site)/** (mis. slug artikel yang
+ * tidak ada) dilayani oleh (site)/not-found.tsx, BUKAN berkas ini -- Next
+ * memilih not-found.js terdekat di pohon segmen tempat notFound() dilempar.
+ * Lihat komentar di (site)/not-found.tsx untuk kenapa berkas itu sengaja
+ * TIDAK mendefinisikan <html>/<body> sendiri.
+ */
 export default function NotFound() {
   return (
     <html lang="id" className={`${fontVariables} antialiased`}>
