@@ -16,6 +16,7 @@
     "prepare:cert-placeholders": "bun scripts/prepare-cert-placeholders.ts",
     "prepare-map": "bun scripts/prepare-map.ts",
     "prepare-models": "bun scripts/prepare-models.ts",
+    "prepare-og-corporate": "bun scripts/prepare-og-corporate.tsx",
     "doctor": "react-doctor . -y --blocking warning --no-score",
     "doctor:design": "react-doctor design",
     "lighthouse": "lhci autorun",
