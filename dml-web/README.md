@@ -4,6 +4,11 @@ Situs company profile PT Dutabahari Menara Line. Next.js 16.3 App Router, Payloa
 
 ## Setup fresh clone
 
+> Repo ini memakai bun, dan hanya bun. `package.json` menetapkan
+> `packageManager: bun@1.3.14`. Jangan menjalankan `npm install` atau `yarn`
+> di sini — lockfile yang dihasilkannya diabaikan git dan menghasilkan pohon
+> dependency yang berbeda dari yang dipakai anggota tim lain.
+
 1. `bun install`
 2. Salin `.env.example` jadi `.env.local`, isi setiap variabel (lihat komentar di file itu).
 3. `docker compose up -d` dan tunggu healthcheck Postgres lolos sebelum lanjut:

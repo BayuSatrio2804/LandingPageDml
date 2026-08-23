@@ -1,6 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+# Repo ini bun-only, lihat packageManager di package.json. package-lock.json
+# yang ter-commit pernah membuat dua pohon dependency yang tidak saling tahu.
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 /node_modules
 /.pnp
 .pnp.*
