@@ -26,18 +26,26 @@ export function Reveal({
 
     const ctx = gsap.context(() => {
       const targets = gsap.utils.toArray<HTMLElement>(container.children);
-      gsap.from(targets, {
-        opacity: 0,
-        y: 24,
-        duration: 0.6,
-        ease: "power3.out",
-        stagger,
-        scrollTrigger: {
-          trigger: container,
-          start: "top 82%",
-          once: true,
+      gsap.fromTo(
+        targets,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+          stagger,
+          // Melepas gaya inline setelah selesai. Tanpa ini, opacity dan
+          // transform hasil tween tetap menempel sebagai style inline dan
+          // menang atas CSS mana pun yang mengubah keduanya belakangan.
+          clearProps: "opacity,transform",
+          scrollTrigger: {
+            trigger: container,
+            start: "top 82%",
+            once: true,
+          },
         },
-      });
+      );
     }, root);
 
     return () => ctx.revert();

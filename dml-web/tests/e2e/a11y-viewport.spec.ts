@@ -1,12 +1,7 @@
 import { test } from "@playwright/test";
 import { runAxeCheck } from "./axe";
 
-// Sama seperti tentang-kami.spec.ts: tanpa ini, axe bisa menangkap section
-// yang dibungkus Reveal di tengah fade-in GSAP (opacity masih transisi dari
-// 0), yang membuat warna teks efektif jadi campuran dengan latar dan gagal
-// cek kontras axe secara keliru meski token warna asli lolos WCAG AA nyaman
-// di opacity penuh (dijaga tokens.test.ts).
-test.use({ contextOptions: { reducedMotion: "reduce" } });
+// Guard reducedMotion dilepas di Plan 8 setelah Reveal pindah ke fromTo + clearProps.
 
 const ROUTES = ["/", "/kontak", "/tentang-kami", "/karier"];
 const VIEWPORTS = [
