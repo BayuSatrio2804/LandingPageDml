@@ -24,6 +24,17 @@ describe("kontras token Navy Selat", () => {
     expect(contrastRatio(TOKENS.accent, TOKENS.accentSoft)).toBeGreaterThanOrEqual(4.5);
   });
 
+  /*
+   * surface3 mengerjakan dua hal sekaligus: garis rambut di bidang terang dan
+   * teks di atas bidang navy (kaki halaman, dan sejak Plan 7 juga kepala
+   * halaman). Sampai sekarang pekerjaan kedua cuma dijaga contrast-tokens.spec.ts,
+   * jadi kombinasi yang pecah lolos `bun run test` dan baru ketahuan di
+   * Playwright. Asersi ini memindahkan penjaganya ke gerbang yang lebih murah.
+   */
+  it("surface3 sebagai teks di atas navy lolos AA", () => {
+    expect(contrastRatio(TOKENS.surface3, TOKENS.accent)).toBeGreaterThanOrEqual(4.5);
+  });
+
   it("teks on-accent lolos AA di seluruh state tombol terisi", () => {
     for (const surface of [TOKENS.accent, TOKENS.accentHover, TOKENS.accentPress]) {
       expect(contrastRatio(TOKENS.onAccent, surface)).toBeGreaterThanOrEqual(4.5);
