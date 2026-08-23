@@ -11,18 +11,13 @@ const PUBLIC_MEDIA_DIR = new URL("../public/media/", import.meta.url).pathname;
  * Peta manual dari basePath manifest ke lokasi file mentah hasil unzip.
  * Diisi tangan karena kurasi frame adalah keputusan manusia, bukan
  * sesuatu yang bisa ditebak dari nama arsip.
+ *
+ * Set hero-malam (DJI_0811-0820) dihapus di Plan 6 bersama hero lama. Berkas
+ * mentahnya masih ada di assets/_raw/sts-sri-yuliani/; kalau set itu
+ * dibutuhkan lagi, kembalikan entrinya di sini dan di MEDIA lalu jalankan
+ * bun run prepare-assets.
  */
 const RAW_SOURCE: Record<string, string> = {
-  "/media/hero-malam/dji-0811": "sts-sri-yuliani/DJI_0811.JPG",
-  "/media/hero-malam/dji-0812": "sts-sri-yuliani/DJI_0812.JPG",
-  "/media/hero-malam/dji-0813": "sts-sri-yuliani/DJI_0813.JPG",
-  "/media/hero-malam/dji-0814": "sts-sri-yuliani/DJI_0814.JPG",
-  "/media/hero-malam/dji-0815": "sts-sri-yuliani/DJI_0815.JPG",
-  "/media/hero-malam/dji-0816": "sts-sri-yuliani/DJI_0816.JPG",
-  "/media/hero-malam/dji-0817": "sts-sri-yuliani/DJI_0817.JPG",
-  "/media/hero-malam/dji-0818": "sts-sri-yuliani/DJI_0818.JPG",
-  "/media/hero-malam/dji-0819": "sts-sri-yuliani/DJI_0819.JPG",
-  "/media/hero-malam/dji-0820": "sts-sri-yuliani/DJI_0820.JPG",
   "/media/hari/dji-0030": "sts-06-juli/DJI_0030.JPG",
   "/media/lini-bisnis/transportasi-bbm": "sts-sri-yuliani/DJI_0660.JPG",
   "/media/lini-bisnis/penumpang-roro": "kapal-kapal/DJI_0322.JPG",

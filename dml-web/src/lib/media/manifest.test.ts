@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { MEDIA, avifSrc, avifSrcSet } from "./manifest";
 
 describe("MEDIA manifest", () => {
-  it("hero-malam punya 10 frame", () => {
-    expect(MEDIA["hero-malam"]).toHaveLength(10);
+  it("setiap set punya minimal satu frame", () => {
+    for (const [id, set] of Object.entries(MEDIA)) {
+      expect(set.length, `set ${id} kosong`).toBeGreaterThan(0);
+    }
   });
 
   it("setiap frame punya alt text bahasa Indonesia non-kosong", () => {
