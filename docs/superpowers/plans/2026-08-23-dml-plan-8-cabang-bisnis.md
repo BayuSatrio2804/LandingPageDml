@@ -1541,12 +1541,21 @@ jadwal dan fasilitas kapal (tidak ada di company profile)."
 - Modify: `src/features/inquiry/schema.test.ts`
 - Modify: `src/features/inquiry/actions.ts`
 - Modify: `src/features/inquiry/actions.test.ts`
+- Modify: `src/payload/collections/Inquiries.ts` (kunci `access.create`)
 
 **Interfaces:**
 - Consumes: `inquirySchema` yang sudah ada; `submitInquiry` yang sudah ada.
 - Produces: `businessInquirySchema`; tipe `BusinessInquiryInput`; `submitInquiry` yang kini mengisi kolom `company` dan `service` di koleksi `inquiries`.
 
 **Konteks.** Koleksi `inquiries` (`src/payload/collections/Inquiries.ts`) sudah punya kolom `company` dan `service` yang tidak pernah terisi dari form mana pun, karena `inquirySchema` tidak memilikinya. Task ini menutup celah itu tanpa mengubah perilaku form `/kontak` yang sudah ada.
+
+**Ini bukan dugaan dari membaca kode.** Cek asap `/admin` tanggal 23 Agustus 2026 menjalankan query langsung ke database dan menemukan 22 baris `inquiries`, dengan `company` dan `service` **nol terisi**:
+
+```
+ source | count | ada_company | ada_service
+--------+-------+-------------+-------------
+ kontak |    22 |           0 |           0
+```
 
 Jangan menyentuh honeypot, blok `try/catch` Payload, atau komentar `react-doctor-disable-next-line`. Ketiganya menyelesaikan bug nyata yang sudah didokumentasikan di tempatnya.
 
@@ -1737,19 +1746,69 @@ Tambahkan `businessInquirySchema` ke baris import dari `./schema`.
 Run: `bun run test src/features/inquiry/`
 Expected: PASS seluruhnya, termasuk tes lama `/kontak` yang tidak boleh berubah perilakunya.
 
-- [ ] **Step 9: Typecheck dan commit**
+- [ ] **Step 9: Jadikan `inquiries` benar-benar read-only di admin**
+
+Cek asap `/admin` menemukan koleksi `inquiries` **menampilkan tombol "Create New"**, padahal master spec bagian 10 menyebutnya read-only. Access control-nya sendiri sudah benar sejak Plan 2 — tulis anonim lewat `/api` sudah ditutup — tapi admin yang login tetap bisa mengetik lead manual.
+
+Alasan menutupnya bukan keamanan, melainkan kejujuran data: lead yang diketik admin akan tercampur dengan lead sungguhan dari form, dan kolom `source` yang jadi pembedanya berubah jadi berbohong. Setelah Plan 8 ada dua form dengan `source` berbeda (`kontak` dan `permintaan-informasi-bbm`), jadi nilai kolom itu justru makin penting.
+
+Di `src/payload/collections/Inquiries.ts`, ubah `create` di blok `access`:
+
+```ts
+    // Nol tulis dari mana pun kecuali submitInquiry. Local API
+    // payload.create() memakai overrideAccess: true secara default
+    // (terverifikasi di tipe Payload 3.88,
+    // node_modules/payload/dist/collections/operations/local/create.d.ts:54
+    // menandainya @default true), jadi server action tetap bisa menulis
+    // meski gerbang ini tertutup rapat.
+    //
+    // Yang berubah: tombol "Create New" hilang dari UI admin. Cek asap
+    // 23 Agustus 2026 menemukan tombol itu masih ada, yang membantah
+    // master spec bagian 10 yang menyebut koleksi ini read-only. Lead
+    // yang diketik manual admin akan tercampur dengan lead sungguhan
+    // dari form, dan kolom `source` yang jadi pembedanya jadi berbohong.
+    create: () => false,
+```
+
+Perbarui juga komentar di atasnya yang masih menjelaskan versi lama (`Boolean(user)`), supaya tidak ada dua penjelasan yang saling membantah di satu blok.
+
+- [ ] **Step 10: Buktikan `submitInquiry` masih menulis setelah gerbang ditutup**
+
+Ini pemeriksaan yang menentukan. Kalau salah, form kontak yang sudah hidup ikut mati.
+
+Run: `bun run test src/features/inquiry/`
+Expected: PASS seluruhnya. Tes action memakai mock `payload.create`, jadi ia tidak membuktikan jalur sungguhan — pembuktiannya di bawah.
+
+```bash
+docker compose up -d
+until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
+docker compose exec -T postgres psql -U dml -d dml -c "SELECT count(*) AS sebelum FROM inquiries;"
+bun run test:e2e tests/e2e/kontak.spec.ts
+docker compose exec -T postgres psql -U dml -d dml -c "SELECT count(*) AS sesudah FROM inquiries;"
+```
+Expected: `kontak.spec.ts` lolos, dan `sesudah` lebih besar dari `sebelum`. Itu bukti bahwa server action masih menembus gerbang yang baru ditutup.
+
+Kalau `sesudah` sama dengan `sebelum` sementara spec lolos, **berhenti**: berarti spec itu tidak benar-benar menyentuh database, dan asumsi `overrideAccess` perlu diperiksa ulang sebelum lanjut.
+
+- [ ] **Step 11: Typecheck dan commit**
 
 Run: `bun run typecheck`
 Expected: bersih.
 
 ```bash
-git add dml-web/src/features/inquiry/schema.ts dml-web/src/features/inquiry/schema.test.ts dml-web/src/features/inquiry/actions.ts dml-web/src/features/inquiry/actions.test.ts
+git add dml-web/src/features/inquiry/schema.ts dml-web/src/features/inquiry/schema.test.ts dml-web/src/features/inquiry/actions.ts dml-web/src/features/inquiry/actions.test.ts dml-web/src/payload/collections/Inquiries.ts
 git commit -m "feat: skema dan action untuk permintaan informasi bisnis
 
 Koleksi inquiries sudah punya kolom company dan service sejak Plan 2 dan
-tidak pernah terisi dari form mana pun. businessInquirySchema memperluas
-inquirySchema, bukan menduplikasinya, supaya aturan telepon, email, dan
-honeypot tetap hidup di satu tempat."
+tidak pernah terisi dari form mana pun: query langsung ke database
+menunjukkan 22 baris dengan nol company dan nol service.
+businessInquirySchema memperluas inquirySchema, bukan menduplikasinya,
+supaya aturan telepon, email, dan honeypot tetap hidup di satu tempat.
+
+Sekalian menutup tombol Create New di admin, yang ditemukan cek asap masih
+ada padahal master spec menyebut koleksi ini read-only. Alasannya bukan
+keamanan (tulis anonim sudah ditutup Plan 2) tapi kejujuran kolom source,
+yang jadi makin penting sejak ada dua form dengan source berbeda."
 ```
 
 ---
