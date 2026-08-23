@@ -48,6 +48,7 @@ export function articleJsonLd(input: {
   description: string;
   path: string;
   publishedAt: string;
+  updatedAt: string;
   imageUrl?: string;
   authorName?: string;
 }) {
@@ -58,6 +59,7 @@ export function articleJsonLd(input: {
     description: input.description,
     mainEntityOfPage: absoluteUrl(input.path),
     datePublished: input.publishedAt,
+    dateModified: input.updatedAt,
     publisher: {
       "@type": "Organization",
       name: COMPANY.legalName,

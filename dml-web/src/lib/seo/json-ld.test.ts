@@ -76,6 +76,7 @@ describe("articleJsonLd", () => {
     description: "Ringkasan.",
     path: "/artikel/operasi-sts",
     publishedAt: "2026-08-23T00:00:00.000Z",
+    updatedAt: "2026-08-24T00:00:00.000Z",
     imageUrl: "https://contoh.test/media/kapal.jpg",
     authorName: "Redaksi DML",
   };
@@ -91,6 +92,7 @@ describe("articleJsonLd", () => {
     const data = articleJsonLd(input) as Record<string, unknown>;
     expect(data.author).toEqual({ "@type": "Person", name: "Redaksi DML" });
     expect(data.datePublished).toBe("2026-08-23T00:00:00.000Z");
+    expect(data.dateModified).toBe("2026-08-24T00:00:00.000Z");
   });
 
   it("menghilangkan penulis dan gambar kalau tidak ada, bukan mengisinya kosong", () => {
@@ -99,6 +101,7 @@ describe("articleJsonLd", () => {
       description: "D",
       path: "/artikel/t",
       publishedAt: "2026-08-23T00:00:00.000Z",
+      updatedAt: "2026-08-23T00:00:00.000Z",
     }) as Record<string, unknown>;
     expect("author" in data).toBe(false);
     expect("image" in data).toBe(false);
