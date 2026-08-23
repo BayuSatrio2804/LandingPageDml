@@ -494,12 +494,19 @@ Ini langkah yang paling mudah dilewati dan paling mahal kalau dilewati. `name` b
 docker compose exec -T postgres psql -U dml -d dml -c "SELECT count(*) FROM users;"
 ```
 
-- Kalau hasilnya `0`, database lokal kosong dan migrasi akan lolos di sini tanpa membuktikan apa pun. **Buat satu user lebih dulu**, lalu ulangi, supaya jalur yang sebenarnya terjadi di produksi ikut teruji:
+- Kalau hasilnya `0`, database lokal kosong dan migrasi akan lolos di sini tanpa membuktikan apa pun. **Isi satu baris lebih dulu, pada skema LAMA, baru jalankan migrasi.** Urutannya penting: menjalankan migrasi lebih dulu lalu menyisipkan baris tanpa kolom `name` cuma menghasilkan galat NOT NULL dari sisipannya sendiri, yang terbaca seperti bug yang sedang dicari padahal bukan.
+
   ```bash
+  # 1. Skema lama, kolom name belum ada. Baris ini mewakili user yang sudah
+  #    hidup di produksi sebelum Plan 9.
+  docker compose exec -T postgres psql -U dml -d dml -c \
+    "INSERT INTO users (email, hash, salt, updated_at, created_at) VALUES ('uji@example.com', 'x', 'x', now(), now());"
+
+  # 2. Baru migrasi. Inilah jalur yang sebenarnya terjadi saat deploy.
   bun run payload migrate
-  docker compose exec -T postgres psql -U dml -d dml -c "INSERT INTO users (email, hash, salt, updated_at, created_at) VALUES ('uji@example.com', 'x', 'x', now(), now());"
   ```
-  Lalu `bun run payload migrate:down` dan `bun run payload migrate` ulang.
+
+  Kalau langkah 1 sendiri gagal karena kolom `name` sudah ada, migrasi sudah terlanjur jalan. Mundurkan dulu dengan `bun run payload migrate:down`, lalu ulangi dari langkah 1.
 - Kalau migrasi gagal dengan galat NOT NULL, sunting berkas migrasi supaya kolomnya ditambahkan dengan default sementara, diisi, baru ditegakkan:
   ```sql
   ALTER TABLE "users" ADD COLUMN "name" varchar;
@@ -639,6 +646,26 @@ describe("query artikel", () => {
     find.mockResolvedValue({ docs: [{ slug: "a" }, { slug: "b" }] });
     expect(await listPublishedSlugs()).toEqual(["a", "b"]);
   });
+
+  it("daftar mengembalikan array kosong, bukan melempar, saat database tidak terjangkau", async () => {
+    // next build memprerender / dan /artikel, dan generateStaticParams
+    // memanggil listPublishedSlugs. Kalau ketiganya melempar, build gagal di
+    // lingkungan mana pun yang tidak punya Postgres, termasuk stage builder
+    // di dalam Docker. Situs tanpa artikel jauh lebih ringan daripada situs
+    // yang tidak bisa dibangun.
+    find.mockRejectedValue(new Error("koneksi ditolak"));
+    expect(await listPublishedPosts()).toEqual([]);
+    expect(await listPublishedSlugs()).toEqual([]);
+  });
+
+  it("findPublishedPost TETAP melempar saat database gagal", async () => {
+    // Sengaja beda dari dua di atas. Menelan galat di sini berarti gangguan
+    // database sesaat berubah jadi 404 untuk artikel yang sebenarnya ada,
+    // dan 404 adalah sinyal permanen bagi mesin pencari. Melempar berarti
+    // error boundary yang tampil, dan status kodenya 500, bukan 404.
+    find.mockRejectedValue(new Error("koneksi ditolak"));
+    await expect(findPublishedPost("a")).rejects.toThrow();
+  });
 });
 ```
 
@@ -676,18 +703,48 @@ async function client() {
   return getPayload({ config });
 }
 
+/**
+ * Kegagalan database TIDAK dilempar oleh fungsi daftar, dan ini keputusan
+ * arsitektur, bukan penanganan galat yang malas.
+ *
+ * `next build` memprerender `/` (seksi Artikel Terbaru), `/artikel`, dan
+ * memanggil generateStaticParams untuk `/artikel/[slug]`. Kalau ketiganya
+ * melempar saat database tidak terjangkau, build gagal di setiap lingkungan
+ * yang tidak punya Postgres, dan yang paling penting: di stage builder
+ * Dockerfile, yang memang tidak berada di jaringan yang sama dengan service
+ * database saat `docker compose up --build` berjalan.
+ *
+ * Situs yang tayang tanpa artikel sementara jauh lebih ringan daripada situs
+ * yang tidak bisa dibangun sama sekali. Hook revalidasi memulihkan isinya
+ * pada publikasi berikutnya, dan `/` juga memasang `revalidate` sebagai
+ * jaring kedua.
+ *
+ * findPublishedPost sengaja TIDAK ikut aturan ini; lihat komentarnya sendiri.
+ */
 export async function listPublishedPosts(limit?: number): Promise<Post[]> {
-  const payload = await client();
-  const result = await payload.find({
-    collection: "posts",
-    where: PUBLISHED_WHERE,
-    sort: "-publishedAt",
-    depth: 1,
-    ...(limit === undefined ? {} : { limit }),
-  });
-  return result.docs as Post[];
+  try {
+    const payload = await client();
+    const result = await payload.find({
+      collection: "posts",
+      where: PUBLISHED_WHERE,
+      sort: "-publishedAt",
+      depth: 1,
+      ...(limit === undefined ? {} : { limit }),
+    });
+    return result.docs as Post[];
+  } catch (error) {
+    console.error("artikel: gagal memuat daftar", error);
+    return [];
+  }
 }
 
+/**
+ * Ini SATU-SATUNYA query artikel yang melempar saat database gagal, dan
+ * bedanya disengaja. Menelan galat di sini mengubah gangguan database sesaat
+ * jadi 404 untuk artikel yang sebenarnya ada, dan 404 dibaca mesin pencari
+ * sebagai sinyal permanen. Melempar berarti error boundary yang tampil
+ * dengan status 500, yang justru sinyal sementara.
+ */
 export async function findPublishedPost(slug: string): Promise<Post | null> {
   const payload = await client();
   const result = await payload.find({
@@ -700,22 +757,27 @@ export async function findPublishedPost(slug: string): Promise<Post | null> {
 }
 
 export async function listPublishedSlugs(): Promise<string[]> {
-  const payload = await client();
-  const result = await payload.find({
-    collection: "posts",
-    where: PUBLISHED_WHERE,
-    depth: 0,
-    limit: 1000,
-    select: { slug: true },
-  });
-  return (result.docs as Array<{ slug: string }>).map((doc) => doc.slug);
+  try {
+    const payload = await client();
+    const result = await payload.find({
+      collection: "posts",
+      where: PUBLISHED_WHERE,
+      depth: 0,
+      limit: 1000,
+      select: { slug: true },
+    });
+    return (result.docs as Array<{ slug: string }>).map((doc) => doc.slug);
+  } catch (error) {
+    console.error("artikel: gagal memuat slug", error);
+    return [];
+  }
 }
 ```
 
 - [ ] **Step 4: Jalankan tes, pastikan lolos**
 
 Run: `bun run test src/features/articles/queries.test.ts`
-Expected: PASS, 6 tes.
+Expected: PASS, 8 tes.
 
 - [ ] **Step 5: Gerbang cepat**
 
@@ -1815,7 +1877,40 @@ Tambahkan satu kalimat ke docblock urutan seksi yang sudah ada di berkas itu:
  * lalu bidang teks. Ia hilang seluruhnya kalau koleksi artikel kosong.
 ```
 
-- [ ] **Step 6: Verifikasi beranda tetap tayang dengan koleksi kosong**
+- [ ] **Step 6: Pasang jaring kedua di beranda**
+
+Tambahkan di kepala `src/app/(site)/page.tsx`, di bawah impor:
+
+```tsx
+/**
+ * Jaring kedua untuk build yang berjalan tanpa database. queries.ts sudah
+ * mengembalikan daftar kosong alih-alih melempar, jadi build tetap sukses,
+ * tapi hasilnya beranda tanpa seksi artikel yang dibekukan sebagai halaman
+ * statis. Tanpa baris ini ia bertahan begitu sampai ada publikasi berikutnya
+ * yang memicu revalidatePath. Satu jam adalah harga yang murah untuk
+ * jaminan bahwa beranda menyembuhkan dirinya sendiri.
+ */
+export const revalidate = 3600;
+```
+
+- [ ] **Step 7: Buktikan build tetap sukses tanpa database**
+
+Ini langkah yang menentukan apakah fase D bisa berjalan sama sekali. Stage builder di dalam Dockerfile **tidak** berada di jaringan yang sama dengan service Postgres saat `docker compose up --build` berjalan, jadi build wajib bertahan tanpa database.
+
+```bash
+docker compose down
+bun run build
+```
+Expected: build **sukses**, dengan galat koneksi tercetak sebagai `console.error` dari `queries.ts` tanpa menjatuhkan proses.
+
+Kalau build gagal, cari pemanggil artikel yang belum fail-soft. Yang wajib bertahan tanpa database ada tiga: seksi beranda, halaman `/artikel`, dan `generateStaticParams` di `/artikel/[slug]`. Ketiganya lewat `queries.ts`, jadi perbaikannya ada di sana, bukan di halaman.
+
+```bash
+docker compose up -d
+until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
+```
+
+- [ ] **Step 8: Verifikasi beranda tetap tayang dengan koleksi kosong**
 
 ```bash
 docker compose up -d
@@ -1828,11 +1923,11 @@ kill %1
 ```
 Expected: `200`, lalu `0`. Koleksi masih kosong, jadi seksinya memang harus absen.
 
-- [ ] **Step 7: Gerbang**
+- [ ] **Step 9: Gerbang**
 
 Run: `bun run lint && bun run typecheck && bun run test`
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add dml-web/src/features/articles/latest-articles.tsx \
@@ -1844,7 +1939,9 @@ Beranda halaman penjualan; pengakuan bahwa belum ada artikel di sana
 melemahkan tanpa memberi apa pun.
 
 Presentasi dipisah dari query supaya tes render tidak menyentuh
-database."
+database. Beranda memasang revalidate satu jam sebagai jaring kedua:
+build tanpa database menghasilkan beranda tanpa seksi artikel, dan tanpa
+revalidate ia bertahan begitu sampai publikasi berikutnya."
 ```
 
 ---
@@ -2840,15 +2937,70 @@ Di `src/lib/seo/metadata.ts`, tambahkan satu baris di dalam objek yang dikembali
 Run: `bun run test src/lib/seo/metadata.test.ts`
 Expected: PASS, 3 tes.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Buka blokir berkas upload di `robots.ts`**
+
+`robots.ts` hari ini melarang seluruh `/api`. Payload menyajikan berkas upload lokal di `/api/media/file/<nama>`, jadi larangan itu ikut memblokir **setiap gambar artikel**.
+
+Dua akibatnya, dan yang kedua yang serius:
+
+1. Google Images tidak pernah mengindeks satu pun foto cover.
+2. Properti `image` di JSON-LD `Article` yang dibangun Task 6 menunjuk URL yang diblokir robots. Google menuntut gambar di data terstruktur Article bisa dirayapi; yang diblokir membuat rich result-nya dibuang seluruhnya.
+
+Keduanya lolos dari setiap pemeriksaan visual, karena tampilan di halaman memakai `/_next/image` yang mem-proxy berkasnya dan sama sekali tidak terpengaruh.
+
+Ganti aturan di `src/app/robots.ts`:
+
+```ts
+    rules: {
+      userAgent: "*",
+      /**
+       * allow menang atas disallow pada pencocokan terpanjang, jadi baris
+       * ini membuka justru berkas upload tanpa membuka REST API Payload.
+       *
+       * Tanpa ini, /api/media/file/... ikut terblokir bersama /api, dan
+       * setiap gambar cover artikel jadi tidak bisa dirayapi. Yang paling
+       * merugikan bukan Google Images, melainkan JSON-LD Article: propertinya
+       * `image` menunjuk URL terblokir, dan rich result-nya dibuang. Tidak
+       * ada satu pun pemeriksaan visual yang bisa menangkap ini, karena
+       * halaman menampilkan gambarnya lewat /_next/image.
+       */
+      allow: ["/", "/api/media/file/"],
+      disallow: ["/admin", "/api"],
+    },
+```
+
+- [ ] **Step 6: Buktikan robots.txt-nya benar**
 
 ```bash
-git add dml-web/src/lib/seo/metadata.ts dml-web/src/lib/seo/metadata.test.ts
-git commit -m "feat: metadataBase supaya gambar OG tidak menunjuk localhost
+docker compose up -d
+until docker compose ps --format json | grep -q '"Health":"healthy"'; do sleep 1; done
+bun run build && bun run start &
+sleep 8
+/usr/bin/curl -s http://localhost:3000/robots.txt
+kill %1
+```
+Expected: keluarannya memuat `Allow: /api/media/file/` **dan** `Disallow: /api`.
+
+- [ ] **Step 7: Gerbang**
+
+Run: `bun run lint && bun run typecheck && bun run test`
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add dml-web/src/lib/seo/metadata.ts dml-web/src/lib/seo/metadata.test.ts dml-web/src/app/robots.ts
+git commit -m "feat: metadataBase, dan buka blokir robots untuk berkas upload
 
 Dikerjakan sebelum task OG mana pun. Urutannya bagian dari desain: path
 relatif tanpa metadataBase diresolusi ke localhost, dan kerusakannya
-tidak terlihat sampai ada yang membagikan tautannya."
+tidak terlihat sampai ada yang membagikan tautannya.
+
+robots.ts melarang seluruh /api, dan Payload menyajikan upload di
+/api/media/file/. Artinya setiap gambar cover artikel terblokir dari
+perayapan, termasuk yang ditunjuk properti image di JSON-LD Article,
+yang membuat rich result-nya dibuang. Halaman tetap menampilkan
+gambarnya lewat /_next/image, jadi tidak ada pemeriksaan visual yang
+bisa menangkap ini."
 ```
 
 ---
@@ -4090,7 +4242,11 @@ docker build --target runner -t dml-web:uji \
 ```
 Expected: sukses.
 
-Kalau build gagal di `bun run build` karena tidak bisa menghubungi database, itu **bukan kegagalan Dockerfile**: sejak Task 8 beranda melakukan query artikel. Build butuh Postgres yang terjangkau dari dalam container build. Jalankan build dengan `--network host` sementara, atau naikkan stack compose Task 22 lebih dulu lalu build dengan jaringan yang sama. Catat cara yang dipakai; ia masuk runbook di Task 23.
+Build ini berjalan **tanpa database sama sekali**, dan itu memang syaratnya. Container build tidak berada di jaringan yang sama dengan service Postgres saat `docker compose up --build` dijalankan, dan `--network host` tidak menolong pada build yang dipicu compose.
+
+Yang membuatnya mungkin adalah fail-soft di `queries.ts` (Task 3) beserta `revalidate` di beranda (Task 8), dan sifat itu sudah dibuktikan terpisah di Task 8 Step 7. **Kalau build di sini gagal dengan galat koneksi database, jangan menambal Dockerfile.** Berarti ada pemanggil artikel yang belum lewat `queries.ts`, dan perbaikannya di sana.
+
+Yang muncul di log build sebagai `artikel: gagal memuat daftar` adalah keluaran yang benar dan diharapkan, bukan peringatan yang perlu dibungkam.
 
 - [ ] **Step 4: Periksa ukuran dan isi image**
 
@@ -4202,6 +4358,18 @@ services:
       - payload-uploads:/app/uploads
     ports:
       - "3000:3000"
+    # Tanpa healthcheck, Coolify tidak punya sinyal kesiapan dan akan
+    # mengalihkan lalu lintas ke container yang prosesnya sudah hidup tapi
+    # servernya belum menerima koneksi. Beranda dipakai sebagai probe karena
+    # ia satu-satunya halaman yang menyentuh database DAN dirender untuk
+    # pengunjung; probe yang cuma memeriksa port terbuka lolos bahkan saat
+    # database mati.
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     depends_on:
       postgres:
         condition: service_healthy
