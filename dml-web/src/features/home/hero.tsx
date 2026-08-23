@@ -260,6 +260,10 @@ export function Hero() {
       cleanups.push(() => {
         btn.removeEventListener("mousemove", move);
         btn.removeEventListener("mouseleave", out);
+        // quickTo mengembalikan fungsi setter, tween-nya menempel di tombol.
+        // Melepas listener saja menyisakan tween hidup yang masih memegang
+        // referensi ke elemen setelah hero unmount.
+        gsap.killTweensOf(btn);
       });
     }
 
