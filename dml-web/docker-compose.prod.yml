@@ -1,0 +1,103 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Job satu kali, bukan service yang hidup terus. Ia dibangun dari stage
+  # builder karena di sanalah seluruh node_modules tersedia; image runner
+  # sengaja tidak memuatnya.
+  #
+  # `bun run migrate`, BUKAN `bun run payload migrate` (CLI resmi Payload).
+  # CLI-nya gagal DETERMINISTIK di gambar oven/bun:1.3.14-slim dengan "Cannot
+  # find module 'tsx://...'" -- bin.js Payload memuat payload.config.ts
+  # lewat tsx 4.22.4, yang punya bug terdokumentasi (payloadcms/payload
+  # issue #16949) yang tidak tertambal di bawah runtime bun. Melewati tsx
+  # lewat --disable-transpile cuma memindahkan kegagalan ke race sirkular
+  # @lexical/react <-> lexical yang sama dengan yang didokumentasikan di
+  # scripts/seed.ts. scripts/migrate.ts memanggil API terprogram Payload
+  # langsung (tanpa bin.js CLI sama sekali) dan dijalankan lewat bundel
+  # satu berkas seperti seed, menghindari kedua bug sekaligus. Diverifikasi
+  # 5/5 run bersih lokal plus berhasil di dalam image builder ini sendiri.
+  #
+  # Migrasi non-interaktif dan gagal keras. push:false di payload.config.ts
+  # sudah mencegah lahirnya baris batch:-1 yang membuat migrate() berhenti
+  # di prompt konfirmasi dan menggantung selamanya di proses non-TTY.
+  # Jangan melemahkan itu dari sini.
+  migrate:
+    build:
+      context: .
+      target: builder
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    command: ["bun", "run", "migrate"]
+    environment:
+      DATABASE_URI: ${DATABASE_URI}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    restart: unless-stopped
+    environment:
+      DATABASE_URI: ${DATABASE_URI}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS}
+      PAYLOAD_UPLOAD_DIR: /app/uploads
+    volumes:
+      # Inilah satu-satunya alasan Task 18 ada. Tanpa pemetaan ini, seluruh
+      # gambar artikel hilang tiap redeploy, dan hilangnya senyap.
+      - payload-uploads:/app/uploads
+    ports:
+      - "3000:3000"
+    # Tanpa healthcheck, Coolify tidak punya sinyal kesiapan dan akan
+    # mengalihkan lalu lintas ke container yang prosesnya sudah hidup tapi
+    # servernya belum menerima koneksi. Beranda dipakai sebagai probe karena
+    # ia satu-satunya halaman yang menyentuh database DAN dirender untuk
+    # pengunjung; probe yang cuma memeriksa port terbuka lolos bahkan saat
+    # database mati.
+    #
+    # wget dan curl TIDAK ADA di oven/bun:1.3.14-slim (diverifikasi langsung
+    # lewat `docker run ... which wget/curl`, keduanya kosong) -- rencana
+    # awal memakai wget --spider, tapi itu akan gagal senyap sebagai
+    # healthcheck yang selalu unhealthy. bun sendiri sudah pasti ada di image
+    # ini (ia runtime-nya), jadi probe HTTP-nya ditulis lewat fetch bawaan
+    # bun, bukan menambah paket sistem baru.
+    healthcheck:
+      test:
+        - CMD
+        - bun
+        - -e
+        - fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:
+  payload-uploads:

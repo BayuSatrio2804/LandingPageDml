@@ -49,8 +49,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# bundel sementara bun run seed, lihat komentar di package.json
+# bundel sementara bun run seed dan bun run migrate, lihat komentar di
+# package.json dan scripts/migrate.ts
 /.seed-bundle.js
+/.migrate-bundle.js
 
 # upload runtime Payload, tidak pernah dikomit
 /uploads/
