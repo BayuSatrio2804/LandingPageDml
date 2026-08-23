@@ -4,9 +4,19 @@ import { headers } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { inquirySchema, businessInquirySchema } from "./schema";
-import { createRateLimiter } from "./rate-limit";
+import { createRateLimiter, clientKeyFrom } from "./rate-limit";
 
 const rateLimiter = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
+
+/**
+ * Batas atas yang tetap berlaku kalau penyerang memutar-mutar x-forwarded-for
+ * sehingga bucket per-alamat tidak pernah penuh. Angkanya dipilih supaya tidak
+ * pernah tersentuh lalu lintas manusia yang wajar: situs company profile
+ * dengan dua form lead tidak menerima 200 kiriman dalam sepuluh menit.
+ */
+const globalLimiter = createRateLimiter({ limit: 200, windowMs: 10 * 60 * 1000 });
+
+const TRUSTED_PROXY_HOPS = Number(process.env.TRUSTED_PROXY_HOPS ?? "1");
 
 // react-doctor/server-auth-actions: sengaja tanpa auth. Ini form kontak
 // publik, pengunjung anonim harus bisa submit tanpa login. Perlindungan
@@ -42,9 +52,9 @@ export async function submitInquiry(
   }
 
   const requestHeaders = await headers();
-  const ip = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = clientKeyFrom(requestHeaders.get("x-forwarded-for"), TRUSTED_PROXY_HOPS);
 
-  if (!rateLimiter.check(ip)) {
+  if (!rateLimiter.check(ip) || !globalLimiter.check("global")) {
     return { ok: false, error: "Terlalu banyak percobaan, coba lagi nanti." };
   }
 
