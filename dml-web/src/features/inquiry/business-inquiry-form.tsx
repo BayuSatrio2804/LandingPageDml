@@ -128,18 +128,21 @@ export function BusinessInquiryForm({
       <TextField
         id="business-cargo"
         label="Jenis muatan (opsional)"
+        autoComplete="off"
         register={register("cargoType")}
         error={errors.cargoType?.message}
       />
       <TextField
         id="business-route"
         label="Rute (opsional)"
+        autoComplete="off"
         register={register("route")}
         error={errors.route?.message}
       />
       <TextField
         id="business-volume"
         label="Perkiraan volume (opsional)"
+        autoComplete="off"
         register={register("volume")}
         error={errors.volume?.message}
       />
@@ -147,6 +150,7 @@ export function BusinessInquiryForm({
         id="business-message"
         label="Kebutuhan"
         multiline
+        autoComplete="off"
         register={register("message")}
         error={errors.message?.message}
       />

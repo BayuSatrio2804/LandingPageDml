@@ -35,18 +35,61 @@ Situs company profile PT Dutabahari Menara Line. Next.js 16.3 App Router, Payloa
 - `bun run lighthouse`: Lighthouse CI mobile-preset terhadap `/`. Ambang `largest-contentful-paint` di `lighthouserc.json` diset 5000ms, bukan target ideal 2500ms dari rencana awal, karena sudah diverifikasi langsung (Plan 3 Task 17) bahwa 2500ms tidak tercapai bahkan dengan seluruh 9 frame crossfade hero dihilangkan (LCP dasar halaman ini ~4100ms di lingkungan sandbox build-time yang dipakai untuk pengujian, dengan throttling mobile-slow-4G simulasi lhci). Artinya bottleneck bukan animasi hero, melainkan lantai performa halaman/lingkungan itu sendiri. Kalau nanti diukur ulang di infra produksi sungguhan dan hasilnya jauh lebih baik, ambang ini boleh diperketat kembali.
 - `bun run payload migrate`: jalankan migrasi Payload. Jangan pernah mengandalkan dev-mode schema push, lihat `payload.config.ts` (`push: false`).
 
+## Rate limit dan proxy
+
+Dua form publik (`/kontak` dan `/bisnis/transportasi-bbm/permintaan-informasi`)
+memakai rate limiter in-memory yang mengunci per alamat klien. Alamat itu
+diambil dari `x-forwarded-for` pada posisi `TRUSTED_PROXY_HOPS` **dihitung dari
+kanan**, bukan dari entri paling kiri yang sepenuhnya dikendalikan klien.
+
+Setel `TRUSTED_PROXY_HOPS` sesuai jumlah proxy yang benar-benar berada di depan
+aplikasi: `1` untuk satu reverse proxy, `2` kalau ada CDN di depannya. Menyetel
+angka terlalu besar membuat kunci jatuh ke nilai yang bisa dipalsukan, yang
+mengembalikan persis bug yang diperbaiki Plan 8.
+
+Limiter ini in-memory per instance dan tidak tahan deploy multi-instance.
+Batas sungguhan terhadap penyalahgunaan tetap ada di lapisan infrastruktur.
+
 ## Struktur
 
-- `src/app/(site)/`: halaman publik — beranda, kontak, karier, tentang kami.
+- `src/app/(site)/`: halaman publik — beranda, bisnis (hub, transportasi BBM,
+  penyeberangan ro-ro, permintaan informasi), kontak, karier, tentang kami.
 - `src/app/(payload)/`: admin panel Payload di `/admin`.
 - `src/payload/`: config dan collection Payload.
 - `src/features/home/`: seksi beranda, satu file per seksi.
 - `src/features/inquiry/`: form kontak, skema validasi, server action, rate limiter.
 - `src/features/route-map/`, `src/features/fleet/`: data dan komponen peta rute serta armada.
+- `src/content/vessels.ts`: 66 nama kapal dari company profile halaman 04,
+  dijaga tes konsistensi silang terhadap `vesselCount` di `fleet.ts` dan
+  `ROUTE_LEGS` di `ports.ts`. Kalau ketiganya tidak lagi cocok, yang salah
+  hampir pasti data baru, bukan `fleet.ts` yang sudah diverifikasi di Plan 5.
+- `src/content/legal-documents.ts`: tabel dokumen legal dari company profile
+  halaman 06, tayang di `/tentang-kami#profil`.
 - `src/content/`: data korporat hardcoded. Setiap angka wajib menyebut sumbernya di
   komentar; `SourceTag` membedakan `cp-pdf`, `riset-publik`, dan `belum-terverifikasi`.
 - `src/lib/`: token warna, manifest media, util motion, SEO.
 - `scripts/`: pipeline aset sekali-jalan (foto, peta, model 3D, placeholder sertifikasi).
+
+## Angka armada yang masih menunggu konfirmasi klien
+
+Company profile menulis ringkasan 64 kapal (9 ro-ro + 55 pengangkut BBM), tapi
+daftar nama kapal di halaman yang sama memuat 66: ro-ro cocok di angka 9,
+sedangkan daftar pengangkut BBM berisi 57, bukan 55. Seluruh selisih dua kapal
+ada di sisi BBM.
+
+`COMPANY.fleetSummary` memakai angka ringkasan; `VESSELS` di `vessels.ts`
+memakai hasil hitung daftar. Tidak ada satu pun tempat di situs yang
+menjumlahkan `VESSELS` lalu menampilkannya bersebelahan dengan angka ringkasan,
+jadi kedua angka tidak pernah tampil saling membantah. Begitu klien
+mengonfirmasi angka yang benar, samakan keduanya dan perbarui
+`vessels.test.ts`.
+
+Satu nama, `OB Sahoya 0`, terbaca terpotong di PDF dan ditandai
+`belum-terverifikasi`. Jangan menebaknya jadi "Sahoya 04".
+
+Dimensi kapal (panjang, lebar, DWT) tidak ada di company profile sama sekali
+dan seluruhnya masih estimasi proporsional. Halaman lini BBM menyatakan ini di
+bawah tabel spesifikasinya, bukan cuma di komentar kode.
 
 ## Menukar placeholder sertifikasi dengan logo resmi
 
