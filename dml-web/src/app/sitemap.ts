@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo/metadata";
+import { listPublishedPosts } from "@/features/articles/queries";
 
 /**
  * Diekspor supaya sitemap.test.ts bisa mencocokkan tiap path ke berkas
@@ -7,13 +8,11 @@ import { absoluteUrl } from "@/lib/seo/metadata";
  * yang 404 dan diiklankan ke mesin pencari selama tujuh plan.
  *
  * /bisnis/galangan-kapal dicoret permanen: PT Dutabahari Menara Line Dockyard
- * adalah perusahaan terpisah di dalam Sinar Alam Corporation, bukan lini DML,
- * dan perawatan armada DML sendiri dikerjakan afiliasi Dutabahari Teknik.
+ * adalah perusahaan terpisah di dalam Sinar Alam Corporation, bukan lini DML.
  * Lihat docblock di src/content/navigation.ts.
  *
- * /artikel dicabut sementara sampai Plan 9 membangun koleksi posts beserta
- * kedua route-nya. Saat itu path ini kembali, bersama slug artikel published
- * yang ditambahkan secara dinamis.
+ * /artikel kembali sejak Plan 9, bersama slug artikel published yang
+ * ditambahkan secara dinamis di bawah.
  */
 export const STATIC_PATHS = [
   "/",
@@ -22,15 +21,36 @@ export const STATIC_PATHS = [
   "/bisnis/transportasi-bbm",
   "/bisnis/transportasi-bbm/permintaan-informasi",
   "/bisnis/penumpang-roro",
+  "/artikel",
   "/karier",
   "/kontak",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return STATIC_PATHS.map((path) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const statis: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
     url: absoluteUrl(path),
     lastModified: new Date(),
     changeFrequency: "monthly",
     priority: path === "/" ? 1 : 0.7,
   }));
+
+  /**
+   * Kegagalan database tidak boleh menjatuhkan sitemap. Sitemap yang gagal
+   * berarti `next build` gagal, dan kehilangan entri artikel untuk sementara
+   * jauh lebih ringan daripada situs yang tidak bisa dibangun sama sekali.
+   */
+  let artikel: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await listPublishedPosts();
+    artikel = posts.map((post) => ({
+      url: absoluteUrl(`/artikel/${post.slug}`),
+      lastModified: new Date(post.updatedAt),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }));
+  } catch (error) {
+    console.error("sitemap: gagal memuat artikel", error);
+  }
+
+  return [...statis, ...artikel];
 }
