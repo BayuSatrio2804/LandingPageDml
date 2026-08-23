@@ -37,8 +37,29 @@ Situs company profile PT Dutabahari Menara Line. Next.js 16.3 App Router, Payloa
 
 ## Struktur
 
-- `src/app/(site)/`: halaman publik.
+- `src/app/(site)/`: halaman publik — beranda, kontak, karier, tentang kami.
 - `src/app/(payload)/`: admin panel Payload di `/admin`.
 - `src/payload/`: config dan collection Payload.
-- `src/features/`: logika per fitur (form inquiry; seksi beranda menyusul).
-- `src/content/`: data korporat hardcoded, wajib ditandai `// unverified: <sumber>` untuk angka yang belum dikonfirmasi klien.
+- `src/features/home/`: seksi beranda, satu file per seksi.
+- `src/features/inquiry/`: form kontak, skema validasi, server action, rate limiter.
+- `src/features/route-map/`, `src/features/fleet/`: data dan komponen peta rute serta armada.
+- `src/content/`: data korporat hardcoded. Setiap angka wajib menyebut sumbernya di
+  komentar; `SourceTag` membedakan `cp-pdf`, `riset-publik`, dan `belum-terverifikasi`.
+- `src/lib/`: token warna, manifest media, util motion, SEO.
+- `scripts/`: pipeline aset sekali-jalan (foto, peta, model 3D, placeholder sertifikasi).
+
+## Menukar placeholder sertifikasi dengan logo resmi
+
+Tiga berkas di `public/assets/cert/` saat ini adalah placeholder yang dibangkitkan
+`bun run prepare:cert-placeholders`, bukan logo resmi. Begitu klien mengirim asetnya:
+
+1. Timpa `iso-9001.png`, `ism-code.png`, dan `hsse.png` dengan berkas asli. Kalau nama
+   berkasnya berbeda, perbarui `assetPath` di `src/content/certifications.ts` — jangan
+   menyunting `hero.tsx`, daftar itu tidak lagi tinggal di sana.
+2. Sesuaikan `width`/`height` di `hero-copy.tsx` kalau rasio aset asli bukan 3:2.
+3. Jalankan `bun run test src/content/certifications.test.ts`. Tes itu menggagalkan build
+   kalau ada `assetPath` yang menunjuk berkas yang tidak ada — bug persis itu yang membuat
+   tiga gambar rusak tayang di produksi sebelum Plan 6.
+4. HSSE masih bertanda `belum-terverifikasi` di `certifications.ts`. Kalau klien
+   mengonfirmasi statusnya, ubah `source`-nya jadi `cp-pdf` dan tambahkan entrinya ke
+   `COMPANY.standards`; kalau klien mencoretnya, hapus entrinya dari `CERT_BADGES`.
