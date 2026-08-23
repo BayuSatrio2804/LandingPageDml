@@ -24,6 +24,11 @@ export function slugify(input: string): string {
  *
  * Empat permukaan, dan cuma empat, yang memuat artikel:
  * daftar, detail, beranda (seksi Artikel Terbaru), dan sitemap.
+ *
+ * Cakupan revalidatePath("/sitemap.xml") atas metadata route sitemap.ts
+ * diverifikasi empiris di Task 11 Plan 9: ubah slug lewat REST API (setara
+ * /admin) tanpa restart server, sitemap.xml langsung memuat slug baru dan
+ * tidak lagi memuat slug lama. Bekerja.
  */
 /**
  * revalidatePath melempar "Invariant: static generation store missing"

@@ -12,6 +12,8 @@ const ROUTES = [
   "/bisnis/transportasi-bbm",
   "/bisnis/penumpang-roro",
   "/bisnis/transportasi-bbm/permintaan-informasi",
+  "/artikel",
+  "/artikel/operasi-ship-to-ship-di-titik-tanpa-jetty",
 ];
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },
