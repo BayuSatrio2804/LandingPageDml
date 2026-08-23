@@ -261,12 +261,19 @@ function Rig({
   const opacityRef = useRef<number[]>(initialOpacity);
   // Cadangan sebelum pengukuran selesai: dimensi dari data kelas, dalam satuan
   // dunia yang sama dengan hull-geometry.ts (meter dibagi sepuluh).
-  const sizesRef = useRef<THREE.Vector3[]>(
-    FLEET_CLASSES.map(
-      (entry) =>
-        new THREE.Vector3(entry.lengthMeters / 10, entry.beamMeters / 25, entry.beamMeters / 10),
-    ),
+  //
+  // useMemo, bukan argumen useRef langsung: argumen useRef dievaluasi setiap
+  // render walau hasilnya dibuang setelah render pertama, jadi bentuk lama
+  // mengkonstruksi satu Vector3 per kelas armada di setiap render.
+  const initialSizes = useMemo(
+    () =>
+      FLEET_CLASSES.map(
+        (entry) =>
+          new THREE.Vector3(entry.lengthMeters / 10, entry.beamMeters / 25, entry.beamMeters / 10),
+      ),
+    [],
   );
+  const sizesRef = useRef<THREE.Vector3[]>(initialSizes);
   const lastIndexRef = useRef(-1);
   const groupRef = useRef<THREE.Group>(null);
   const offset = useMemo(() => new THREE.Vector3(), []);
