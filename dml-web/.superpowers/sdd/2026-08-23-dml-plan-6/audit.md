@@ -11,6 +11,28 @@ desain** (mengganti komponen heading, menambah latar bergradasi) — per
 gerbang keputusan scope di plan, itu cukup untuk **berhenti dan membawa
 daftar ini ke pemilik repo**, bukan langsung dikerjakan sebagai Task 20+.
 
+## Status penyelesaian (2026-08-23, setelah keputusan pemilik repo)
+
+Pemilik repo memutuskan: Temuan 1–4 dan 5 diterima sesuai usulan; Temuan 6
+opsi 3 (samakan `SectionHeader` **dan** wash sekaligus). Seluruhnya
+dikerjakan sebagai Task 20–25 di sesi yang sama, di luar plan tertulis
+(plan ini murni stabilisasi; enam temuan ini muncul dari audit di
+dalamnya, bukan dari daftar tugas plan itu sendiri).
+
+| # | Temuan | Status |
+|---|---|---|
+| 1 | Tabel spesifikasi armada tidak keyboard-focusable | **Selesai** — `tabIndex={0}` + `role="region"` + `aria-label`. `a11y-viewport.spec.ts` sekarang 12/12 lolos tanpa `test.fixme`, jadi berkas ini permanen bagian gerbang `test:e2e`. |
+| 2 | `transition-all` di `fleet-comparator.tsx:130` | **Selesai** — ganti `transition-[width,background-color]`. Nol sisa `transition-all` di seluruh repo (diverifikasi ulang). |
+| 3 | Input form kontak tanpa `autocomplete` | **Selesai** — `TextField` menerima prop `autoComplete`; `ContactForm` mengirim `"name"`/`"tel"`/`"email"`. |
+| 4 | CTA hero tak terjangkau keyboard ~1,6 detik | **Selesai** — `autoAlpha` → `opacity` khusus pada tween `[data-hero-door]`. Diverifikasi ulang: tab ke-9 mendarat di CTA hero segera setelah `page.goto`, sebelum animasi sempat mulai. |
+| 5 | Heading tanpa `text-pretty` | **Selesai** — diterapkan ke `SectionHeader` (mencakup since-1988, route-map, fleet-comparator, dan Tentang Kami lewat Temuan 6) plus 8 lokasi manual lain. Diverifikasi visual lewat screenshot (`/`, `/kontak`, `/karier`, `/tentang-kami`) — tidak ada heading yang berubah tinggi secara mengganggu. |
+| 6 | Tentang Kami vs beranda | **Selesai, opsi 3** — Silsilah/Profil/Grup masing-masing jadi section full-bleed dengan wash berselang-seling (`surface-wash`/`surface-2-wash`/`surface-wash`) dan `SectionHeader`. H1 halaman dan `AnchorNav` tetap di kontainer polos di atasnya, sama seperti pola kontak/karier. |
+
+Gerbang penuh (`lint`, `typecheck`, `test` — 201 tes, `build`, `test:e2e` —
+36 tes termasuk 12 dari sweep viewport, `doctor` — tepat satu temuan
+tersisa yaitu pengecualian permanen `effect-needs-cleanup`) hijau setelah
+seluruh perbaikan ini.
+
 ---
 
 ## Temuan 1 — Tabel spesifikasi armada tidak bisa digulir dengan keyboard di mobile
@@ -223,13 +245,18 @@ efektif jadi campuran dengan latar dan gagal cek kontras axe secara keliru
 meski token warna asli lolos WCAG AA di opacity penuh. Dengan guard itu,
 11 dari 12 lolos; satu-satunya kegagalan adalah Temuan 1 di atas.
 
-**Keputusan berkas ini:** dua belas tes tambahan memperlambat setiap run
-`test:e2e` bagi semua orang. Berkas ini dibiarkan sementara di repo,
-belum dijalankan sebagai bagian gerbang mana pun — keputusan menjadikannya
-permanen (dan apakah `Reveal` perlu diperbaiki dari `gsap.from()` ke
-`fromTo()` + `clearProps` seperti hero, supaya guard reducedMotion ini
-tidak perlu dipertahankan selamanya) dibawa bersama daftar temuan ini ke
-pemilik repo.
+**Keputusan berkas ini — SELESAI:** setelah Temuan 1 diperbaiki, seluruh 12
+tes lolos tanpa `test.fixme`. Berkas ini sekarang permanen bagian gerbang
+`test:e2e`, bukan lagi sementara.
+
+Catatan yang belum diputuskan (bukan bagian dari enam temuan, cuma
+teramati sepanjang jalan): `Reveal` masih memakai `gsap.from()`, bukan
+`fromTo()` + `clearProps` seperti hero. Guard `reducedMotion: "reduce"` di
+`a11y-viewport.spec.ts` dan `tentang-kami.spec.ts` menutupi gejalanya untuk
+axe, tapi akar masalahnya (elemen di bawah lipatan sempat opacity rendah
+sebelum ScrollTrigger memicu) tetap ada untuk pengguna motion normal yang
+scroll cepat. Di luar scope enam temuan yang disetujui; layak jadi task
+tersendiri kalau pemilik repo mau menutupnya nanti.
 
 ---
 
@@ -245,3 +272,6 @@ sengaja polos).
 Per gerbang di plan ini: satu temuan yang menyentuh keputusan desain sudah
 cukup untuk **berhenti**. Daftar ini dibawa ke pemilik repo sebagai
 keputusan scope, bukan dikerjakan diam-diam sebagai Task 20 dst.
+
+**Keputusan diterima 2026-08-23** — lihat "Status penyelesaian" di awal
+berkas ini. Seluruh enam temuan sudah dikerjakan dan diverifikasi.
