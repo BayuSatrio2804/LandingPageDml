@@ -15,20 +15,26 @@ utama memuat dua item yang menuju halaman 404 (`/bisnis` dan `/artikel`), footer
 memuat tiga tautan mati, dan `sitemap.ts` mengiklankan enam URL yang tidak ada ke
 mesin pencari.
 
-Plan 8 menutup semuanya sekaligus: empat halaman baru di cabang `/bisnis`, dua
-halaman artikel dengan koleksi Payload dan jalur revalidasi yang benar-benar
-diverifikasi, satu tabel legalitas, lalu sapuan konsistensi yang menyelaraskan
-sitemap, copy usang, dan tiga utang teknis yang tercatat sejak Plan 2 dan Plan 6.
+Spec ini menutup semuanya: empat halaman baru di cabang `/bisnis`, dua halaman
+artikel dengan koleksi Payload dan jalur revalidasi yang benar-benar diverifikasi,
+satu tabel legalitas, lalu sapuan konsistensi yang menyelaraskan sitemap, copy
+usang, dan tiga utang teknis yang tercatat sejak Plan 2 dan Plan 6.
 
-Setelah plan ini, tidak ada satu pun tautan internal di situs yang menuju halaman
-yang tidak ada, dan `/admin` sudah pernah diverifikasi lewat browser sungguhan
-untuk pertama kalinya sejak repo ini dimulai.
+Setelah keduanya selesai, tidak ada satu pun tautan internal di situs yang menuju
+halaman yang tidak ada, dan `/admin` sudah pernah diverifikasi lewat browser
+sungguhan untuk pertama kalinya sejak repo ini dimulai.
+
+**Dieksekusi sebagai dua plan, bukan satu.** Plan 8 mengerjakan cabang bisnis,
+legalitas, dan sapuan; Plan 9 mengerjakan artikel. Pembagian, alasan, dan tiga
+berkas yang disentuh keduanya ada di bagian 18. Nomor bagian di spec ini dirujuk
+langsung oleh kedua plan, jadi penomorannya tidak boleh diubah setelah plan
+ditulis.
 
 ---
 
 ## 2. Keputusan yang sudah diambil
 
-Enam keputusan berikut diambil pemilik repo pada sesi brainstorming 23 Agustus
+Tujuh keputusan berikut diambil pemilik repo pada sesi brainstorming 23 Agustus
 2026. Semuanya sudah final dan tidak dibuka lagi di implementasi.
 
 | # | Keputusan | Alasan |
@@ -39,6 +45,7 @@ Enam keputusan berikut diambil pemilik repo pada sesi brainstorming 23 Agustus
 | 4 | Revalidasi pakai `revalidatePath` | Bukan `unstable_cache` + `revalidateTag`, bukan `cacheComponents`. Lihat bagian 10.2. |
 | 5 | Subhalaman dalam, beranda tetap ringkas | Subhalaman `/bisnis/*` jadi dokumen operasional, bukan versi panjang beranda. Lihat bagian 12. |
 | 6 | Tabel dokumen legal masuk `/tentang-kami#profil` | Datanya lengkap di PDF hal. 06 dan tidak diblokir klien. Heading "Legalitas dan Sertifikasi" sudah ada di sana tapi isinya satu kalimat. |
+| 7 | Dieksekusi sebagai dua plan, bisnis lebih dulu | Dua puluh empat task akan jadi plan terbesar di repo ini, kedua cabang tidak saling bergantung, dan separuh artikel membawa satu-satunya risiko tinggi. Lihat bagian 18. |
 
 ---
 
@@ -707,8 +714,54 @@ dan Plan 7. Mitigasi: aturan pembagian tugas di bagian 12 ditulis sebagai tabel
 yang tegas, dan audit design dijalankan terhadap seluruh halaman baru, bukan
 sampel.
 
-**Ukuran plan.** Sekitar 20 sampai 24 task. Kalau di tengah jalan terlihat bahwa
-cabang artikel dan cabang bisnis saling menghambat, urutannya boleh dipisah:
-selesaikan seluruh cabang `/bisnis` dan sapuan lebih dulu, lalu artikel. Keduanya
-tidak punya ketergantungan kode satu sama lain kecuali di `sitemap.ts`, dan itu
-satu berkas.
+**Ukuran plan, sudah ditangani lewat pemecahan.** Spec ini dieksekusi sebagai dua
+plan, lihat bagian 18. Yang tersisa jadi risiko adalah antarmuka di antara
+keduanya, yaitu `sitemap.ts`, `README.md`, dan `page.tsx` beranda. Ketiganya
+disentuh dua kali. Mitigasinya ada di bagian 18.
+
+---
+
+## 18. Pemecahan jadi dua plan
+
+Spec ini menggambarkan satu kesatuan desain, tapi dieksekusi sebagai dua plan
+berurutan. Keputusan diambil pemilik repo 23 Agustus 2026.
+
+**Plan 8 — cabang bisnis, legalitas, dan sapuan.** Bagian 4.1, 4.3, 4.4, 5, 6, 7,
+8, 9, 11, 12, 13, 14. Sekitar 14 sampai 16 task. Keluarannya: seluruh cabang
+`/bisnis` hidup, tabel legalitas terisi, dan tidak ada lagi tautan internal yang
+menuju halaman tidak ada, kecuali `/artikel` yang masih menunggu Plan 9.
+
+**Plan 9 — artikel.** Bagian 10 seluruhnya, ditambah entri sitemap dinamis dari
+bagian 11.1 dan spec admin-publish dari bagian 15. Sekitar 8 sampai 10 task.
+
+**Kenapa dipecah.** Dua puluh empat task akan jadi plan terbesar di repo ini,
+melewati Plan 2 (16 task) dan Plan 6 (19 task). Kedua cabang tidak punya
+ketergantungan kode satu sama lain. Dan separuh artikel membawa satu-satunya
+risiko yang dinilai tinggi di bagian 17, yaitu `/admin` yang belum pernah dibuka
+browser mana pun sejak repo dimulai; risiko itu lebih aman ditangani tanpa
+belasan task lain menggantung di belakangnya.
+
+**Kenapa bisnis lebih dulu.** Dua item navigasi utama saat ini menuju 404,
+`/bisnis` dan `/artikel`. Cabang bisnis menutup yang pertama beserta tiga tautan
+footer, dan tidak bergantung pada apa pun yang belum ada. Cabang artikel
+bergantung pada Payload, Postgres, dan alur admin yang belum pernah terbukti.
+Mendahulukan yang pasti membuat situs sudah dalam keadaan konsisten sebelum
+risiko yang belum diketahui dibuka.
+
+### 18.1 Tiga berkas yang disentuh kedua plan
+
+Ini satu-satunya biaya pemecahan, dan ditangani eksplisit, bukan diserahkan pada
+ingatan.
+
+| Berkas | Plan 8 | Plan 9 |
+|---|---|---|
+| `src/app/sitemap.ts` | Daftar statis disinkronkan, `/bisnis/galangan-kapal` dihapus, tiga route bisnis baru ditambahkan. `/artikel` **tetap tinggal** karena Plan 9 akan mengisinya | Slug artikel published ditambahkan secara dinamis |
+| `README.md` | Bagian struktur dan perintah diperbarui untuk halaman bisnis baru | Ditambah peringatan bahwa `bun run build` kini butuh Postgres, lihat bagian 10.2 |
+| `src/app/(site)/page.tsx` | Tidak disentuh | Seksi Artikel Terbaru disisipkan antara `Certifications` dan `CtaSection` |
+
+Tes sitemap dari bagian 11.1, yang memastikan setiap path dapat diselesaikan ke
+route yang ada, ditulis di Plan 8 dan **wajib diperluas, bukan ditulis ulang**, di
+Plan 9. `/artikel` yang masih 404 selama jeda antara kedua plan adalah keadaan
+yang diketahui dan diterima; tes di Plan 8 menuliskannya sebagai pengecualian
+bertanggal dengan rujukan ke Plan 9, supaya ia tidak lolos diam-diam sebagai
+kelalaian.
