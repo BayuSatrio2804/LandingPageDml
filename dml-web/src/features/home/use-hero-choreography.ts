@@ -70,17 +70,23 @@ export function useHeroChoreography(refs: HeroRefs): { mounted: boolean; reduced
           clearProps: "transform,opacity,visibility",
         },
       );
+      // opacity, bukan autoAlpha: autoAlpha juga menyetel visibility:hidden,
+      // dan browser mengecualikan elemen visibility:hidden dari urutan Tab.
+      // [data-hero-door] membungkus dua CTA hero (Permintaan Informasi BBM,
+      // Pesan Tiket Ro-Ro) — dengan autoAlpha, keduanya tidak terjangkau
+      // keyboard selama ~1,6 detik animasi intro berjalan meski sudah ada di
+      // DOM dengan tabIndex=0. Temuan 4, audit Plan 6.
       gsap.fromTo(
         "[data-hero-door]",
-        { y: 20, autoAlpha: 0 },
+        { y: 20, opacity: 0 },
         {
           y: 0,
-          autoAlpha: 1,
+          opacity: 1,
           duration: 0.9,
           ease: "power3.out",
           delay: 0.7,
           stagger: 0.1,
-          clearProps: "transform,opacity,visibility",
+          clearProps: "transform,opacity",
         },
       );
       gsap.fromTo("[data-hero-certs]", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.9, delay: 0.8 });
