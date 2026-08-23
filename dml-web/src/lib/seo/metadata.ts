@@ -11,12 +11,40 @@ export function buildMetadata({
   title,
   description,
   path,
+  ownImage = false,
 }: {
   title: string;
   description: string;
   path: string;
+  /**
+   * true untuk halaman yang punya opengraph-image.tsx sendiri di segmen
+   * yang sama (artikel, Task 15). Segmen semacam itu TIDAK otomatis
+   * mewarisi berkasnya kalau openGraph.images sudah diset eksplisit di
+   * sini -- diverifikasi empiris: berkas per-segmen hanya mengisi
+   * openGraph.images kalau field itu dibiarkan kosong sama sekali, bukan
+   * menang secara otomatis atas objek metadata seperti yang disebut
+   * dokumentasi Next soal "file-based metadata has higher priority" (itu
+   * berlaku antara file dan objek metadata statis di segmen yang sama saat
+   * TIDAK ADA keduanya bentrok eksplisit, bukan override paksa). Set true
+   * di sini untuk melewati default korporat dan membiarkan Next mengisinya
+   * dari berkas.
+   */
+  ownImage?: boolean;
 }): Metadata {
   const url = absoluteUrl(path);
+  /**
+   * Path statis yang di-commit (scripts/prepare-og-corporate.tsx), bukan
+   * konvensi berkas opengraph-image.tsx untuk grup (site). Percobaan
+   * pertama Task 14 memakai konvensi berkas grup supaya seluruh halaman
+   * mewarisinya otomatis, tapi terbukti gagal: openGraph diset eksplisit
+   * di SETIAP halaman di sini (title/description/url berbeda per
+   * halaman), dan aturan merge Next bersifat shallow-replace per key --
+   * openGraph anak menggantikan SELURUH openGraph induk, termasuk images
+   * yang diwariskan lewat konvensi berkas grup. Diverifikasi empiris:
+   * dari 7 rute yang diperiksa, cuma "/" yang menyisakan og:image; 6
+   * lainnya nihil.
+   */
+  const openGraphImages = ownImage ? undefined : [{ url: absoluteUrl("/og-corporate.png") }];
   return {
     /**
      * Tanpa metadataBase, gambar OG berpath relatif diresolusi terhadap
@@ -36,27 +64,13 @@ export function buildMetadata({
       siteName: "PT Dutabahari Menara Line",
       locale: "id_ID",
       type: "website",
-      /**
-       * Path statis yang di-commit (scripts/prepare-og-corporate.tsx), bukan
-       * konvensi berkas opengraph-image.tsx. Percobaan pertama memakai
-       * konvensi berkas supaya seluruh halaman grup (site) mewarisinya
-       * otomatis, tapi terbukti gagal: openGraph di sini diset eksplisit di
-       * SETIAP halaman (title/description/url berbeda per halaman), dan
-       * aturan merge Next bersifat shallow-replace per key -- openGraph anak
-       * menggantikan SELURUH openGraph induk, termasuk images yang
-       * diwariskan lewat konvensi berkas. Diverifikasi empiris: dari 7 rute
-       * yang diperiksa, cuma "/" yang menyisakan og:image; 6 lainnya nihil.
-       * Halaman artikel menimpa array ini lewat opengraph-image.tsx-nya
-       * sendiri di segmen yang sama (Task 15), yang menang atas objek
-       * metadata biasa pada segmen yang sama menurut dokumentasi Next.
-       */
-      images: [{ url: absoluteUrl("/og-corporate.png") }],
+      ...(openGraphImages ? { images: openGraphImages } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [absoluteUrl("/og-corporate.png")],
+      ...(ownImage ? {} : { images: [absoluteUrl("/og-corporate.png")] }),
     },
   };
 }

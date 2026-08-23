@@ -36,4 +36,19 @@ describe("buildMetadata", () => {
       images: [absoluteUrl("/og-corporate.png")],
     });
   });
+
+  it("ownImage:true melewatkan gambar korporat supaya berkas opengraph-image segmen bisa mengisinya", () => {
+    // Diverifikasi empiris (Task 15): berkas per-segmen cuma mengisi
+    // openGraph.images kalau field itu kosong sama sekali di objek metadata
+    // segmen yang sama -- ia tidak menang paksa atas images yang sudah
+    // diset eksplisit di sana.
+    const own = buildMetadata({
+      title: "Judul Artikel",
+      description: "Deskripsi",
+      path: "/artikel/contoh",
+      ownImage: true,
+    });
+    expect(own.openGraph?.images).toBeUndefined();
+    expect(own.twitter?.images).toBeUndefined();
+  });
 });

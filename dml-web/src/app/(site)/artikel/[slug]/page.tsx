@@ -40,12 +40,14 @@ export async function generateMetadata({
     title: "Artikel tidak ditemukan | PT Dutabahari Menara Line",
     description: "Artikel yang dicari tidak tersedia.",
     path: `/artikel/${slug}`,
+    ownImage: true,
   });
 
   return buildMetadata({
     title: `${post.seo?.metaTitle ?? post.title} | PT Dutabahari Menara Line`,
     description: post.seo?.metaDescription ?? post.excerpt,
     path: `/artikel/${post.slug}`,
+    ownImage: true,
   });
 }
 
