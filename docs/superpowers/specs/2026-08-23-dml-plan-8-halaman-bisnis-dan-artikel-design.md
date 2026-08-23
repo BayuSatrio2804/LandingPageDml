@@ -544,10 +544,32 @@ perlindungan yang tidak dimiliki proses Node tunggal.
 ### 11.6 Verifikasi `/admin` lewat browser sungguhan
 
 Butir 1 dari lima item Plan 2: `/admin` login dan UI `inquiries` read-only tidak
-pernah diverifikasi browser oleh sesi mana pun. Spec Playwright admin-publish di
-bagian 10.2 sekaligus menutup ini, karena ia harus login ke `/admin` lebih dulu
-sebelum bisa mempublikasikan apa pun. Ditambah satu asersi kecil: koleksi
-`inquiries` terbuka dan tidak menawarkan tombol create.
+pernah diverifikasi browser oleh sesi mana pun.
+
+**Sebagian sudah terjawab lewat cek asap 23 Agustus 2026**, dijalankan sebelum
+Plan 8 dieksekusi. Hasilnya: `/admin` sehat. Layar buat-user-pertama merender,
+pembuatan user berhasil, dashboard menampilkan ketiga koleksi, halaman
+`inquiries` terbuka penuh dengan 22 baris, dan alur logout lalu login ulang
+utuh. Skema juga sehat: sepuluh tabel, tiga migrasi di `batch 1` — bukan `-1`,
+artinya tidak pernah ada dev-mode schema push yang bisa membuat `migrate()`
+menggantung di prompt interaktif saat boot produksi.
+
+Cek itu menemukan satu hal yang membantah master spec bagian 10: koleksi
+`inquiries` **menampilkan tombol "Create New"**, jadi ia tidak read-only di UI.
+Access control-nya sendiri benar; yang salah adalah UI-nya. Ditutup di Plan 8
+Task 8 Step 9 dengan mengunci `access.create` ke `false`, yang aman karena Local
+API `payload.create()` memakai `overrideAccess: true` secara default
+(terverifikasi di tipe Payload 3.88).
+
+Yang **belum** terjawab dan tetap jadi tanggung jawab spec admin-publish di
+bagian 10.2: apakah publish artikel dari `/admin` benar-benar menyegarkan
+`/artikel`, beranda, dan sitemap tanpa rebuild. Cek asap tidak bisa menjawab itu
+karena koleksi `posts` belum ada.
+
+Asersi untuk spec admin-publish, sudah disesuaikan dengan kenyataan yang
+ditemukan: koleksi `inquiries` terbuka, dan **setelah Plan 8** ia tidak lagi
+menawarkan tombol create. Menulis asersi itu tanpa perubahan Task 8 Step 9 akan
+menghasilkan tes merah.
 
 ---
 
