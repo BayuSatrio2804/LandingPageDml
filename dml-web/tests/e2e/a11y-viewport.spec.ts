@@ -3,7 +3,16 @@ import { runAxeCheck } from "./axe";
 
 // Guard reducedMotion dilepas di Plan 8 setelah Reveal pindah ke fromTo + clearProps.
 
-const ROUTES = ["/", "/kontak", "/tentang-kami", "/karier"];
+const ROUTES = [
+  "/",
+  "/kontak",
+  "/tentang-kami",
+  "/karier",
+  "/bisnis",
+  "/bisnis/transportasi-bbm",
+  "/bisnis/penumpang-roro",
+  "/bisnis/transportasi-bbm/permintaan-informasi",
+];
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },
   { name: "tablet", width: 768, height: 1024 },
