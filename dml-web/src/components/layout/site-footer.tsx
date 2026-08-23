@@ -5,15 +5,16 @@ import { MODEL_CREDITS } from "@/content/model-credits";
 import { ExternalLink } from "./external-link";
 
 /**
- * Kaki halaman navy, satu-satunya blok berwarna penuh di halaman. Ini bukan
- * seksi yang membalik tema di tengah scroll, melainkan penutup: pthis.id
- * memakai pola yang sama (footer background var(--c-primary), tautan #ced9ea),
- * dan blok itu yang menahan halaman terang supaya tidak berakhir menggantung
- * di putih.
+ * Kaki halaman navy. Sejak Plan 5 ini adalah penutup, bukan seksi yang
+ * membalik tema di tengah scroll: bidang navy solid menahan halaman terang
+ * supaya tidak berakhir menggantung di putih. Sejak Plan 7 kepala halaman
+ * memakai pita navy yang sama (site-header.tsx), jadi kaki halaman ini bukan
+ * lagi satu-satunya blok berwarna penuh di halaman.
  *
  * Teks sekundernya memakai token surface-3 apa adanya, bukan putih beropasitas.
- * #CED9EA di atas navy terukur 6,6:1; putih 60 persen jatuh jauh di bawah itu
- * dan atribusi lisensi CC BY di bawah wajib tetap lolos AA.
+ * surface3 di atas accent terukur 7,96:1 sejak palet Plan 7 (naik dari 6,64:1
+ * di palet lama); putih 60 persen jatuh jauh di bawah itu dan atribusi
+ * lisensi CC BY di bawah wajib tetap lolos AA.
  */
 export function SiteFooter() {
   return (
