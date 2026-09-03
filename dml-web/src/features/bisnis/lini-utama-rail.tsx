@@ -6,42 +6,26 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
+import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "./bisnis-defaults";
 
 const BBM = MEDIA.bisnis.find((asset) => asset.id === "lini-bbm")!;
 const RORO = MEDIA.bisnis.find((asset) => asset.id === "lini-roro")!;
 
-const PANELS = [
-  {
-    id: "transportasi-bbm",
-    num: "01",
-    title: "Transportasi BBM",
-    summary:
-      "Distribusi bahan bakar cair ke pelabuhan dan pulau-pulau utama Indonesia, dari muat di terminal sampai serah di titik yang tidak terjangkau jetty konvensional.",
-    metric: "55",
-    metricLabel: "kapal pengangkut BBM",
-    bullets: ["Motor Tanker (MT)", "Self Propelled Oil Barge", "Oil Barge (OB)", "Tugboat pendamping"],
-    href: "/bisnis/transportasi-bbm",
-    cta: "Detail Transportasi BBM",
-    asset: BBM,
-    imageFirst: true,
-  },
-  {
-    id: "penumpang-roro",
-    num: "02",
-    title: "Penyeberangan Ro-Ro",
-    summary:
-      "Layanan penyeberangan penumpang dan kendaraan dengan jadwal tetap di lintasan yang menghubungkan Jawa, Bali, Lombok, dan Kalimantan Tengah.",
-    metric: "9",
-    metricLabel: "kapal ro-ro penumpang",
-    bullets: ["Ketapang - Gilimanuk", "Surabaya - Lembar", "Surabaya - Kumai", "Jangkar - Lembar"],
-    href: "/bisnis/penumpang-roro",
-    cta: "Detail Penyeberangan Ro-Ro",
-    asset: RORO,
-    imageFirst: false,
-  },
-];
+/** Bagian yang tidak diedit admin: id, tautan, foto, urutan gambar. */
+const PANEL_STATIC = [
+  { id: "transportasi-bbm", href: "/bisnis/transportasi-bbm", asset: BBM, imageFirst: true },
+  { id: "penumpang-roro", href: "/bisnis/penumpang-roro", asset: RORO, imageFirst: false },
+] as const;
 
-export function LiniUtamaRail() {
+export function LiniUtamaRail({
+  copy = BISNIS_PAGE_DEFAULTS.liniUtama,
+}: {
+  copy?: BisnisPageData["liniUtama"];
+}) {
+  const PANELS = PANEL_STATIC.map((base, i) => ({
+    ...base,
+    ...(copy.panels[i] ?? BISNIS_PAGE_DEFAULTS.liniUtama.panels[i]!),
+  }));
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);
     const rail = q("[data-pin-rail]")[0];

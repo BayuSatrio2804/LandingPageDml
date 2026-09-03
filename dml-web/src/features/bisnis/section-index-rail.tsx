@@ -2,14 +2,9 @@
 
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
+import { BISNIS_PAGE_DEFAULTS } from "./bisnis-defaults";
 
-const SECTIONS = [
-  { id: "lini", label: "01 Lini utama" },
-  { id: "sts", label: "02 Ship-to-ship" },
-  { id: "afiliasi", label: "03 Afiliasi" },
-  { id: "klien", label: "04 Klien" },
-  { id: "kontak", label: "05 Kontak" },
-];
+const SECTION_IDS = ["lini", "sts", "afiliasi", "klien", "kontak"] as const;
 
 /**
  * Indeks seksi mengambang plus garis progres gulir.
@@ -19,7 +14,15 @@ const SECTIONS = [
  * komponen lain. Itu berarti ia harus dimount setelah seksi-seksi itu ada di
  * DOM — di page.tsx ia diletakkan paling bawah.
  */
-export function SectionIndexRail() {
+export function SectionIndexRail({
+  labels = BISNIS_PAGE_DEFAULTS.sectionIndexLabels,
+}: {
+  labels?: string[];
+}) {
+  const SECTIONS = SECTION_IDS.map((id, i) => ({
+    id,
+    label: labels[i] ?? BISNIS_PAGE_DEFAULTS.sectionIndexLabels[i] ?? "",
+  }));
   const root = useSectionMotion<HTMLDivElement>((scope) => {
     const bar = scope.querySelector<HTMLElement>("[data-scroll-bar]");
     if (bar) {

@@ -12,6 +12,7 @@ import { SectionIndexRail } from "@/features/bisnis/section-index-rail";
 import { getClients } from "@/lib/cms/clients";
 import { getBusinessLines } from "@/lib/cms/business-lines";
 import { getVessels } from "@/lib/cms/vessels";
+import { getBusinessPage } from "@/lib/cms/business-page";
 
 export const metadata: Metadata = buildMetadata({
   title: "Bisnis Kami | PT Dutabahari Menara Line",
@@ -21,10 +22,11 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function BisnisPage() {
-  const [clients, { affiliates }, vessels] = await Promise.all([
+  const [clients, { affiliates }, vessels, page] = await Promise.all([
     getClients(),
     getBusinessLines(),
     getVessels(),
+    getBusinessPage(),
   ]);
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
@@ -33,19 +35,19 @@ export default async function BisnisPage() {
 
   return (
     <>
-      <BisnisHero />
-      <LiniUtamaRail />
+      <BisnisHero copy={page.hero} />
+      <LiniUtamaRail copy={page.liniUtama} />
       <VesselTicker vessels={vessels} />
-      <AlurSts />
-      <AfiliasiRows affiliates={affiliates} />
-      <KlienMarquee clients={clients} />
-      <BisnisCta />
+      <AlurSts copy={page.alurSts} />
+      <AfiliasiRows affiliates={affiliates} copy={page.afiliasi} />
+      <KlienMarquee clients={clients} copy={page.klien} />
+      <BisnisCta copy={page.cta} />
       {/*
         Paling bawah dengan sengaja: triggernya menunjuk [data-index-section]
         milik seksi di atasnya, jadi seksi-seksi itu harus sudah ada di DOM
         saat komponen ini membuat ScrollTrigger.
       */}
-      <SectionIndexRail />
+      <SectionIndexRail labels={page.sectionIndexLabels} />
 
       <script
         type="application/ld+json"

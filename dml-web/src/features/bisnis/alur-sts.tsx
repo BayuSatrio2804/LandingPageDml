@@ -6,20 +6,20 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
+import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "./bisnis-defaults";
 
-const STEPS = MEDIA["alur-sts"].map((asset, index) => ({
-  id: asset.id,
-  num: String(index + 1).padStart(2, "0"),
-  asset,
-  title: ["Bertemu di area labuh", "Tambat sisi-ke-sisi", "Selang tersambung"][index],
-  desc: [
-    "Kapal pengangkut menghampiri pasangannya di laut lepas, di luar antrean jetty.",
-    "Tali tambat dan fender menahan kedua lambung sepanjang operasi berlangsung.",
-    "Awak menyeberang lewat jembatan penghubung untuk memasang selang transfer.",
-  ][index],
-}));
-
-export function AlurSts() {
+export function AlurSts({
+  copy = BISNIS_PAGE_DEFAULTS.alurSts,
+}: {
+  copy?: BisnisPageData["alurSts"];
+}) {
+  const STEPS = MEDIA["alur-sts"].map((asset, index) => ({
+    id: asset.id,
+    num: String(index + 1).padStart(2, "0"),
+    asset,
+    title: copy.steps[index]?.title ?? BISNIS_PAGE_DEFAULTS.alurSts.steps[index]?.title ?? "",
+    desc: copy.steps[index]?.desc ?? BISNIS_PAGE_DEFAULTS.alurSts.steps[index]?.desc ?? "",
+  }));
   // Tahap aktif disimpan di state React, bukan ditulis langsung ke DOM,
   // supaya nomor besar di kolom sticky tetap benar kalau komponen dirender
   // ulang di tengah scroll.
@@ -106,18 +106,15 @@ export function AlurSts() {
       <div className="mx-auto grid max-w-350 grid-cols-[1fr_1.35fr] gap-16 px-8 max-lg:grid-cols-1 max-lg:gap-10">
         <div className="sticky top-30 self-start max-lg:static">
           <p className="m-0 font-mono text-[11px] tracking-[0.2em] text-ink-muted uppercase">
-            02 · Cara kerja di lini BBM
+            {copy.kicker}
           </p>
           <h2
             id="sts-title"
             className="mt-3.5 mb-0 font-display text-[clamp(2rem,3.6vw,3.25rem)] leading-[1.03] font-bold tracking-[-0.02em] text-ink text-pretty"
           >
-            Ship-to-ship, tiga tahap
+            {copy.heading}
           </h2>
-          <p className="mt-5 mb-0 max-w-[38ch] leading-relaxed text-ink-muted">
-            Memindahkan bahan bakar langsung antar kapal di tengah perairan, tanpa menunggu antrean
-            sandar pelabuhan.
-          </p>
+          <p className="mt-5 mb-0 max-w-[38ch] leading-relaxed text-ink-muted">{copy.intro}</p>
 
           <div className="mt-11 flex items-end gap-4" aria-live="polite">
             <span

@@ -109,6 +109,7 @@ export interface Config {
     'home-hero': HomeHero;
     'home-sections': HomeSection;
     'about-page': AboutPage;
+    'business-page': BusinessPage;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
@@ -117,6 +118,7 @@ export interface Config {
     'home-hero': HomeHeroSelect<false> | HomeHeroSelect<true>;
     'home-sections': HomeSectionsSelect<false> | HomeSectionsSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
+    'business-page': BusinessPageSelect<false> | BusinessPageSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -1087,6 +1089,101 @@ export interface AboutPage {
   createdAt?: string | null;
 }
 /**
+ * Teks halaman Bisnis Kami: hero, dua panel lini utama, alur ship-to-ship, judul bagian afiliasi & klien, ajakan penutup, dan label indeks samping.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-page".
+ */
+export interface BusinessPage {
+  id: number;
+  hero: {
+    title: string;
+    intro: string;
+    metrics?:
+      | {
+          value: number;
+          unit: string;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  liniUtama?: {
+    /**
+     * Urutan penting: panel pertama tautannya ke /bisnis/transportasi-bbm, kedua ke /bisnis/penumpang-roro.
+     */
+    panels?:
+      | {
+          /**
+           * Mis. "01".
+           */
+          num: string;
+          title: string;
+          summary: string;
+          metric: string;
+          metricLabel: string;
+          bullets: string[];
+          /**
+           * Teks tombol.
+           */
+          cta: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  alurSts: {
+    kicker: string;
+    heading: string;
+    intro: string;
+    steps?:
+      | {
+          title: string;
+          desc: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  afiliasi: {
+    kicker: string;
+    heading: string;
+    subtext: string;
+  };
+  klien: {
+    kicker: string;
+    heading: string;
+    /**
+     * Satuan angka jumlah klien, mis. "klien".
+     */
+    stat1Unit: string;
+    stat1Caption: string;
+    stat2Value: string;
+    stat2Unit: string;
+    stat2Caption: string;
+    /**
+     * Catatan kecil di bawah pita logo.
+     */
+    placeholderNote: string;
+  };
+  cta: {
+    kicker: string;
+    heading: string;
+    /**
+     * Tombol ke halaman permintaan informasi.
+     */
+    primaryButtonLabel: string;
+    /**
+     * Tombol ke situs pemesanan tiket.
+     */
+    secondaryButtonLabel: string;
+  };
+  /**
+   * Lima label navigasi mengambang di sisi kanan. Urutan = urutan bagian.
+   */
+  sectionIndexLabels: string[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1390,6 +1487,87 @@ export interface AboutPageSelect<T extends boolean = true> {
         primaryButtonLabel?: T;
         secondaryButtonLabel?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-page_select".
+ */
+export interface BusinessPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        title?: T;
+        intro?: T;
+        metrics?:
+          | T
+          | {
+              value?: T;
+              unit?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  liniUtama?:
+    | T
+    | {
+        panels?:
+          | T
+          | {
+              num?: T;
+              title?: T;
+              summary?: T;
+              metric?: T;
+              metricLabel?: T;
+              bullets?: T;
+              cta?: T;
+              id?: T;
+            };
+      };
+  alurSts?:
+    | T
+    | {
+        kicker?: T;
+        heading?: T;
+        intro?: T;
+        steps?:
+          | T
+          | {
+              title?: T;
+              desc?: T;
+              id?: T;
+            };
+      };
+  afiliasi?:
+    | T
+    | {
+        kicker?: T;
+        heading?: T;
+        subtext?: T;
+      };
+  klien?:
+    | T
+    | {
+        kicker?: T;
+        heading?: T;
+        stat1Unit?: T;
+        stat1Caption?: T;
+        stat2Value?: T;
+        stat2Unit?: T;
+        stat2Caption?: T;
+        placeholderNote?: T;
+      };
+  cta?:
+    | T
+    | {
+        kicker?: T;
+        heading?: T;
+        primaryButtonLabel?: T;
+        secondaryButtonLabel?: T;
+      };
+  sectionIndexLabels?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
