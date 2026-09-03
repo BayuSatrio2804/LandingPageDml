@@ -43,7 +43,15 @@ const dirname = path.dirname(filename);
  */
 const storagePlugins = [
   vercelBlobStorage({
-    collections: { media: true },
+    collections: {
+      // disablePayloadAccessControl: `media.url` jadi URL absolut Blob
+      // (`<store>.public.blob.vercel-storage.com/...`), bukan route proksi
+      // `/api/media/file/*`. next/image memakainya langsung tanpa satu
+      // invokasi function per gambar, dan opengraph-image.tsx yang jalan
+      // saat build bisa fetch byte cover-nya (route proksi belum hidup saat
+      // build).
+      media: { disablePayloadAccessControl: true },
+    },
     token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
 ];
