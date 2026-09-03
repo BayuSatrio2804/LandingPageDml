@@ -3,6 +3,7 @@
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { countUpBatch, revealBatch } from "@/lib/motion/reveal-batch";
 import { yearsOperating } from "@/lib/company/years-operating";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 /**
  * Pita statistik menjorok ke atas menembus batas seksi hero, jadi jembatan
@@ -14,11 +15,13 @@ export function StatStrip({
   vessels,
   people,
   sektorCount,
+  labels = ABOUT_PAGE_DEFAULTS.statLabels,
 }: {
   foundedIso: string;
   vessels: number;
   people: number;
   sektorCount: number;
+  labels?: AboutPageData["statLabels"];
 }) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     revealBatch(scope);
@@ -27,10 +30,10 @@ export function StatStrip({
 
   const years = yearsOperating(foundedIso, new Date());
   const stats = [
-    { id: "tahun", value: years, unit: "Tahun", label: "Beroperasi tanpa putus sejak 1988" },
-    { id: "kapal", value: vessels, unit: "Kapal", label: "Armada bahan bakar dan penyeberangan" },
-    { id: "orang", value: people, prefix: ">", unit: "Orang", label: "Awak kapal dan staf kantor" },
-    { id: "sektor", value: sektorCount, unit: "Sektor", label: "Sektor usaha di dalam grup" },
+    { id: "tahun", value: years, unit: "Tahun", label: labels.years },
+    { id: "kapal", value: vessels, unit: "Kapal", label: labels.ships },
+    { id: "orang", value: people, prefix: ">", unit: "Orang", label: labels.people },
+    { id: "sektor", value: sektorCount, unit: "Sektor", label: labels.sectors },
   ];
 
   return (

@@ -5,15 +5,18 @@ import { groupedLegalDocuments } from "@/content/about";
 import type { LegalDocument, Membership, StandardCluster } from "@/content/types";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { revealBatch } from "@/lib/motion/reveal-batch";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 export function LegalSection({
   legalDocuments,
   standards,
   memberships,
+  copy = ABOUT_PAGE_DEFAULTS.legal,
 }: {
   legalDocuments: LegalDocument[];
   standards: StandardCluster[];
   memberships: Membership[];
+  copy?: AboutPageData["legal"];
 }) {
   const groups = groupedLegalDocuments(legalDocuments);
 
@@ -56,7 +59,7 @@ export function LegalSection({
           data-reveal="clip"
           className="m-0 text-center font-display text-[clamp(1.9rem,3.2vw,2.85rem)] leading-[1.05] font-bold tracking-[-0.02em] text-ink"
         >
-          Legalitas dan Sertifikasi
+          {copy.heading}
         </h2>
 
         <div className="mt-14 grid grid-cols-[1.5fr_1fr] items-start gap-14 max-lg:grid-cols-1 max-lg:gap-10">
@@ -113,7 +116,7 @@ export function LegalSection({
               className="rounded-[14px] bg-surface-2 p-6.5 shadow-[0_24px_54px_-44px_rgb(15_27_46/0.5)]"
             >
               <p className="m-0 font-mono text-[11px] tracking-[0.16em] text-line uppercase">
-                Standar yang diterapkan
+                {copy.standardsLabel}
               </p>
               <div className="mt-5 flex flex-col gap-5.5">
                 {standards.map((cluster) => (
@@ -142,10 +145,7 @@ export function LegalSection({
                     </ul>
                   </div>
                 ))}
-                <p className="m-0 text-xs leading-[1.6] text-line">
-                  Titik abu menandai standar yang belum tercantum di company profile resmi dan masih
-                  menunggu konfirmasi.
-                </p>
+                <p className="m-0 text-xs leading-[1.6] text-line">{copy.footnote}</p>
               </div>
             </div>
 
@@ -154,7 +154,7 @@ export function LegalSection({
               className="rounded-[14px] bg-surface-2 p-6.5 shadow-[0_24px_54px_-44px_rgb(15_27_46/0.5)]"
             >
               <p className="m-0 font-mono text-[11px] tracking-[0.16em] text-line uppercase">
-                Keanggotaan
+                {copy.membershipsLabel}
               </p>
               <ul className="mt-4.5 flex list-none flex-col gap-3.5 p-0">
                 {memberships.map((membership) => (

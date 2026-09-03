@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 /** Server component: gerak satu-satunya memakai Reveal yang sudah ada di repo. */
-export function AboutCta() {
+export function AboutCta({
+  copy = ABOUT_PAGE_DEFAULTS.cta,
+}: {
+  copy?: AboutPageData["cta"];
+}) {
   return (
     <section
       aria-labelledby="about-cta-title"
@@ -21,20 +26,20 @@ export function AboutCta() {
           id="about-cta-title"
           className="mx-auto m-0 max-w-[22ch] font-display text-[clamp(2rem,4vw,3.25rem)] leading-[1.04] font-bold tracking-[-0.02em] text-on-accent text-pretty"
         >
-          Ingin tahu lini kerja kami lebih jauh?
+          {copy.heading}
         </h2>
         <div className="mt-9 flex flex-wrap justify-center gap-3.5">
           <Link
             href="/bisnis"
             className="inline-flex items-center gap-2.5 rounded-full bg-surface-2 px-7 py-3.5 text-sm font-medium text-accent transition-all hover:gap-4 hover:bg-on-accent hover:text-accent-hover"
           >
-            Lihat Bisnis Kami <span aria-hidden="true">→</span>
+            {copy.primaryButtonLabel} <span aria-hidden="true">→</span>
           </Link>
           <Link
             href="/kontak"
             className="inline-flex items-center gap-2.5 rounded-full border border-on-accent/50 px-7 py-3.5 text-sm font-medium text-on-accent transition-all hover:gap-4 hover:bg-on-accent/12"
           >
-            Hubungi kami <span aria-hidden="true">→</span>
+            {copy.secondaryButtonLabel} <span aria-hidden="true">→</span>
           </Link>
         </div>
       </Reveal>
