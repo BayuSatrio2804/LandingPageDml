@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidateAllCollectionHooks } from "../revalidate-all";
 
 /**
  * Lima kelas dipakai fleet comparator 3D dan blueprint SVG (Beranda dan
@@ -28,6 +29,7 @@ export const FleetClasses: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
+  hooks: revalidateAllCollectionHooks,
   fields: [
     { name: "slug", type: "text", required: true, unique: true },
     { name: "name", type: "text", required: true },

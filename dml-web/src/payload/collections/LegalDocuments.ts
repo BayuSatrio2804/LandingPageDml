@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidateAllCollectionHooks } from "../revalidate-all";
 
 /**
  * Tabel dokumen legal (akta, izin usaha, pendaftaran, pajak) dari company
@@ -27,6 +28,7 @@ export const LegalDocuments: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
+  hooks: revalidateAllCollectionHooks,
   fields: [
     { name: "document", type: "text", required: true, unique: true },
     { name: "number", type: "text", required: true },

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidateAllCollectionHooks } from "../revalidate-all";
 
 /**
  * Roster 66 kapal bernama dari company profile hal. 04, admin-editable.
@@ -27,6 +28,7 @@ export const Vessels: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
+  hooks: revalidateAllCollectionHooks,
   fields: [
     { name: "name", type: "text", required: true, unique: true },
     { name: "classSlug", type: "text", required: true, index: true },

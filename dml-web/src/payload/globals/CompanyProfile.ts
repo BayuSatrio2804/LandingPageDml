@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { revalidateAllGlobalHooks } from "../revalidate-all";
 
 /**
  * Profil perusahaan, admin-editable. Dulu ini seluruhnya hardcode di
@@ -20,6 +21,7 @@ export const CompanyProfile: GlobalConfig = {
   admin: {
     group: "Perusahaan",
   },
+  hooks: revalidateAllGlobalHooks,
   fields: [
     {
       type: "tabs",
