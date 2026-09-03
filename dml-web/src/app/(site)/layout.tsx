@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { localBusinessJsonLd, organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { getCompanyProfile } from "@/lib/cms/company";
+import { getThemePreset } from "@/lib/cms/appearance";
+import { themeStyleBlock } from "@/lib/theme-presets";
 import "../globals.css";
 
 export const metadata: Metadata = buildMetadata({
@@ -17,7 +19,8 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
-  const company = await getCompanyProfile();
+  const [company, theme] = await Promise.all([getCompanyProfile(), getThemePreset()]);
+  const themeCss = themeStyleBlock(theme);
   return (
     <html lang="id" className={`${fontVariables} h-full antialiased`}>
       {/*
@@ -32,6 +35,15 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         dengan min-h-full begitu class "lenis" nempel di <html>.
       */}
       <body className="min-h-dvh flex flex-col">
+        {themeCss ? (
+          /*
+            Override CSS var keluarga aksen sesuai preset global `appearance`.
+            Datang setelah globals.css jadi menang atas nilai @theme bawaan
+            pada spesifisitas :root yang sama. Tidak dirender untuk preset
+            navy (nilainya sudah sama dengan bawaan).
+          */
+          <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+        ) : null}
         <SkipLink />
         <SmoothScrollProvider>
           <SiteHeader />

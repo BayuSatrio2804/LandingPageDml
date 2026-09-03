@@ -112,6 +112,7 @@ export interface Config {
     'business-page': BusinessPage;
     'business-subpages': BusinessSubpage;
     'contact-career': ContactCareer;
+    appearance: Appearance;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
@@ -123,6 +124,7 @@ export interface Config {
     'business-page': BusinessPageSelect<false> | BusinessPageSelect<true>;
     'business-subpages': BusinessSubpagesSelect<false> | BusinessSubpagesSelect<true>;
     'contact-career': ContactCareerSelect<false> | ContactCareerSelect<true>;
+    appearance: AppearanceSelect<false> | AppearanceSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -1277,6 +1279,21 @@ export interface ContactCareer {
   createdAt?: string | null;
 }
 /**
+ * Preset warna aksen situs. Hanya warna tautan/tombol/aksen yang berubah — latar dan teks tetap. Scene 3D di Beranda tetap navy.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appearance".
+ */
+export interface Appearance {
+  id: number;
+  /**
+   * Perubahan langsung terlihat setelah Save.
+   */
+  theme: 'navy' | 'teal' | 'forest' | 'plum';
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1744,6 +1761,16 @@ export interface ContactCareerSelect<T extends boolean = true> {
         perLineIntro?: T;
         perLineLinkLabel?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "appearance_select".
+ */
+export interface AppearanceSelect<T extends boolean = true> {
+  theme?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

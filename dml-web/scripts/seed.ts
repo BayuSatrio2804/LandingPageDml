@@ -337,6 +337,14 @@ async function main() {
     console.log("contact-career: sudah ada");
   }
 
+  const appearance = await payload.findGlobal({ slug: "appearance" });
+  if (!appearance.createdAt) {
+    await payload.updateGlobal({ slug: "appearance", data: { theme: "navy" } });
+    console.log("appearance: dibuat");
+  } else {
+    console.log("appearance: sudah ada");
+  }
+
   for (const client of CLIENTS_SEED) {
     const ada = await payload.find({
       collection: "clients",
