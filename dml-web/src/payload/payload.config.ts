@@ -22,6 +22,7 @@ import { HomeSections } from "./globals/HomeSections";
 import { AboutPage } from "./globals/AboutPage";
 import { BusinessPage } from "./globals/BusinessPage";
 import { BusinessSubpages } from "./globals/BusinessSubpages";
+import { ContactCareer } from "./globals/ContactCareer";
 import { CompanyProfile } from "./globals/CompanyProfile";
 import { SiteNavigation } from "./globals/SiteNavigation";
 import { migrations } from "../migrations";
@@ -89,6 +90,7 @@ export default buildConfig({
     AboutPage,
     BusinessPage,
     BusinessSubpages,
+    ContactCareer,
     ArticlesPage,
     CompanyProfile,
     SiteNavigation,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getCompanyProfile, getSiteNavigation } from "@/lib/cms/company";
+import { getContactCareer } from "@/lib/cms/contact-career";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { ExternalLink } from "@/components/layout/external-link";
@@ -13,7 +14,11 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function KontakPage() {
-  const [COMPANY, { footerGroups }] = await Promise.all([getCompanyProfile(), getSiteNavigation()]);
+  const [COMPANY, { footerGroups }, { contact }] = await Promise.all([
+    getCompanyProfile(),
+    getSiteNavigation(),
+    getContactCareer(),
+  ]);
   const BUSINESS_LINES = footerGroups.find((group) => group.heading === "Bisnis")?.items ?? [];
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
@@ -22,10 +27,10 @@ export default async function KontakPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-      <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Kontak</h1>
-      <p className="mt-4 max-w-[55ch] text-ink-muted">
-        Isi form di bawah untuk pertanyaan umum. Tim kami akan menghubungi lewat WhatsApp.
-      </p>
+      <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">
+        {contact.title}
+      </h1>
+      <p className="mt-4 max-w-[55ch] text-ink-muted">{contact.intro}</p>
 
       <div className="mt-12 grid gap-12 md:grid-cols-[3fr_2fr]">
         <ContactForm whatsappNumber={COMPANY.whatsapp} />
@@ -42,24 +47,21 @@ export default async function KontakPage() {
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                   `${office.street}, ${office.city}, ${office.province}`,
                 )}`}
-                label="Buka di Google Maps"
+                label={contact.mapsLinkLabel}
                 className="mt-2 inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover"
               />
             </div>
           ))}
           <div>
-            <p className="font-display font-bold text-ink">Telepon</p>
+            <p className="font-display font-bold text-ink">{contact.phoneLabel}</p>
             <p className="mt-1 text-sm text-ink-muted">{COMPANY.phone}</p>
           </div>
         </address>
       </div>
 
       <section className="mt-16 border-t border-surface-3 pt-10">
-        <h2 className="font-display text-pretty text-xl font-bold">Kontak per Lini Bisnis</h2>
-        <p className="mt-2 max-w-[60ch] text-sm text-ink-muted">
-          Kedua lini bisnis kami saat ini melayani lewat satu nomor kontak yang sama.
-          Detail armada, lintasan, dan standar operasi ada di halaman masing-masing lini.
-        </p>
+        <h2 className="font-display text-pretty text-xl font-bold">{contact.perLineHeading}</h2>
+        <p className="mt-2 max-w-[60ch] text-sm text-ink-muted">{contact.perLineIntro}</p>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2">
           {BUSINESS_LINES.map((line) => (
             <li key={line.label} className="rounded-card border border-surface-3 bg-surface-2 p-5">
@@ -69,7 +71,7 @@ export default async function KontakPage() {
                 href={line.href}
                 className="mt-3 inline-flex text-sm text-accent transition-colors hover:text-accent-hover"
               >
-                Lihat detail lini
+                {contact.perLineLinkLabel}
               </Link>
             </li>
           ))}
