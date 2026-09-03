@@ -12,8 +12,14 @@ const nextConfig: NextConfig = {
    * mungkin luput dari hasil telusur adalah importMap admin dan berkas
    * migrasi. Task 20 Step 4 memeriksa /admin dari dalam container, bukan
    * dari next start lokal.
+   *
+   * HANYA untuk build di luar Vercel (image Docker). Di Vercel, `standalone`
+   * mengubah letak berkas .nft.json hasil telusur, dan langkah
+   * onBuildComplete milik Vercel gagal dengan "ENOENT ... next-server.js
+   * .nft.json". Vercel mem-bundle fungsi servernya sendiri, jadi opsi ini
+   * tidak diperlukan di sana.
    */
-  output: "standalone",
+  ...(process.env.VERCEL ? {} : { output: "standalone" as const }),
   /**
    * withPayload() sendiri sudah memasang outputFileTracingIncludes untuk
    * @libsql/client (adapter DB lain, bukan yang dipakai repo ini) -- bukti
