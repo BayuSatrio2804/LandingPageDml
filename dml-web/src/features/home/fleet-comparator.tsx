@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion
 import { useIsDesktop } from "@/lib/motion/use-is-desktop";
 import { useElementHandle, useInViewport } from "@/lib/motion/use-in-viewport";
 import { useScrollProgress } from "@/lib/motion/use-scroll-progress";
-import { FLEET_CLASSES } from "@/content/fleet";
+import type { FleetClass } from "@/content/types";
 import { BlueprintSvg } from "@/features/fleet/blueprint-svg";
 import { FleetSpecTable } from "@/features/fleet/spec-table";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -24,12 +24,12 @@ const FleetCanvas = dynamic(() => import("./fleet-3d/fleet-canvas").then((mod) =
  */
 const PIN_LENGTH = "+=340%";
 
-function SpecBlock() {
+function SpecBlock({ fleetClasses }: { fleetClasses: FleetClass[] }) {
   return (
     <section className="bg-surface-wash pb-24 md:pb-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <h3 className="font-display text-pretty text-xl font-bold text-ink">Spesifikasi per kelas</h3>
-        <FleetSpecTable fleetClasses={FLEET_CLASSES} />
+        <FleetSpecTable fleetClasses={fleetClasses} />
         <p className="mt-6 max-w-[70ch] text-xs text-ink-muted">
           Panjang, DWT, dan kapasitas per kelas adalah estimasi proporsional dan masih menunggu
           konfirmasi data teknis dari klien.
@@ -40,7 +40,7 @@ function SpecBlock() {
 }
 
 /** Jalur tanpa 3D: blueprint dua kolom, tidak ada yang dipaku. */
-function StaticFleet() {
+function StaticFleet({ fleetClasses }: { fleetClasses: FleetClass[] }) {
   return (
     <section className="bg-surface-wash py-20 md:py-28">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
@@ -49,14 +49,14 @@ function StaticFleet() {
           description="Lima kelas kapal, dari SPOB terkecil sampai motor tanker terbesar, dalam satu skala."
         />
         <div className="mt-12">
-          <BlueprintSvg fleetClasses={FLEET_CLASSES} />
+          <BlueprintSvg fleetClasses={fleetClasses} />
         </div>
       </div>
     </section>
   );
 }
 
-export function FleetComparator() {
+export function FleetComparator({ fleetClasses }: { fleetClasses: FleetClass[] }) {
   const [stageNode, attachStage, stageRef] = useElementHandle<HTMLDivElement>();
   const reduced = usePrefersReducedMotion();
   const isDesktop = useIsDesktop();
@@ -77,13 +77,13 @@ export function FleetComparator() {
   if (!canvasEnabled) {
     return (
       <>
-        <StaticFleet />
-        <SpecBlock />
+        <StaticFleet fleetClasses={fleetClasses} />
+        <SpecBlock fleetClasses={fleetClasses} />
       </>
     );
   }
 
-  const active = FLEET_CLASSES[activeIndex] ?? FLEET_CLASSES[0];
+  const active = fleetClasses[activeIndex] ?? fleetClasses[0];
 
   return (
     <>
@@ -108,7 +108,7 @@ export function FleetComparator() {
                   pergantian kapal terbaca sebagai halaman yang berubah
                   sendiri, bukan sebagai urutan yang sedang dijalani. */}
               <ol className="mt-10 space-y-1" aria-label="Urutan kelas kapal">
-                {FLEET_CLASSES.map((fleetClass, index) => {
+                {fleetClasses.map((fleetClass, index) => {
                   const current = index === activeIndex;
                   return (
                     <li
@@ -168,6 +168,7 @@ export function FleetComparator() {
             <div className="relative col-span-8 h-[78%]">
               {hasEntered && (
                 <FleetCanvas
+                  fleetClasses={fleetClasses}
                   progressRef={progressRef}
                   onActiveIndexChange={handleActiveIndexChange}
                   active={inViewport}
@@ -186,7 +187,7 @@ export function FleetComparator() {
         </div>
       </section>
 
-      <SpecBlock />
+      <SpecBlock fleetClasses={fleetClasses} />
     </>
   );
 }

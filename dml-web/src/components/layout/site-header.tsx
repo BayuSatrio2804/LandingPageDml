@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { NAV_ITEMS } from "@/content/navigation";
-import { COMPANY } from "@/content/company";
+import { getCompanyProfile, getSiteNavigation } from "@/lib/cms/company";
 import { ExternalLink } from "./external-link";
 import { MobileMenu } from "./mobile-menu";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const [company, { navItems }] = await Promise.all([getCompanyProfile(), getSiteNavigation()]);
   return (
     /*
      * Pita navy penuh, sepasang dengan kaki halaman. Solid, bukan bg-accent/90:
@@ -25,12 +25,12 @@ export function SiteHeader() {
           href="/"
           className="font-display text-lg font-bold tracking-tight"
         >
-          {COMPANY.shortName}
+          {company.shortName}
         </Link>
 
         <nav aria-label="Navigasi utama" className="hidden md:block">
           <ul className="flex items-center gap-7">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <li key={item.href}>
                 {item.external ? (
                   <ExternalLink
@@ -51,7 +51,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <MobileMenu items={NAV_ITEMS} />
+        <MobileMenu items={navItems} />
       </div>
     </header>
   );

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { FLEET_CLASSES } from "@/content/fleet";
-import { MAIN_LINES } from "@/content/business-lines";
-import { COMPANY } from "@/content/company";
+import { getCompanyProfile } from "@/lib/cms/company";
+import { getBusinessLines } from "@/lib/cms/business-lines";
+import { getVessels } from "@/lib/cms/vessels";
+import { getFleetClasses } from "@/lib/cms/fleet-classes";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString, serviceJsonLd } from "@/lib/seo/json-ld";
@@ -18,19 +19,22 @@ export const metadata: Metadata = buildMetadata({
   path: "/bisnis/penumpang-roro",
 });
 
-const RORO_CLASSES = FLEET_CLASSES.filter(
-  (fleetClass) => fleetClass.category === "Penumpang Ro-Ro",
-);
-
-export default function PenumpangRoroPage() {
+export default async function PenumpangRoroPage() {
+  const [COMPANY, { mainLines }, vessels, fleetClasses] = await Promise.all([
+    getCompanyProfile(),
+    getBusinessLines(),
+    getVessels(),
+    getFleetClasses(),
+  ]);
+  const RORO_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Penumpang Ro-Ro");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Bisnis Kami", path: "/bisnis" },
     { name: "Penyeberangan Ro-Ro", path: "/bisnis/penumpang-roro" },
   ]);
-  const line = MAIN_LINES.find((entry) => entry.id === "penumpang-roro");
+  const line = mainLines.find((entry) => entry.id === "penumpang-roro");
   const hero = MEDIA["bisnis"].find((frame) => frame.id === "lini-roro") ?? null;
-  const service = serviceJsonLd({
+  const service = serviceJsonLd(COMPANY, {
     name: "Penyeberangan Ro-Ro",
     description: line?.summary ?? "",
     path: "/bisnis/penumpang-roro",
@@ -63,7 +67,7 @@ export default function PenumpangRoroPage() {
             title="Lintasan"
             description="Lima lintasan dari company profile halaman 03 dan 04. Kolom operator memisahkan lintasan yang dijalankan sendiri dari lintasan afiliasi."
           />
-          <RouteTable />
+          <RouteTable dmlLegalName={COMPANY.legalName} vessels={vessels} />
         </div>
       </section>
 
@@ -74,7 +78,7 @@ export default function PenumpangRoroPage() {
             title="Armada Jambo"
             description="Sembilan kapal ro-ro. Panjang dan kapasitas penumpang di bawah berlaku untuk kelas, bukan diukur per kapal."
           />
-          <VesselRoster fleetClasses={RORO_CLASSES} />
+          <VesselRoster fleetClasses={RORO_CLASSES} vessels={vessels} />
           <dl className="mt-12 grid gap-8 sm:grid-cols-3">
             {RORO_CLASSES.map((fleetClass) => (
               <div key={fleetClass.slug}>

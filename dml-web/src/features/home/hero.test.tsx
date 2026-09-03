@@ -2,6 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Hero } from "./hero";
+import type { CertBadge } from "@/content/types";
+
+const CERTIFICATIONS: CertBadge[] = [
+  { name: "ISO 9001:2015", assetPath: "/assets/cert/iso-9001.png", alt: "Tersertifikasi ISO 9001:2015", source: "cp-pdf" },
+  { name: "ISM Code", assetPath: "/assets/cert/ism-code.png", alt: "Menerapkan ISM Code", source: "cp-pdf" },
+  { name: "HSSE", assetPath: "/assets/cert/hsse.png", alt: "Utamakan keselamatan dan kesehatan kerja", source: "belum-terverifikasi" },
+];
 
 /**
  * matches: true memilih jalur reduced motion, jadi tidak ada GSAP yang jalan di
@@ -26,7 +33,7 @@ beforeEach(() => {
 
 describe("Hero", () => {
   it("render headline sebagai h1", () => {
-    render(<Hero />);
+    render(<Hero certifications={CERTIFICATIONS} />);
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
@@ -35,13 +42,13 @@ describe("Hero", () => {
   // kata, jadi menambah satu kata saja akan menggagalkan test ini — memang itu
   // gunanya.
   it("headline maksimal tujuh kata", () => {
-    render(<Hero />);
+    render(<Hero certifications={CERTIFICATIONS} />);
     const words = screen.getByRole("heading", { level: 1 }).textContent?.trim().split(/\s+/) ?? [];
     expect(words.length).toBeLessThanOrEqual(7);
   });
 
   it("subteks maksimal dua puluh kata", () => {
-    render(<Hero />);
+    render(<Hero certifications={CERTIFICATIONS} />);
     const subtext = screen.getByTestId("hero-subteks").textContent?.trim().split(/\s+/) ?? [];
     expect(subtext.length).toBeLessThanOrEqual(20);
   });
@@ -49,14 +56,14 @@ describe("Hero", () => {
   it("CTA BBM menunjuk halaman permintaan informasi, bukan kontak umum", () => {
     // Ditutup di Plan 9 setelah Plan 8 membangun halamannya. Label CTA-nya
     // memang sudah "Permintaan Informasi BBM" sejak Plan 4.
-    render(<Hero />);
+    render(<Hero certifications={CERTIFICATIONS} />);
     expect(
       screen.getByRole("link", { name: /Permintaan Informasi BBM/i }),
     ).toHaveAttribute("href", "/bisnis/transportasi-bbm/permintaan-informasi");
   });
 
   it("CTA ro-ro mengarah ke pemesanan tiket", () => {
-    render(<Hero />);
+    render(<Hero certifications={CERTIFICATIONS} />);
     expect(screen.getByRole("link", { name: /pesan tiket ro-ro/i })).toHaveAttribute(
       "href",
       "https://dutabahari.id",
@@ -78,20 +85,20 @@ describe("Hero", () => {
   // renderToStaticMarkup meniru render server sungguhan (tidak pernah
   // menjalankan efek sama sekali), jadi itu yang dipakai di sini.
   it("hero tidak merender gambar apa pun di HTML server", () => {
-    const html = renderToStaticMarkup(<Hero />);
+    const html = renderToStaticMarkup(<Hero certifications={CERTIFICATIONS} />);
     expect(html).not.toMatch(/<img[\s>]/);
     expect(html).toMatch(/<h1[^>]*>.+?<\/h1>/);
   });
 
   it("tidak ada canvas di HTML server", () => {
-    const { container } = render(<Hero />);
+    const { container } = render(<Hero certifications={CERTIFICATIONS} />);
     expect(container.querySelector("canvas")).toBeNull();
   });
 
   // Kedua pintu harus setara sejak mendarat: tidak ada opacity kontainer yang
   // meredupkan salah satunya, karena itu mengalikan turun ke tombol.
   it("kedua label lini bisnis ada", () => {
-    render(<Hero />);
+    render(<Hero certifications={CERTIFICATIONS} />);
     expect(screen.getByText(/transportasi bbm/i)).toBeInTheDocument();
     expect(screen.getByText(/penyeberangan ro-ro/i)).toBeInTheDocument();
   });

@@ -1,6 +1,5 @@
 import { ROUTE_LEGS } from "@/features/route-map/ports";
-import { COMPANY } from "@/content/company";
-import { vesselsByRoute } from "@/content/vessels";
+import type { Vessel } from "@/content/types";
 
 /**
  * Kolom operator adalah alasan komponen ini ada. Lima lintasan terbaca sebagai
@@ -11,13 +10,24 @@ import { vesselsByRoute } from "@/content/vessels";
  * FleetSpecTable: tanpa itu, tabel mendorong lebar dokumen di 375 px dan
  * SELURUH halaman ikut bisa digeser ke samping, dan pengguna keyboard tidak
  * bisa menggulirnya sama sekali (temuan aksesibilitas Plan 6).
+ *
+ * `dmlLegalName`/`vessels` diterima sebagai props, bukan import langsung
+ * dari @/content/company atau @/content/vessels: keduanya sekarang datang
+ * dari CMS, dan komponen ini bukan async, jadi pemanggil yang sudah
+ * mengambilnya (penumpang-roro/page.tsx) yang meneruskannya ke sini.
  */
-const OPERATOR_LABEL: Record<string, string> = {
-  dml: COMPANY.legalName,
-  tsl: "PT Tri Sumaja Lines",
-};
-
-export function RouteTable() {
+export function RouteTable({
+  dmlLegalName,
+  vessels,
+}: {
+  dmlLegalName: string;
+  vessels: Vessel[];
+}) {
+  const OPERATOR_LABEL: Record<string, string> = {
+    dml: dmlLegalName,
+    tsl: "PT Tri Sumaja Lines",
+  };
+  const vesselsByRoute = (routeId: string) => vessels.filter((v) => v.routeId === routeId);
   return (
     <div
       className="mt-10 overflow-x-auto"

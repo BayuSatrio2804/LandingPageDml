@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { CtaLink } from "@/components/ui/cta-link";
-import { CERT_BADGES } from "@/content/certifications";
+import type { CertBadge } from "@/content/types";
 import { DOORS } from "./hero-doors";
 
 // Halaman tujuan dibangun Plan 8. Label CTA-nya sudah "Permintaan Informasi
@@ -15,11 +15,13 @@ export function HeroCopy({
   contentRef,
   ruleRefs,
   countRefs,
+  certifications,
 }: {
   mounted: boolean;
   contentRef: React.RefObject<HTMLDivElement | null>;
   ruleRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   countRefs: React.RefObject<(HTMLSpanElement | null)[]>;
+  certifications: CertBadge[];
 }) {
   return (
     <>
@@ -45,7 +47,7 @@ export function HeroCopy({
               Tersertifikasi
             </span>
             {mounted
-              ? CERT_BADGES.map((badge) => (
+              ? certifications.map((badge) => (
                   <Image
                     key={badge.assetPath}
                     src={badge.assetPath}

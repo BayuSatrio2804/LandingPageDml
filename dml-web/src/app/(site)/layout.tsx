@@ -6,6 +6,7 @@ import { SkipLink } from "@/components/layout/skip-link";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { localBusinessJsonLd, organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
+import { getCompanyProfile } from "@/lib/cms/company";
 import "../globals.css";
 
 export const metadata: Metadata = buildMetadata({
@@ -15,7 +16,8 @@ export const metadata: Metadata = buildMetadata({
   path: "/",
 });
 
-export default function SiteLayout({ children }: LayoutProps<"/">) {
+export default async function SiteLayout({ children }: LayoutProps<"/">) {
+  const company = await getCompanyProfile();
   return (
     <html lang="id" className={`${fontVariables} h-full antialiased`}>
       {/*
@@ -41,13 +43,13 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: safeJsonLdString(organizationJsonLd()),
+            __html: safeJsonLdString(organizationJsonLd(company)),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: safeJsonLdString(localBusinessJsonLd()),
+            __html: safeJsonLdString(localBusinessJsonLd(company)),
           }}
         />
       </body>

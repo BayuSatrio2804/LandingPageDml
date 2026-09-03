@@ -8,6 +8,10 @@ import { Since1988 } from "@/features/home/since-1988";
 import { Certifications } from "@/features/home/certifications";
 import { CtaSection } from "@/features/home/cta-section";
 import { LatestArticles } from "@/features/articles/latest-articles";
+import { getCompanyProfile } from "@/lib/cms/company";
+import { getCertifications } from "@/lib/cms/certifications";
+import { getBusinessLines } from "@/lib/cms/business-lines";
+import { getFleetClasses } from "@/lib/cms/fleet-classes";
 
 /**
  * Urutan seksi juga urutan ritme visual, dan itu disengaja. Hero adalah bidang
@@ -32,17 +36,23 @@ import { LatestArticles } from "@/features/articles/latest-articles";
  */
 export const revalidate = 3600;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [company, certifications, { mainLines, affiliates }, fleetClasses] = await Promise.all([
+    getCompanyProfile(),
+    getCertifications(),
+    getBusinessLines(),
+    getFleetClasses(),
+  ]);
   return (
     <>
-      <Hero />
+      <Hero certifications={certifications} />
       <DayCut />
-      <BusinessLines />
-      <Affiliates />
-      <FleetComparator />
+      <BusinessLines mainLines={mainLines} />
+      <Affiliates affiliates={affiliates} />
+      <FleetComparator fleetClasses={fleetClasses} />
       <RouteMap />
-      <Since1988 />
-      <Certifications />
+      <Since1988 company={company} />
+      <Certifications company={company} />
       <LatestArticles />
       <CtaSection />
     </>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { COMPANY } from "@/content/company";
+import { getCompanyProfile } from "@/lib/cms/company";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { ExternalLink } from "@/components/layout/external-link";
@@ -10,7 +10,8 @@ export const metadata: Metadata = buildMetadata({
   path: "/karier",
 });
 
-export default function KarierPage() {
+export default async function KarierPage() {
+  const COMPANY = await getCompanyProfile();
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Karier", path: "/karier" },

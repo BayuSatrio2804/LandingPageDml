@@ -4,7 +4,7 @@ import type { Post } from "@/payload/payload-types";
 import { SectionHeader } from "@/components/ui/section-header";
 import { CtaLink } from "@/components/ui/cta-link";
 import { formatTanggal } from "./format-date";
-import { resolveMedia, CATEGORY_LABELS } from "./article-list";
+import { resolveMedia, resolveCategory } from "./article-list";
 
 const JUMLAH = 3;
 
@@ -46,7 +46,7 @@ export function LatestArticlesView({ posts }: { posts: Post[] }) {
                     />
                   ) : null}
                   <p className="mt-5 flex flex-wrap items-center gap-x-3 font-mono text-xs text-ink-muted">
-                    <span>{CATEGORY_LABELS[post.category] ?? post.category}</span>
+                    <span>{resolveCategory(post.category)?.name ?? "Tanpa kategori"}</span>
                     <span aria-hidden="true">·</span>
                     <time dateTime={post.publishedAt}>{formatTanggal(post.publishedAt)}</time>
                   </p>

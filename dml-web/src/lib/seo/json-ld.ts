@@ -1,17 +1,17 @@
-import { COMPANY } from "@/content/company";
+import type { Company } from "@/content/types";
 import { absoluteUrl, SITE_URL } from "./metadata";
 
-export function organizationJsonLd() {
+export function organizationJsonLd(company: Company) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: COMPANY.legalName,
+    name: company.legalName,
     url: SITE_URL,
-    foundingDate: COMPANY.foundedIso,
-    founder: { "@type": "Person", name: COMPANY.founder },
-    parentOrganization: { "@type": "Organization", name: COMPANY.parent },
-    telephone: COMPANY.phone,
-    address: COMPANY.offices.map((office) => ({
+    foundingDate: company.foundedIso,
+    founder: { "@type": "Person", name: company.founder },
+    parentOrganization: { "@type": "Organization", name: company.parent },
+    telephone: company.phone,
+    address: company.offices.map((office) => ({
       "@type": "PostalAddress",
       streetAddress: office.street,
       addressLocality: office.city,
@@ -43,15 +43,18 @@ export function breadcrumbJsonLd(
  * properti kosong sebagai kesalahan, sementara properti yang absen memang
  * boleh absen untuk tipe Article.
  */
-export function articleJsonLd(input: {
-  title: string;
-  description: string;
-  path: string;
-  publishedAt: string;
-  updatedAt: string;
-  imageUrl?: string;
-  authorName?: string;
-}) {
+export function articleJsonLd(
+  company: Company,
+  input: {
+    title: string;
+    description: string;
+    path: string;
+    publishedAt: string;
+    updatedAt: string;
+    imageUrl?: string;
+    authorName?: string;
+  },
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -62,7 +65,7 @@ export function articleJsonLd(input: {
     dateModified: input.updatedAt,
     publisher: {
       "@type": "Organization",
-      name: COMPANY.legalName,
+      name: company.legalName,
       url: SITE_URL,
     },
     ...(input.imageUrl ? { image: input.imageUrl } : {}),
@@ -80,11 +83,14 @@ export function articleJsonLd(input: {
  * company profile, dan menuliskan "Indonesia" adalah klaim yang tidak
  * berdasar untuk data terstruktur yang justru dibaca mesin.
  */
-export function serviceJsonLd(input: {
-  name: string;
-  description: string;
-  path: string;
-}) {
+export function serviceJsonLd(
+  company: Company,
+  input: {
+    name: string;
+    description: string;
+    path: string;
+  },
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -93,7 +99,7 @@ export function serviceJsonLd(input: {
     url: absoluteUrl(input.path),
     provider: {
       "@type": "Organization",
-      name: COMPANY.legalName,
+      name: company.legalName,
       url: SITE_URL,
     },
   };
@@ -105,14 +111,14 @@ export function serviceJsonLd(input: {
  * Organization untuk identitas korporat dan induknya, LocalBusiness untuk
  * tempat yang bisa didatangi beserta teleponnya.
  */
-export function localBusinessJsonLd() {
+export function localBusinessJsonLd(company: Company) {
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    name: COMPANY.legalName,
+    name: company.legalName,
     url: SITE_URL,
-    telephone: COMPANY.phone,
-    address: COMPANY.offices.map((office) => ({
+    telephone: company.phone,
+    address: company.offices.map((office) => ({
       "@type": "PostalAddress",
       streetAddress: office.street,
       addressLocality: office.city,

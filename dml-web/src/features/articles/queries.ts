@@ -69,7 +69,10 @@ export async function findPublishedPost(slug: string): Promise<Post | null> {
   const result = await payload.find({
     collection: "posts",
     where: { and: [{ slug: { equals: slug } }, PUBLISHED_WHERE] },
-    depth: 1,
+    // depth 2, bukan 1: relatedOverride adalah relasi ke Post lain, dan
+    // kartu artikel terkait butuh coverImage/category post-post itu ikut
+    // terekspansi juga (satu hop lagi), bukan cuma id mentahnya.
+    depth: 2,
     limit: 1,
   });
   return (result.docs[0] as Post | undefined) ?? null;

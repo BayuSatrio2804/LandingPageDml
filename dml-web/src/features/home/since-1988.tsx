@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { COMPANY } from "@/content/company";
+import type { CompanyProfileData } from "@/lib/cms/company";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { SectionHeader } from "@/components/ui/section-header";
 import { useCounter } from "@/lib/motion/use-counter";
@@ -31,8 +31,8 @@ function YearCounter({ target }: { target: number }) {
  * itu terbaca sebagai bagian dari cerita, bukan sebagai daftar nilai generik
  * yang bisa ditempel di perusahaan mana pun.
  */
-export function Since1988() {
-  const years = yearsOperating(COMPANY.foundedIso, new Date());
+export function Since1988({ company }: { company: CompanyProfileData }) {
+  const years = yearsOperating(company.foundedIso, new Date());
   const frame = MEDIA["lini-bisnis"].find((asset) => asset.id === "operasi-sts");
 
   return (
@@ -48,11 +48,11 @@ export function Since1988() {
               </p>
             </div>
             <p className="mt-10 max-w-[42ch] text-ink">
-              {COMPANY.legalName} didirikan {COMPANY.founder} di Banjarmasin pada 30 November 1988,
-              dan kini bagian dari {COMPANY.parent}.
+              {company.legalName} didirikan {company.founder} di Banjarmasin pada 30 November 1988,
+              dan kini bagian dari {company.parent}.
             </p>
             <Link
-              href="/tentang-kami#silsilah"
+              href="/tentang-kami#jati-diri"
               className="mt-6 inline-block text-sm font-medium text-accent hover:text-accent-hover"
             >
               Lihat silsilah lengkap
@@ -75,7 +75,7 @@ export function Since1988() {
         </div>
 
         <Reveal className="mt-20 border-t border-surface-3" stagger={0.08}>
-          {COMPANY.values.map((value) => (
+          {company.values.map((value) => (
             <div
               key={value.key}
               data-testid="nilai-perusahaan"

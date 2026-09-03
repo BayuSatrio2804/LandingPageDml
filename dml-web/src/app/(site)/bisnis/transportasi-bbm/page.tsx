@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { FLEET_CLASSES } from "@/content/fleet";
-import { COMPANY } from "@/content/company";
-import { MAIN_LINES } from "@/content/business-lines";
+import { getCompanyProfile } from "@/lib/cms/company";
+import { getBusinessLines } from "@/lib/cms/business-lines";
+import { getVessels } from "@/lib/cms/vessels";
+import { getFleetClasses } from "@/lib/cms/fleet-classes";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString, serviceJsonLd } from "@/lib/seo/json-ld";
@@ -18,10 +19,6 @@ export const metadata: Metadata = buildMetadata({
     "Armada motor tanker, oil barge, SPOB, dan tugboat PT Dutabahari Menara Line untuk distribusi bahan bakar cair ke pelabuhan dan pulau utama Indonesia.",
   path: "/bisnis/transportasi-bbm",
 });
-
-const BBM_CLASSES = FLEET_CLASSES.filter(
-  (fleetClass) => fleetClass.category === "Transportasi BBM",
-);
 
 /**
  * Empat langkah, bukan angka bulat yang dikarang. Urutannya mengikuti apa yang
@@ -48,15 +45,22 @@ const STS_STEPS = [
   },
 ];
 
-export default function TransportasiBbmPage() {
+export default async function TransportasiBbmPage() {
+  const [COMPANY, { mainLines }, vessels, fleetClasses] = await Promise.all([
+    getCompanyProfile(),
+    getBusinessLines(),
+    getVessels(),
+    getFleetClasses(),
+  ]);
+  const BBM_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Transportasi BBM");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Bisnis Kami", path: "/bisnis" },
     { name: "Transportasi BBM", path: "/bisnis/transportasi-bbm" },
   ]);
-  const line = MAIN_LINES.find((entry) => entry.id === "transportasi-bbm");
+  const line = mainLines.find((entry) => entry.id === "transportasi-bbm");
   const hero = MEDIA["bisnis"].find((frame) => frame.id === "lini-bbm") ?? null;
-  const service = serviceJsonLd({
+  const service = serviceJsonLd(COMPANY, {
     name: "Transportasi BBM",
     description: line?.summary ?? "",
     path: "/bisnis/transportasi-bbm",
@@ -112,7 +116,7 @@ export default function TransportasiBbmPage() {
             title="Daftar kapal"
             description="Lima puluh tujuh kapal pengangkut BBM, dikelompokkan per kelas, disalin dari daftar armada company profile halaman 04."
           />
-          <VesselRoster fleetClasses={BBM_CLASSES} />
+          <VesselRoster fleetClasses={BBM_CLASSES} vessels={vessels} />
         </div>
       </section>
 

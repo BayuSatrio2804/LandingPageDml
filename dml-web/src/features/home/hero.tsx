@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import type { CertBadge } from "@/content/types";
 import { HeroDoors } from "./hero-doors";
 import { HeroCopy } from "./hero-copy";
 import { useHeroChoreography } from "./use-hero-choreography";
@@ -50,7 +51,7 @@ import { useHeroChoreography } from "./use-hero-choreography";
  * (+=260%) yang datang setelahnya di page.tsx.
  */
 
-export function Hero() {
+export function Hero({ certifications }: { certifications: CertBadge[] }) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
@@ -99,6 +100,7 @@ export function Hero() {
           contentRef={contentRef}
           ruleRefs={ruleRefs}
           countRefs={countRefs}
+          certifications={certifications}
         />
       </div>
     </section>

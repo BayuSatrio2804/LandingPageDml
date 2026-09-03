@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COMPANY } from "@/content/company";
-import { FOOTER_GROUPS } from "@/content/navigation";
+import { getCompanyProfile, getSiteNavigation } from "@/lib/cms/company";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { ExternalLink } from "@/components/layout/external-link";
 import { ContactForm } from "@/features/inquiry/contact-form";
-
-const BUSINESS_LINES = FOOTER_GROUPS.find((group) => group.heading === "Bisnis")?.items ?? [];
 
 export const metadata: Metadata = buildMetadata({
   title: "Kontak | PT Dutabahari Menara Line",
@@ -15,7 +12,9 @@ export const metadata: Metadata = buildMetadata({
   path: "/kontak",
 });
 
-export default function KontakPage() {
+export default async function KontakPage() {
+  const [COMPANY, { footerGroups }] = await Promise.all([getCompanyProfile(), getSiteNavigation()]);
+  const BUSINESS_LINES = footerGroups.find((group) => group.heading === "Bisnis")?.items ?? [];
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Kontak", path: "/kontak" },

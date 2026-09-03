@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { FleetSpecTable } from "./spec-table";
-import { FLEET_CLASSES } from "@/content/fleet";
+import { FLEET_CLASSES_SEED } from "@/lib/cms/fleet-classes-seed";
+
+const FLEET_CLASSES = FLEET_CLASSES_SEED.map((fleetClass) => ({ ...fleetClass, vesselCount: 0 }));
 
 describe("FleetSpecTable", () => {
   it("render sebagai table dengan satu baris per kelas kapal", () => {

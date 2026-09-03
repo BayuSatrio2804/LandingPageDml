@@ -56,6 +56,60 @@ function revalidasiArtikel(slugs: Array<string | undefined>) {
   amanRevalidatePath("/sitemap.xml");
 }
 
+/** Kumpulkan teks polos dari satu dokumen richText Lexical (blok paragraph). */
+function teksDariRichText(doc: unknown): string {
+  if (!doc || typeof doc !== "object") return "";
+  const root = (doc as { root?: { children?: unknown[] } }).root;
+  if (!root || !Array.isArray(root.children)) return "";
+  const potong: string[] = [];
+  const jelajah = (nodes: unknown[]) => {
+    for (const node of nodes) {
+      if (!node || typeof node !== "object") continue;
+      const n = node as { text?: unknown; children?: unknown[] };
+      if (typeof n.text === "string") potong.push(n.text);
+      if (Array.isArray(n.children)) jelajah(n.children);
+    }
+  };
+  jelajah(root.children);
+  return potong.join(" ");
+}
+
+/**
+ * Teks polos dari seluruh blok isi artikel, dipakai murni untuk menaksir
+ * lama baca. Blok "paragraph" menyimpan richText di field text; blok
+ * "heading"/"quote" menyimpan string biasa; blok "image" tidak punya teks.
+ */
+function teksDariBlok(blocks: unknown): string {
+  if (!Array.isArray(blocks)) return "";
+  return blocks
+    .map((block) => {
+      if (!block || typeof block !== "object") return "";
+      const b = block as { blockType?: string; text?: unknown };
+      switch (b.blockType) {
+        case "paragraph":
+          return teksDariRichText(b.text);
+        case "heading":
+        case "quote":
+          return typeof b.text === "string" ? b.text : "";
+        default:
+          return "";
+      }
+    })
+    .join(" ");
+}
+
+/**
+ * Lama baca dihitung otomatis dari panjang isi, bukan diisi manual admin,
+ * supaya tidak pernah basi terhadap isi asli setelah artikel disunting.
+ * 200 kata/menit adalah taksiran baca santai bahasa Indonesia, dibulatkan
+ * ke atas dan minimal 1 menit supaya artikel pendek tidak menampilkan "0".
+ */
+function hitungMenitBaca(content: unknown): number {
+  const teks = teksDariBlok(content);
+  const jumlahKata = teks.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(jumlahKata / 200));
+}
+
 export const Posts: CollectionConfig = {
   slug: "posts",
   admin: {
@@ -102,6 +156,15 @@ export const Posts: CollectionConfig = {
         return data;
       },
     ],
+    beforeChange: [
+      ({ data }) => {
+        if (!data) return data;
+        if (Array.isArray(data.content)) {
+          data.readingMinutes = hitungMenitBaca(data.content);
+        }
+        return data;
+      },
+    ],
     afterChange: [
       ({ doc, previousDoc }) => {
         // Slug lama ikut disegarkan. Kalau tidak, artikel yang slug-nya
@@ -137,20 +200,56 @@ export const Posts: CollectionConfig = {
       admin: { description: "Dipakai sebagai meta description dan ringkasan di kartu." },
     },
     { name: "coverImage", type: "upload", relationTo: "media", required: true },
-    { name: "content", type: "richText", required: true },
     {
-      name: "category",
-      type: "select",
+      name: "content",
+      type: "blocks",
       required: true,
-      options: [
-        { label: "Operasi", value: "operasi" },
-        { label: "Armada", value: "armada" },
-        { label: "Keselamatan", value: "keselamatan" },
-        { label: "Perusahaan", value: "perusahaan" },
+      blocks: [
+        {
+          slug: "paragraph",
+          fields: [{ name: "text", type: "richText", required: true }],
+        },
+        {
+          slug: "heading",
+          fields: [{ name: "text", type: "text", required: true }],
+        },
+        {
+          slug: "quote",
+          fields: [
+            { name: "text", type: "text", required: true },
+            { name: "attribution", type: "text" },
+          ],
+        },
+        {
+          slug: "image",
+          fields: [
+            { name: "image", type: "upload", relationTo: "media", required: true },
+            { name: "caption", type: "text" },
+          ],
+        },
       ],
     },
+    {
+      name: "readingMinutes",
+      type: "number",
+      admin: {
+        readOnly: true,
+        description: "Dihitung otomatis dari panjang isi saat disimpan.",
+      },
+    },
+    { name: "category", type: "relationship", relationTo: "categories", required: true },
     { name: "publishedAt", type: "date", required: true },
     { name: "author", type: "relationship", relationTo: "users", required: true },
+    {
+      name: "relatedOverride",
+      type: "relationship",
+      relationTo: "posts",
+      hasMany: true,
+      admin: {
+        description:
+          "Pilihan manual artikel terkait. Kosongkan untuk memakai kategori sama + terbaru secara otomatis.",
+      },
+    },
     {
       name: "seo",
       type: "group",

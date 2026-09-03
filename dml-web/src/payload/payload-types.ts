@@ -71,6 +71,13 @@ export interface Config {
     media: Media;
     inquiries: Inquiry;
     posts: Post;
+    categories: Category;
+    clients: Client;
+    certifications: Certification;
+    'business-lines': BusinessLine;
+    vessels: Vessel;
+    'fleet-classes': FleetClass;
+    'legal-documents': LegalDocument;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +89,13 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    clients: ClientsSelect<false> | ClientsSelect<true>;
+    certifications: CertificationsSelect<false> | CertificationsSelect<true>;
+    'business-lines': BusinessLinesSelect<false> | BusinessLinesSelect<true>;
+    vessels: VesselsSelect<false> | VesselsSelect<true>;
+    'fleet-classes': FleetClassesSelect<false> | FleetClassesSelect<true>;
+    'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -91,8 +105,16 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'articles-page': ArticlesPage;
+    'company-profile': CompanyProfile;
+    'site-navigation': SiteNavigation;
+  };
+  globalsSelect: {
+    'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
+    'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
+    'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -222,24 +244,59 @@ export interface Post {
    */
   excerpt: string;
   coverImage: number | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  category: 'operasi' | 'armada' | 'keselamatan' | 'perusahaan';
+  content: (
+    | {
+        text: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'paragraph';
+      }
+    | {
+        text: string;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'heading';
+      }
+    | {
+        text: string;
+        attribution?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'quote';
+      }
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'image';
+      }
+  )[];
+  /**
+   * Dihitung otomatis dari panjang isi saat disimpan.
+   */
+  readingMinutes?: number | null;
+  category: number | Category;
   publishedAt: string;
   author: number | User;
+  /**
+   * Pilihan manual artikel terkait. Kosongkan untuk memakai kategori sama + terbaru secara otomatis.
+   */
+  relatedOverride?: (number | Post)[] | null;
   seo?: {
     /**
      * Opsional. Kosong berarti memakai judul artikel.
@@ -253,6 +310,152 @@ export interface Post {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  name: string;
+  /**
+   * Terisi otomatis dari nama.
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clients".
+ */
+export interface Client {
+  id: number;
+  name: string;
+  sector: string;
+  /**
+   * Kosongkan untuk merender nama klien sebagai teks (belum ada logo resmi).
+   */
+  logo?: (number | null) | Media;
+  source: 'cp-pdf' | 'riset-publik' | 'belum-terverifikasi';
+  /**
+   * Angka lebih kecil tampil lebih dulu di marquee.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certifications".
+ */
+export interface Certification {
+  id: number;
+  name: string;
+  badge: number | Media;
+  alt: string;
+  source: 'cp-pdf' | 'riset-publik' | 'belum-terverifikasi';
+  /**
+   * Angka lebih kecil tampil lebih dulu di hero.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-lines".
+ */
+export interface BusinessLine {
+  id: number;
+  /**
+   * Terisi otomatis dari judul. Dipakai kode untuk mencari entri ini.
+   */
+  slug: string;
+  kind: 'lini-utama' | 'afiliasi';
+  /**
+   * Contoh: "01".
+   */
+  number: string;
+  title: string;
+  operator: string;
+  summary: string;
+  bullets: string[];
+  /**
+   * Kosongkan kedua field untuk lini tanpa metrik (afiliasi).
+   */
+  metric?: {
+    value?: string | null;
+    label?: string | null;
+  };
+  /**
+   * ID aset di src/lib/media/manifest.ts (pipeline gambar statis). Kosongkan kalau lini ini tidak punya foto.
+   */
+  mediaId?: string | null;
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vessels".
+ */
+export interface Vessel {
+  id: number;
+  name: string;
+  classSlug: string;
+  /**
+   * Hanya diisi untuk kapal ro-ro-ferry.
+   */
+  routeId?: string | null;
+  source: 'cp-pdf' | 'riset-publik' | 'belum-terverifikasi';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fleet-classes".
+ */
+export interface FleetClass {
+  id: number;
+  slug: string;
+  name: string;
+  category: string;
+  lengthMeters: number;
+  beamMeters: number;
+  /**
+   * Kosongkan untuk kelas tanpa DWT, misalnya Ro-Ro Ferry.
+   */
+  dwt?: number | null;
+  capacityLabel: string;
+  /**
+   * Hanya diisi untuk kelas penumpang.
+   */
+  passengerCapacity?: number | null;
+  altText: string;
+  /**
+   * Urutan tampil di comparator 3D dan blueprint.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents".
+ */
+export interface LegalDocument {
+  id: number;
+  document: string;
+  number: string;
+  issuer: string;
+  source: 'cp-pdf' | 'riset-publik' | 'belum-terverifikasi';
+  /**
+   * Angka lebih kecil tampil lebih dulu di kelompoknya.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -293,6 +496,34 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'clients';
+        value: number | Client;
+      } | null)
+    | ({
+        relationTo: 'certifications';
+        value: number | Certification;
+      } | null)
+    | ({
+        relationTo: 'business-lines';
+        value: number | BusinessLine;
+      } | null)
+    | ({
+        relationTo: 'vessels';
+        value: number | Vessel;
+      } | null)
+    | ({
+        relationTo: 'fleet-classes';
+        value: number | FleetClass;
+      } | null)
+    | ({
+        relationTo: 'legal-documents';
+        value: number | LegalDocument;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -425,10 +656,45 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   excerpt?: T;
   coverImage?: T;
-  content?: T;
+  content?:
+    | T
+    | {
+        paragraph?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+              blockName?: T;
+            };
+        quote?:
+          | T
+          | {
+              text?: T;
+              attribution?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              caption?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  readingMinutes?: T;
   category?: T;
   publishedAt?: T;
   author?: T;
+  relatedOverride?: T;
   seo?:
     | T
     | {
@@ -438,6 +704,108 @@ export interface PostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clients_select".
+ */
+export interface ClientsSelect<T extends boolean = true> {
+  name?: T;
+  sector?: T;
+  logo?: T;
+  source?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certifications_select".
+ */
+export interface CertificationsSelect<T extends boolean = true> {
+  name?: T;
+  badge?: T;
+  alt?: T;
+  source?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-lines_select".
+ */
+export interface BusinessLinesSelect<T extends boolean = true> {
+  slug?: T;
+  kind?: T;
+  number?: T;
+  title?: T;
+  operator?: T;
+  summary?: T;
+  bullets?: T;
+  metric?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+      };
+  mediaId?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vessels_select".
+ */
+export interface VesselsSelect<T extends boolean = true> {
+  name?: T;
+  classSlug?: T;
+  routeId?: T;
+  source?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fleet-classes_select".
+ */
+export interface FleetClassesSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  category?: T;
+  lengthMeters?: T;
+  beamMeters?: T;
+  dwt?: T;
+  capacityLabel?: T;
+  passengerCapacity?: T;
+  altText?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents_select".
+ */
+export interface LegalDocumentsSelect<T extends boolean = true> {
+  document?: T;
+  number?: T;
+  issuer?: T;
+  source?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -478,6 +846,278 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles-page".
+ */
+export interface ArticlesPage {
+  id: number;
+  heading: string;
+  intro: string;
+  /**
+   * Pita catatan opsional di bawah intro. Kosongkan untuk menyembunyikannya.
+   */
+  notice?: string | null;
+  /**
+   * Jumlah kartu per halaman sebelum tombol "Muat lebih banyak" dipakai.
+   */
+  pageSize: number;
+  /**
+   * Kosongkan untuk memakai artikel terbit terbaru secara otomatis.
+   */
+  featured?: (number | null) | Post;
+  shareChannels: ('whatsapp' | 'linkedin' | 'x' | 'email' | 'copy')[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-profile".
+ */
+export interface CompanyProfile {
+  id: number;
+  legalName: string;
+  shortName: string;
+  abbreviation: string;
+  tagline: string;
+  foundedIso: string;
+  founder: string;
+  parent: string;
+  phone: string;
+  /**
+   * Format E.164 tanpa tanda plus, untuk tautan wa.me.
+   */
+  whatsapp: string;
+  bookingUrl: string;
+  offices: {
+    label: string;
+    street: string;
+    city: string;
+    postalCode?: string | null;
+    province: string;
+    phone?: string | null;
+    fax?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * Tiga huruf DML sebagai nilai. Urutan baris adalah urutan tampil.
+   */
+  values: {
+    key: 'D' | 'M' | 'L';
+    term: string;
+    description: string;
+    id?: string | null;
+  }[];
+  standards: {
+    label: string;
+    items: {
+      name: string;
+      source: 'cp-pdf' | 'riset-publik' | 'belum-terverifikasi';
+      id?: string | null;
+    }[];
+    id?: string | null;
+  }[];
+  memberships: {
+    name: string;
+    /**
+     * Kepanjangan akronim, opsional.
+     */
+    expansion?: string | null;
+    id?: string | null;
+  }[];
+  fleetSummary: {
+    vessels: number;
+    passengerVessels: number;
+    oilTransportVessels: number;
+    people: number;
+  };
+  /**
+   * Kantor Sinar Alam Corporation, bukan kantor DML sendiri.
+   */
+  groupOffices: {
+    label: string;
+    street: string;
+    city: string;
+    postalCode?: string | null;
+    province: string;
+    phone?: string | null;
+    fax?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * Peta sektor usaha grup, dipakai halaman Tentang Kami.
+   */
+  groupUnits: {
+    sector: string;
+    companies: string[];
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-navigation".
+ */
+export interface SiteNavigation {
+  id: number;
+  /**
+   * Menu di header, urutan baris adalah urutan tampil.
+   */
+  navItems: {
+    label: string;
+    href: string;
+    /**
+     * Centang kalau tautan keluar dari situs ini.
+     */
+    external?: boolean | null;
+    id?: string | null;
+  }[];
+  footerGroups: {
+    heading: string;
+    items: {
+      label: string;
+      href: string;
+      external?: boolean | null;
+      id?: string | null;
+    }[];
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles-page_select".
+ */
+export interface ArticlesPageSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  notice?: T;
+  pageSize?: T;
+  featured?: T;
+  shareChannels?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-profile_select".
+ */
+export interface CompanyProfileSelect<T extends boolean = true> {
+  legalName?: T;
+  shortName?: T;
+  abbreviation?: T;
+  tagline?: T;
+  foundedIso?: T;
+  founder?: T;
+  parent?: T;
+  phone?: T;
+  whatsapp?: T;
+  bookingUrl?: T;
+  offices?:
+    | T
+    | {
+        label?: T;
+        street?: T;
+        city?: T;
+        postalCode?: T;
+        province?: T;
+        phone?: T;
+        fax?: T;
+        id?: T;
+      };
+  values?:
+    | T
+    | {
+        key?: T;
+        term?: T;
+        description?: T;
+        id?: T;
+      };
+  standards?:
+    | T
+    | {
+        label?: T;
+        items?:
+          | T
+          | {
+              name?: T;
+              source?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  memberships?:
+    | T
+    | {
+        name?: T;
+        expansion?: T;
+        id?: T;
+      };
+  fleetSummary?:
+    | T
+    | {
+        vessels?: T;
+        passengerVessels?: T;
+        oilTransportVessels?: T;
+        people?: T;
+      };
+  groupOffices?:
+    | T
+    | {
+        label?: T;
+        street?: T;
+        city?: T;
+        postalCode?: T;
+        province?: T;
+        phone?: T;
+        fax?: T;
+        id?: T;
+      };
+  groupUnits?:
+    | T
+    | {
+        sector?: T;
+        companies?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-navigation_select".
+ */
+export interface SiteNavigationSelect<T extends boolean = true> {
+  navItems?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        external?: T;
+        id?: T;
+      };
+  footerGroups?:
+    | T
+    | {
+        heading?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              external?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

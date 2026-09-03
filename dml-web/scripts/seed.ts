@@ -1,7 +1,13 @@
 import { getPayload } from "payload";
 import config from "../src/payload/payload.config";
 import { slugify } from "../src/payload/collections/Posts";
-import type { Post } from "../src/payload/payload-types";
+import { COMPANY_PROFILE_SEED, SITE_NAVIGATION_SEED } from "../src/lib/cms/company-seed";
+import { CLIENTS_SEED } from "../src/lib/cms/clients-seed";
+import { CERTIFICATIONS_SEED } from "../src/lib/cms/certifications-seed";
+import { BUSINESS_LINES_SEED } from "../src/lib/cms/business-lines-seed";
+import { VESSELS_SEED } from "../src/lib/cms/vessels-seed";
+import { FLEET_CLASSES_SEED } from "../src/lib/cms/fleet-classes-seed";
+import { LEGAL_DOCUMENTS_SEED } from "../src/lib/cms/legal-documents-seed";
 
 /**
  * `bun run seed` (lihat package.json) menjalankan berkas ini lewat `bun
@@ -63,22 +69,7 @@ function paragraf(value: string) {
   };
 }
 
-// Sama bentuknya dengan paragraf(), termasuk textFormat, supaya keduanya
-// bisa dicampur dalam satu array yang diserahkan ke isi().
-function judul(value: string) {
-  return {
-    type: "heading" as const,
-    tag: "h2" as const,
-    version: 1,
-    format: "" as const,
-    indent: 0,
-    direction: "ltr" as const,
-    textFormat: 0,
-    children: [teks(value)],
-  };
-}
-
-function isi(blocks: Array<ReturnType<typeof paragraf> | ReturnType<typeof judul>>) {
+function isi(blocks: Array<ReturnType<typeof paragraf>>) {
   return {
     root: {
       type: "root" as const,
@@ -91,19 +82,47 @@ function isi(blocks: Array<ReturnType<typeof paragraf> | ReturnType<typeof judul
   };
 }
 
+/**
+ * Tiga blok isi artikel, mengikuti skema `content` (type: "blocks") di
+ * Posts.ts: paragraph menyimpan richText di field `text`, heading dan quote
+ * menyimpan string biasa. `blockType` wajib persis salah satu slug blok yang
+ * didaftarkan di sana.
+ */
+function blokParagraf(value: string) {
+  return { blockType: "paragraph" as const, text: isi([paragraf(value)]) };
+}
+
+function blokJudul(value: string) {
+  return { blockType: "heading" as const, text: value };
+}
+
+type Blok = ReturnType<typeof blokParagraf> | ReturnType<typeof blokJudul>;
+
+/**
+ * Slug di sini SENGAJA sama dengan nilai enum lama (operasi/armada/
+ * keselamatan/perusahaan) supaya makna URL dan penyaringan kategori tidak
+ * berubah setelah category pindah dari select enum ke relasi koleksi.
+ */
+const KATEGORI: Array<{ name: string; slug: string }> = [
+  { name: "Operasi", slug: "operasi" },
+  { name: "Armada", slug: "armada" },
+  { name: "Keselamatan", slug: "keselamatan" },
+  { name: "Perusahaan", slug: "perusahaan" },
+];
+
 const ARTIKEL: Array<{
   slug: string;
   title: string;
-  category: Post["category"];
+  categorySlug: string;
   excerpt: string;
   publishedAt: string;
   cover: { file: string; alt: string };
-  content: ReturnType<typeof isi>;
+  content: Blok[];
 }> = [
   {
     slug: "operasi-ship-to-ship-di-titik-tanpa-jetty",
     title: "Operasi ship-to-ship di titik yang tidak punya jetty",
-    category: "operasi",
+    categorySlug: "operasi",
     excerpt:
       "Memindahkan bahan bakar langsung antar kapal di tengah perairan, dari muat di terminal sampai dokumen serah selesai.",
     publishedAt: "2026-08-20T00:00:00.000Z",
@@ -113,32 +132,32 @@ const ARTIKEL: Array<{
     },
     // Fakta: src/features/home/day-cut.tsx dan STS_STEPS di
     // src/app/(site)/bisnis/transportasi-bbm/page.tsx, keduanya bersumber PDF.
-    content: isi([
-      paragraf(
+    content: [
+      blokParagraf(
         "Tidak semua titik serah punya jetty. Sebagian pelabuhan kecil dan titik distribusi di perairan Indonesia tidak bisa disandari kapal pengangkut berukuran besar, dan menunggu antrean sandar di pelabuhan yang lebih besar berarti pasokan sampai terlambat.",
       ),
-      paragraf(
+      blokParagraf(
         "Ship-to-ship transfer menjawab keduanya. Bahan bakar dipindahkan langsung antar kapal di tengah perairan, sehingga titik yang tidak terjangkau jetty konvensional tetap terlayani tanpa bergantung pada giliran sandar.",
       ),
-      judul("Empat langkah, dari terminal sampai serah"),
-      paragraf(
+      blokJudul("Empat langkah, dari terminal sampai serah"),
+      blokParagraf(
         "Motor tanker atau SPOB memuat bahan bakar cair di terminal, dengan dokumen muatan dan pemeriksaan yang mengikuti prosedur ISM Code.",
       ),
-      paragraf(
+      blokParagraf(
         "Kapal lalu berlayar ke titik serah, termasuk titik yang tidak terjangkau jetty. Di sinilah armada berukuran berbeda punya gunanya masing-masing.",
       ),
-      paragraf(
+      blokParagraf(
         "Di titik serah, dua kapal disandarkan dengan fender dan tali tambat, lalu diikat dalam posisi yang menahan gerak relatif keduanya sepanjang transfer.",
       ),
-      paragraf(
+      blokParagraf(
         "Selang transfer dipasang, muatan dipindahkan, dan dokumen serah diselesaikan sebelum kedua kapal dilepas.",
       ),
-    ]),
+    ],
   },
   {
     slug: "ism-code-dan-iso-9001-di-operasi-harian",
     title: "ISM Code dan ISO 9001:2015 di operasi harian",
-    category: "keselamatan",
+    categorySlug: "keselamatan",
     excerpt:
       "Dua standar yang mengatur cara kerja armada, dan apa artinya bagi pihak yang menyerahkan muatannya kepada kami.",
     publishedAt: "2026-08-18T00:00:00.000Z",
@@ -147,27 +166,27 @@ const ARTIKEL: Array<{
       alt: "Armada kapal PT Dutabahari Menara Line di perairan",
     },
     // Fakta: src/content/certifications.ts dan COMPANY.standards, keduanya cp-pdf.
-    content: isi([
-      paragraf(
+    content: [
+      blokParagraf(
         "Pengangkutan bahan bakar cair adalah pekerjaan yang kesalahannya mahal, dan mahalnya tidak selalu berupa uang. Karena itu cara kerjanya diatur standar, bukan diserahkan pada kebiasaan tiap kapal.",
       ),
-      judul("ISM Code"),
-      paragraf(
+      blokJudul("ISM Code"),
+      blokParagraf(
         "International Safety Management Code mengatur sistem manajemen keselamatan di atas kapal: siapa bertanggung jawab atas apa, bagaimana prosedur ditulis dan diperbarui, dan bagaimana kejadian dilaporkan serta ditindaklanjuti. Ia bukan sertifikat yang digantung lalu dilupakan, melainkan sistem yang harus terlihat jejaknya di operasi harian.",
       ),
-      judul("ISO 9001:2015"),
-      paragraf(
+      blokJudul("ISO 9001:2015"),
+      blokParagraf(
         "ISO 9001:2015 mengatur sistem manajemen mutu. Di konteks pelayaran, ia menyentuh hal yang sering luput dari perhatian: konsistensi dokumen, ketertelusuran keputusan, dan cara keluhan pelanggan diproses sampai tuntas.",
       ),
-      paragraf(
+      blokParagraf(
         "Keduanya bertemu di titik yang sama, yaitu prosedur yang sama dijalankan cara yang sama, siapa pun yang bertugas.",
       ),
-    ]),
+    ],
   },
   {
     slug: "berdiri-1988-di-banjarmasin",
     title: "Berdiri 1988 di Banjarmasin",
-    category: "perusahaan",
+    categorySlug: "perusahaan",
     excerpt:
       "PT Dutabahari Menara Line didirikan Herman Chandra di Banjarmasin pada 30 November 1988.",
     publishedAt: "2026-08-15T00:00:00.000Z",
@@ -176,17 +195,17 @@ const ARTIKEL: Array<{
       alt: "Kapal PT Dutabahari Menara Line dilihat dari udara",
     },
     // Fakta: src/content/timeline.ts dan src/content/company.ts, cp-pdf hal. 01 dan 02.
-    content: isi([
-      paragraf(
+    content: [
+      blokParagraf(
         "PT Dutabahari Menara Line didirikan Herman Chandra di Banjarmasin pada 30 November 1988. Kota itu sampai hari ini tetap jadi kantor pusatnya.",
       ),
-      paragraf(
+      blokParagraf(
         "Perusahaan ini bagian dari Sinar Alam Corporation, dan menjalankan dua lini yang dioperasikannya sendiri: transportasi bahan bakar cair, serta penyeberangan penumpang dan kendaraan dengan kapal ro-ro.",
       ),
-      paragraf(
+      blokParagraf(
         "Di luar dua lini itu, sejumlah perusahaan afiliasi menangani pekerjaan yang bersinggungan, termasuk perawatan armada dan pengoperasian lintasan penyeberangan tertentu.",
       ),
-    ]),
+    ],
   },
 ];
 
@@ -214,6 +233,176 @@ async function main() {
     }));
   console.log(`admin: ${admin.id}`);
 
+  const categoryIdBySlug: Record<string, number> = {};
+  for (const kategori of KATEGORI) {
+    const ada = await payload.find({
+      collection: "categories",
+      where: { slug: { equals: kategori.slug } },
+      limit: 1,
+    });
+    const doc =
+      ada.docs[0] ??
+      (await payload.create({ collection: "categories", data: kategori }));
+    categoryIdBySlug[kategori.slug] = doc.id;
+    console.log(ada.docs[0] ? `kategori (sudah ada): ${kategori.slug}` : `kategori dibuat: ${kategori.slug}`);
+  }
+
+  // findGlobal pada global yang belum pernah disimpan mengembalikan nilai
+  // default field tanpa createdAt/updatedAt terisi. Itu dipakai sebagai
+  // penanda "belum ada baris sungguhan", supaya seed tidak menimpa
+  // articles-page yang sudah disunting redaksi lewat /admin.
+  const articlesPage = await payload.findGlobal({ slug: "articles-page" });
+  if (!articlesPage.createdAt) {
+    await payload.updateGlobal({
+      slug: "articles-page",
+      data: {
+        heading: "Artikel",
+        intro: "Kabar operasi, armada, dan keselamatan dari lapangan.",
+        pageSize: 6,
+        shareChannels: ["whatsapp", "linkedin", "x", "email", "copy"],
+      },
+    });
+    console.log("articles-page: dibuat");
+  } else {
+    console.log("articles-page: sudah ada");
+  }
+
+  const companyProfile = await payload.findGlobal({ slug: "company-profile" });
+  if (!companyProfile.createdAt) {
+    await payload.updateGlobal({ slug: "company-profile", data: COMPANY_PROFILE_SEED });
+    console.log("company-profile: dibuat");
+  } else {
+    console.log("company-profile: sudah ada");
+  }
+
+  const siteNavigation = await payload.findGlobal({ slug: "site-navigation" });
+  if (!siteNavigation.createdAt) {
+    await payload.updateGlobal({ slug: "site-navigation", data: SITE_NAVIGATION_SEED });
+    console.log("site-navigation: dibuat");
+  } else {
+    console.log("site-navigation: sudah ada");
+  }
+
+  for (const client of CLIENTS_SEED) {
+    const ada = await payload.find({
+      collection: "clients",
+      where: { name: { equals: client.name } },
+      limit: 1,
+    });
+    if (ada.docs.length > 0) {
+      console.log(`klien (sudah ada): ${client.name}`);
+      continue;
+    }
+    const logo = client.logoFile
+      ? await payload.create({
+          collection: "media",
+          data: { alt: `Logo ${client.name}` },
+          filePath: `public/assets/clients/${client.logoFile}`,
+        })
+      : null;
+    await payload.create({
+      collection: "clients",
+      data: {
+        name: client.name,
+        sector: client.sector,
+        logo: logo?.id,
+        source: client.source,
+        order: client.order,
+      },
+    });
+    console.log(`klien dibuat: ${client.name}`);
+  }
+
+  for (const cert of CERTIFICATIONS_SEED) {
+    const ada = await payload.find({
+      collection: "certifications",
+      where: { name: { equals: cert.name } },
+      limit: 1,
+    });
+    if (ada.docs.length > 0) {
+      console.log(`sertifikasi (sudah ada): ${cert.name}`);
+      continue;
+    }
+    const badge = await payload.create({
+      collection: "media",
+      data: { alt: cert.alt },
+      filePath: `public/assets/cert/${cert.badgeFile}`,
+    });
+    await payload.create({
+      collection: "certifications",
+      data: {
+        name: cert.name,
+        badge: badge.id,
+        alt: cert.alt,
+        source: cert.source,
+        order: cert.order,
+      },
+    });
+    console.log(`sertifikasi dibuat: ${cert.name}`);
+  }
+
+  for (const line of BUSINESS_LINES_SEED) {
+    const ada = await payload.find({
+      collection: "business-lines",
+      where: { slug: { equals: line.slug } },
+      limit: 1,
+    });
+    if (ada.docs.length > 0) {
+      console.log(`lini bisnis (sudah ada): ${line.slug}`);
+      continue;
+    }
+    await payload.create({
+      collection: "business-lines",
+      data: { ...line, metric: line.metric ?? undefined },
+    });
+    console.log(`lini bisnis dibuat: ${line.slug}`);
+  }
+
+  for (const fleetClass of FLEET_CLASSES_SEED) {
+    const ada = await payload.find({
+      collection: "fleet-classes",
+      where: { slug: { equals: fleetClass.slug } },
+      limit: 1,
+    });
+    if (ada.docs.length > 0) {
+      console.log(`kelas armada (sudah ada): ${fleetClass.slug}`);
+      continue;
+    }
+    await payload.create({
+      collection: "fleet-classes",
+      data: {
+        ...fleetClass,
+        dwt: fleetClass.dwt ?? undefined,
+        passengerCapacity: fleetClass.passengerCapacity ?? undefined,
+      },
+    });
+    console.log(`kelas armada dibuat: ${fleetClass.slug}`);
+  }
+
+  for (const doc of LEGAL_DOCUMENTS_SEED) {
+    const ada = await payload.find({
+      collection: "legal-documents",
+      where: { document: { equals: doc.document } },
+      limit: 1,
+    });
+    if (ada.docs.length > 0) {
+      console.log(`dokumen legal (sudah ada): ${doc.document}`);
+      continue;
+    }
+    await payload.create({ collection: "legal-documents", data: doc });
+    console.log(`dokumen legal dibuat: ${doc.document}`);
+  }
+
+  const adaVessel = await payload.find({ collection: "vessels", limit: 1 });
+  if (adaVessel.docs.length > 0) {
+    console.log(`kapal (sudah ada): ${adaVessel.totalDocs} baris`);
+  } else {
+    for (const vessel of VESSELS_SEED) {
+      await payload.create({ collection: "vessels", data: vessel });
+    }
+    console.log(`kapal dibuat: ${VESSELS_SEED.length} baris`);
+  }
+
   for (const artikel of ARTIKEL) {
     const ada = await payload.find({
       collection: "posts",
@@ -223,6 +412,11 @@ async function main() {
     if (ada.docs.length > 0) {
       console.log(`lewati (sudah ada): ${artikel.slug}`);
       continue;
+    }
+
+    const categoryId = categoryIdBySlug[artikel.categorySlug];
+    if (!categoryId) {
+      throw new Error(`Kategori "${artikel.categorySlug}" belum dibuat, cek daftar KATEGORI.`);
     }
 
     const media = await payload.create({
@@ -237,7 +431,7 @@ async function main() {
         title: artikel.title,
         slug: slugify(artikel.slug),
         excerpt: artikel.excerpt,
-        category: artikel.category,
+        category: categoryId,
         publishedAt: artikel.publishedAt,
         coverImage: media.id,
         author: admin.id,

@@ -3,7 +3,7 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import { OgCard, OG_SIZE, OG_CONTENT_TYPE, loadOgFont, toOgSafeImageDataUri } from "@/lib/seo/og-template";
 import { findPublishedPost } from "@/features/articles/queries";
-import { resolveMedia, CATEGORY_LABELS } from "@/features/articles/article-list";
+import { resolveMedia, resolveCategory } from "@/features/articles/article-list";
 import { MEDIA_STATIC_DIR } from "@/payload/collections/Media";
 
 export const size = OG_SIZE;
@@ -41,7 +41,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   return new ImageResponse(
     (
       <OgCard
-        kicker={post ? (CATEGORY_LABELS[post.category] ?? post.category) : "Artikel"}
+        kicker={post ? (resolveCategory(post.category)?.name ?? "Artikel") : "Artikel"}
         title={post?.title ?? "Artikel"}
         {...(imageUrl ? { imageUrl } : {})}
       />

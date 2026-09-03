@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FLEET_MODEL_BY_SLUG, MODEL_CREDITS } from "./model-credits";
-import { FLEET_CLASSES } from "./fleet";
+import { FLEET_CLASSES_SEED as FLEET_CLASSES } from "@/lib/cms/fleet-classes-seed";
 
 describe("MODEL_CREDITS", () => {
   // Seluruh model berlisensi CC Attribution, bukan CC0. Kredit yang hilang
