@@ -4,6 +4,7 @@ import { getCompanyProfile } from "@/lib/cms/company";
 import { getBusinessLines } from "@/lib/cms/business-lines";
 import { getVessels } from "@/lib/cms/vessels";
 import { getFleetClasses } from "@/lib/cms/fleet-classes";
+import { getBusinessSubpages } from "@/lib/cms/business-subpages";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString, serviceJsonLd } from "@/lib/seo/json-ld";
@@ -20,12 +21,14 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function PenumpangRoroPage() {
-  const [COMPANY, { mainLines }, vessels, fleetClasses] = await Promise.all([
+  const [COMPANY, { mainLines }, vessels, fleetClasses, sub] = await Promise.all([
     getCompanyProfile(),
     getBusinessLines(),
     getVessels(),
     getFleetClasses(),
+    getBusinessSubpages(),
   ]);
+  const roro = sub.roro;
   const RORO_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Penumpang Ro-Ro");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
@@ -43,9 +46,9 @@ export default async function PenumpangRoroPage() {
   return (
     <div>
       <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-        <p className="font-mono text-xs text-ink-muted">Lini utama</p>
+        <p className="font-mono text-xs text-ink-muted">{roro.eyebrow}</p>
         <h1 className="mt-4 font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">
-          Penyeberangan Ro-Ro
+          {roro.title}
         </h1>
         <p className="mt-6 max-w-[60ch] text-ink-muted">{line?.summary}</p>
         {hero ? (
@@ -62,32 +65,26 @@ export default async function PenumpangRoroPage() {
 
       <section aria-labelledby="lintasan" className="bg-surface-wash py-20 md:py-28">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader
-            id="lintasan"
-            title="Lintasan"
-            description="Lima lintasan dari company profile halaman 03 dan 04. Kolom operator memisahkan lintasan yang dijalankan sendiri dari lintasan afiliasi."
-          />
+          <SectionHeader id="lintasan" title={roro.lintasanHeading} description={roro.lintasanDesc} />
           <RouteTable dmlLegalName={COMPANY.legalName} vessels={vessels} />
         </div>
       </section>
 
       <section aria-labelledby="armada-roro" className="bg-surface-2-wash py-20 md:py-28">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader
-            id="armada-roro"
-            title="Armada Jambo"
-            description="Sembilan kapal ro-ro. Panjang dan kapasitas penumpang di bawah berlaku untuk kelas, bukan diukur per kapal."
-          />
+          <SectionHeader id="armada-roro" title={roro.armadaHeading} description={roro.armadaDesc} />
           <VesselRoster fleetClasses={RORO_CLASSES} vessels={vessels} />
           <dl className="mt-12 grid gap-8 sm:grid-cols-3">
             {RORO_CLASSES.map((fleetClass) => (
               <div key={fleetClass.slug}>
-                <dt className="text-sm text-ink-muted">Panjang kelas</dt>
+                <dt className="text-sm text-ink-muted">{roro.lengthLabel}</dt>
                 <dd className="mt-1 font-display text-3xl font-bold text-ink">
                   {fleetClass.lengthMeters}
-                  <span className="ml-2 font-sans text-sm font-normal text-ink-muted">meter</span>
+                  <span className="ml-2 font-sans text-sm font-normal text-ink-muted">
+                    {roro.lengthUnit}
+                  </span>
                 </dd>
-                <dt className="mt-6 text-sm text-ink-muted">Kapasitas</dt>
+                <dt className="mt-6 text-sm text-ink-muted">{roro.capacityLabel}</dt>
                 <dd className="mt-1 font-display text-3xl font-bold text-ink">
                   {fleetClass.capacityLabel}
                 </dd>
@@ -99,14 +96,10 @@ export default async function PenumpangRoroPage() {
 
       <section aria-labelledby="tiket" className="bg-surface-wash py-20 md:py-28">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader
-            id="tiket"
-            title="Pesan tiket"
-            description={`Pemesanan tiket ro-ro dilayani lewat BookJambo, kanal resmi ${COMPANY.abbreviation}.`}
-          />
+          <SectionHeader id="tiket" title={roro.tiketHeading} description={roro.tiketDesc} />
           <ExternalLink
             href="https://dutabahari.id"
-            label="Buka BookJambo"
+            label={roro.tiketButtonLabel}
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
           />
         </div>

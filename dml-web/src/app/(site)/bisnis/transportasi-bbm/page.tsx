@@ -4,6 +4,7 @@ import { getCompanyProfile } from "@/lib/cms/company";
 import { getBusinessLines } from "@/lib/cms/business-lines";
 import { getVessels } from "@/lib/cms/vessels";
 import { getFleetClasses } from "@/lib/cms/fleet-classes";
+import { getBusinessSubpages } from "@/lib/cms/business-subpages";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString, serviceJsonLd } from "@/lib/seo/json-ld";
@@ -20,38 +21,16 @@ export const metadata: Metadata = buildMetadata({
   path: "/bisnis/transportasi-bbm",
 });
 
-/**
- * Empat langkah, bukan angka bulat yang dikarang. Urutannya mengikuti apa yang
- * benar-benar terbaca dari foto operasi di assets/_raw dan penjelasan lini BBM
- * di company profile halaman 03. Tidak ada durasi, jarak, atau volume per
- * langkah, karena tidak satu pun angka itu ada di sumber mana pun.
- */
-const STS_STEPS = [
-  {
-    title: "Muat di terminal",
-    body: "Motor tanker atau SPOB memuat bahan bakar cair di terminal, dengan dokumen muatan dan pemeriksaan yang mengikuti prosedur ISM Code.",
-  },
-  {
-    title: "Berlayar ke titik serah",
-    body: "Kapal menuju titik serah, termasuk titik yang tidak terjangkau jetty konvensional. Di sinilah armada berukuran berbeda punya gunanya masing-masing.",
-  },
-  {
-    title: "Sandar kapal ke kapal",
-    body: "Dua kapal disandarkan dengan fender dan tali tambat, lalu diikat dalam posisi yang menahan gerak relatif keduanya sepanjang transfer.",
-  },
-  {
-    title: "Transfer dan serah",
-    body: "Selang transfer dipasang, muatan dipindahkan, lalu dokumen serah diselesaikan sebelum kedua kapal dilepas.",
-  },
-];
-
 export default async function TransportasiBbmPage() {
-  const [COMPANY, { mainLines }, vessels, fleetClasses] = await Promise.all([
+  const [COMPANY, { mainLines }, vessels, fleetClasses, sub] = await Promise.all([
     getCompanyProfile(),
     getBusinessLines(),
     getVessels(),
     getFleetClasses(),
+    getBusinessSubpages(),
   ]);
+  const bbm = sub.bbm;
+  const STS_STEPS = bbm.steps;
   const BBM_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Transportasi BBM");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
@@ -74,9 +53,9 @@ export default async function TransportasiBbmPage() {
         angka, jadi bidang foto tidak boleh mendorong tabel keluar lipatan.
       */}
       <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-        <p className="font-mono text-xs text-ink-muted">Lini utama</p>
+        <p className="font-mono text-xs text-ink-muted">{bbm.eyebrow}</p>
         <h1 className="mt-4 font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">
-          Transportasi BBM
+          {bbm.title}
         </h1>
         <p className="mt-6 max-w-[60ch] text-ink-muted">{line?.summary}</p>
         {hero ? (
@@ -95,14 +74,11 @@ export default async function TransportasiBbmPage() {
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
           <SectionHeader
             id="spesifikasi"
-            title="Kelas armada"
-            description="Empat kelas kapal pengangkut BBM. Panjang, lebar, dan DWT di bawah masih estimasi proporsional, bukan angka dari company profile."
+            title={bbm.kelasArmadaHeading}
+            description={bbm.kelasArmadaDesc}
           />
           <FleetSpecTable fleetClasses={BBM_CLASSES} />
-          <p className="mt-4 font-mono text-xs text-ink-muted">
-            Sumber jumlah kapal: company profile PT Dutabahari Menara Line halaman 04.
-            Dimensi dan DWT belum terverifikasi.
-          </p>
+          <p className="mt-4 font-mono text-xs text-ink-muted">{bbm.sumberNote}</p>
           <div className="mt-12">
             <BlueprintSvg fleetClasses={BBM_CLASSES} />
           </div>
@@ -113,8 +89,8 @@ export default async function TransportasiBbmPage() {
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
           <SectionHeader
             id="roster"
-            title="Daftar kapal"
-            description="Lima puluh tujuh kapal pengangkut BBM, dikelompokkan per kelas, disalin dari daftar armada company profile halaman 04."
+            title={bbm.daftarKapalHeading}
+            description={bbm.daftarKapalDesc}
           />
           <VesselRoster fleetClasses={BBM_CLASSES} vessels={vessels} />
         </div>
@@ -122,11 +98,7 @@ export default async function TransportasiBbmPage() {
 
       <section aria-labelledby="alur-sts" className="bg-surface-wash py-20 md:py-28">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader
-            id="alur-sts"
-            title="Alur ship-to-ship"
-            description="Cara kerja di dalam lini transportasi BBM, bukan lini terpisah. Empat langkah dari muat sampai serah."
-          />
+          <SectionHeader id="alur-sts" title={bbm.alurHeading} description={bbm.alurDesc} />
           <ol className="mt-10 grid gap-8 md:grid-cols-2">
             {STS_STEPS.map((step, index) => (
               <li key={step.title} className="rounded-card border border-surface-3 bg-surface-2 p-6">
@@ -158,7 +130,7 @@ export default async function TransportasiBbmPage() {
 
       <section aria-labelledby="standar" className="bg-surface-2-wash py-20 md:py-28">
         <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader id="standar" title="Standar dan klasifikasi" />
+          <SectionHeader id="standar" title={bbm.standarHeading} />
           <div className="mt-10 grid gap-8 sm:grid-cols-3">
             {COMPANY.standards.map((cluster) => (
               <div key={cluster.label}>
@@ -178,7 +150,7 @@ export default async function TransportasiBbmPage() {
           </div>
           <div className="mt-12">
             <CtaLink href="/bisnis/transportasi-bbm/permintaan-informasi?layanan=transportasi-bbm">
-              Ajukan permintaan informasi
+              {bbm.ctaLabel}
             </CtaLink>
           </div>
         </div>

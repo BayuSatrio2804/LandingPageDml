@@ -12,6 +12,7 @@ import { HOME_HERO_DEFAULTS } from "../src/features/home/hero-defaults";
 import { HOME_SECTIONS_DEFAULTS } from "../src/features/home/home-sections-defaults";
 import { ABOUT_PAGE_DEFAULTS } from "../src/features/about/about-defaults";
 import { BISNIS_PAGE_DEFAULTS } from "../src/features/bisnis/bisnis-defaults";
+import { BISNIS_SUBPAGES_DEFAULTS } from "../src/features/bisnis/subpages-defaults";
 
 /**
  * `bun run seed` (lihat package.json) menjalankan berkas ini lewat `bun
@@ -317,6 +318,14 @@ async function main() {
     console.log("business-page: dibuat");
   } else {
     console.log("business-page: sudah ada");
+  }
+
+  const businessSubpages = await payload.findGlobal({ slug: "business-subpages" });
+  if (!businessSubpages.createdAt) {
+    await payload.updateGlobal({ slug: "business-subpages", data: BISNIS_SUBPAGES_DEFAULTS });
+    console.log("business-subpages: dibuat");
+  } else {
+    console.log("business-subpages: sudah ada");
   }
 
   for (const client of CLIENTS_SEED) {
