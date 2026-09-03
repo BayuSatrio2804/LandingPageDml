@@ -115,6 +115,9 @@ export const Posts: CollectionConfig = {
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "category", "publishedAt", "_status"],
+    group: "Artikel",
+    description:
+      'Artikel di halaman /artikel dan blok "Artikel terbaru" di Beranda. Status Published wajib supaya tampil.',
   },
   /**
    * drafts:true, bukan field bernama _status. Payload membangkitkan kolom

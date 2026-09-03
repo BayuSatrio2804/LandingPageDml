@@ -9,7 +9,8 @@ import { revalidateAllGlobalHooks } from "../revalidate-all";
 export const ArticlesPage: GlobalConfig = {
   slug: "articles-page",
   admin: {
-    group: "Halaman",
+    group: "Artikel",
+    description: "Heading dan intro di kepala halaman /artikel, plus daftar kanal share.",
   },
   hooks: revalidateAllGlobalHooks,
   fields: [

@@ -16,7 +16,9 @@ export const BusinessLines: CollectionConfig = {
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "kind", "number", "order"],
-    group: "Perusahaan",
+    group: "Bisnis",
+    description:
+      'Lini bisnis utama dan afiliasi. Tampil di Beranda dan halaman /bisnis, plus dipakai /bisnis/transportasi-bbm & /bisnis/penumpang-roro. Field "kind" memisahkan Lini utama vs Afiliasi.',
   },
   access: {
     read: () => true,

@@ -14,7 +14,8 @@ export const Certifications: CollectionConfig = {
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "source", "order"],
-    group: "Perusahaan",
+    group: "Profil Perusahaan",
+    description: "Badge sertifikasi (ISO 9001, ISM Code, HSSE) di blok sertifikasi Beranda.",
   },
   access: {
     read: () => true,

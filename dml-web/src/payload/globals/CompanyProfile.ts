@@ -19,7 +19,9 @@ import { revalidateAllGlobalHooks } from "../revalidate-all";
 export const CompanyProfile: GlobalConfig = {
   slug: "company-profile",
   admin: {
-    group: "Perusahaan",
+    group: "Profil Perusahaan",
+    description:
+      "Data inti perusahaan: nama, alamat, kantor, nilai, standar, ringkasan armada, struktur grup. Dipakai hampir semua halaman — Beranda, /tentang-kami, /bisnis/*, /kontak, /karier, dan footer.",
   },
   hooks: revalidateAllGlobalHooks,
   fields: [

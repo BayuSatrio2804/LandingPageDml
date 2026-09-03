@@ -20,7 +20,9 @@ export const Vessels: CollectionConfig = {
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "classSlug", "routeId"],
-    group: "Perusahaan",
+    group: "Armada",
+    description:
+      "Daftar kapal per kelas. Tidak tampil satu per satu di situs, tapi jumlahnya per kelas muncul di Beranda dan halaman /bisnis/*. classSlug harus cocok dengan slug di Fleet Classes.",
   },
   access: {
     read: () => true,

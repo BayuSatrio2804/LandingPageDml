@@ -19,7 +19,8 @@ export const LegalDocuments: CollectionConfig = {
   admin: {
     useAsTitle: "document",
     defaultColumns: ["order", "document", "number", "source"],
-    group: "Perusahaan",
+    group: "Profil Perusahaan",
+    description: "Tabel dokumen legal dan perizinan di halaman /tentang-kami.",
   },
   defaultSort: "order",
   access: {

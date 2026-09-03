@@ -25,6 +25,11 @@ export const MEDIA_STATIC_DIR =
 
 export const Media: CollectionConfig = {
   slug: "media",
+  admin: {
+    group: "Situs",
+    description:
+      "Semua gambar yang diunggah lewat admin (cover artikel, logo klien, badge sertifikasi). Disimpan di Vercel Blob, bukan di repo.",
+  },
   access: { read: () => true },
   upload: {
     staticDir: MEDIA_STATIC_DIR,
