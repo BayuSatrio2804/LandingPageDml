@@ -37,19 +37,19 @@ const nextConfig: NextConfig = {
     "**/*": ["./node_modules/jose/**"],
   },
   /**
-   * Saat penyimpanan media dialihkan ke Cloudflare R2 (lihat R2_BUCKET di
-   * payload.config.ts), `media.url` jadi URL absolut ke domain publik R2.
-   * next/image menolak host eksternal yang tidak terdaftar di sini.
-   * Tanpa R2, media dilayani same-origin dari /media atau /api, jadi blok
-   * ini tidak diperlukan.
+   * Saat penyimpanan media dialihkan ke Vercel Blob (lihat
+   * BLOB_READ_WRITE_TOKEN di payload.config.ts), `media.url` jadi URL
+   * absolut ke `<store>.public.blob.vercel-storage.com`. next/image menolak
+   * host eksternal yang tidak terdaftar di sini. Tanpa Blob, media dilayani
+   * same-origin dari /media atau /api, jadi blok ini tidak diperlukan.
    */
-  ...(process.env.R2_PUBLIC_URL
+  ...(process.env.BLOB_READ_WRITE_TOKEN
     ? {
         images: {
           remotePatterns: [
             {
               protocol: "https" as const,
-              hostname: new URL(process.env.R2_PUBLIC_URL).hostname,
+              hostname: "*.public.blob.vercel-storage.com",
             },
           ],
         },
