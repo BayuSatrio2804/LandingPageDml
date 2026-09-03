@@ -2,14 +2,18 @@
 
 import Image from "next/image";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
-import { IDENTITY_BLOCKS } from "@/content/about";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { revealBatch } from "@/lib/motion/reveal-batch";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 const PORTRAIT = MEDIA["lini-bisnis"].find((asset) => asset.id === "operasi-sts")!;
 
-export function IdentitySection() {
+export function IdentitySection({
+  blocks = ABOUT_PAGE_DEFAULTS.identity,
+}: {
+  blocks?: AboutPageData["identity"];
+}) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);
     revealBatch(scope);
@@ -77,9 +81,9 @@ export function IdentitySection() {
             Jati diri perusahaan
           </h2>
           <div className="flex flex-col gap-13">
-            {IDENTITY_BLOCKS.map((block) => (
+            {blocks.map((block) => (
               <div
-                key={block.id}
+                key={block.title}
                 data-reveal=""
                 data-reveal-group="identity"
                 className="grid grid-cols-[150px_1fr] items-start gap-7 max-md:grid-cols-1 max-md:gap-3.5"
@@ -93,7 +97,7 @@ export function IdentitySection() {
                       {block.lead}
                     </p>
                   ) : null}
-                  {block.items ? (
+                  {block.items.length > 0 ? (
                     <ol className="m-0 flex flex-col gap-3.5 pl-5.5">
                       {block.items.map((item) => (
                         <li key={item} className="max-w-[50ch] text-base leading-[1.8] text-ink text-pretty">

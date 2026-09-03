@@ -108,6 +108,7 @@ export interface Config {
   globals: {
     'home-hero': HomeHero;
     'home-sections': HomeSection;
+    'about-page': AboutPage;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
@@ -115,6 +116,7 @@ export interface Config {
   globalsSelect: {
     'home-hero': HomeHeroSelect<false> | HomeHeroSelect<true>;
     'home-sections': HomeSectionsSelect<false> | HomeSectionsSelect<true>;
+    'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -999,6 +1001,92 @@ export interface HomeSection {
   createdAt?: string | null;
 }
 /**
+ * Semua teks di halaman Tentang Kami: hero, label angka, blok jati diri, nilai inti, struktur grup, legalitas, kantor, dan ajakan penutup.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page".
+ */
+export interface AboutPage {
+  id: number;
+  hero: {
+    title: string;
+    intro1: string;
+    intro2: string;
+  };
+  /**
+   * Kalimat kecil di bawah tiap angka. Angkanya dihitung otomatis.
+   */
+  statLabels: {
+    years: string;
+    ships: string;
+    people: string;
+    sectors: string;
+  };
+  /**
+   * Bagian di seksi Jati Diri. Isi lead ATAU items, note opsional.
+   */
+  identity?:
+    | {
+        title: string;
+        /**
+         * Paragraf pembuka. Kosongkan kalau memakai items.
+         */
+        lead?: string | null;
+        /**
+         * Daftar butir. Kosongkan kalau memakai lead.
+         */
+        items?: string[] | null;
+        /**
+         * Catatan kaki kecil, opsional.
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  coreValues: {
+    heading: string;
+    intro: string;
+    /**
+     * Teks kecil di bawah medali "DML".
+     */
+    medallionCaption: string;
+  };
+  groupChart: {
+    heading: string;
+    intro: string;
+    /**
+     * Nama simpul induk di bagan.
+     */
+    parentName: string;
+    parentCaption: string;
+  };
+  legal: {
+    heading: string;
+    standardsLabel: string;
+    membershipsLabel: string;
+    footnote: string;
+  };
+  offices: {
+    heading: string;
+    intro: string;
+    dmlOwnerLabel: string;
+    groupOwnerLabel: string;
+  };
+  cta: {
+    heading: string;
+    /**
+     * Tombol ke /bisnis.
+     */
+    primaryButtonLabel: string;
+    /**
+     * Tombol ke /kontak.
+     */
+    secondaryButtonLabel: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1230,6 +1318,77 @@ export interface HomeSectionsSelect<T extends boolean = true> {
     | {
         heading?: T;
         buttonLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        title?: T;
+        intro1?: T;
+        intro2?: T;
+      };
+  statLabels?:
+    | T
+    | {
+        years?: T;
+        ships?: T;
+        people?: T;
+        sectors?: T;
+      };
+  identity?:
+    | T
+    | {
+        title?: T;
+        lead?: T;
+        items?: T;
+        note?: T;
+        id?: T;
+      };
+  coreValues?:
+    | T
+    | {
+        heading?: T;
+        intro?: T;
+        medallionCaption?: T;
+      };
+  groupChart?:
+    | T
+    | {
+        heading?: T;
+        intro?: T;
+        parentName?: T;
+        parentCaption?: T;
+      };
+  legal?:
+    | T
+    | {
+        heading?: T;
+        standardsLabel?: T;
+        membershipsLabel?: T;
+        footnote?: T;
+      };
+  offices?:
+    | T
+    | {
+        heading?: T;
+        intro?: T;
+        dmlOwnerLabel?: T;
+        groupOwnerLabel?: T;
+      };
+  cta?:
+    | T
+    | {
+        heading?: T;
+        primaryButtonLabel?: T;
+        secondaryButtonLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;

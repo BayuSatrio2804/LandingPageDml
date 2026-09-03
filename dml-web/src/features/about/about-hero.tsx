@@ -6,12 +6,16 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { revealBatch } from "@/lib/motion/reveal-batch";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 const HERO = MEDIA.hari.find((asset) => asset.id === "dji-0030")!;
 
-const TITLE_WORDS = ["Mengangkut", "Energi", "dan", "Orang", "di", "Perairan", "Indonesia"];
-
-export function AboutHero() {
+export function AboutHero({
+  copy = ABOUT_PAGE_DEFAULTS.hero,
+}: {
+  copy?: AboutPageData["hero"];
+}) {
+  const titleWords = copy.title.split(/\s+/).filter(Boolean);
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);
     revealBatch(scope);
@@ -85,8 +89,8 @@ export function AboutHero() {
           id="about-hero-title"
           className="mt-6.5 mb-0 flex max-w-[17ch] flex-wrap gap-x-[0.26em] font-display text-[clamp(2.25rem,4.4vw,3.9rem)] leading-[1.06] font-bold tracking-[-0.025em] text-on-accent"
         >
-          {TITLE_WORDS.map((word) => (
-            <span key={word} className="block overflow-hidden pb-[0.1em]">
+          {titleWords.map((word, i) => (
+            <span key={`${word}-${i}`} className="block overflow-hidden pb-[0.1em]">
               <span data-word="" className="block">
                 {word}
               </span>
@@ -96,14 +100,10 @@ export function AboutHero() {
 
         <div className="mt-8.5 flex max-w-[56ch] flex-col gap-5.5">
           <p data-reveal="" className="m-0 text-base leading-[1.78] text-on-accent/80">
-            PT Dutabahari Menara Line adalah perusahaan pelayaran yang bergerak di pengangkutan bahan
-            bakar cair dan penyeberangan penumpang. Didirikan Herman Chandra di Banjarmasin pada 30
-            November 1988, perusahaan kini menjadi bagian dari Sinar Alam Corporation.
+            {copy.intro1}
           </p>
           <p data-reveal="" className="m-0 text-base leading-[1.78] text-on-accent/72">
-            Dengan 64 kapal dan lebih dari 300 awak serta staf, DML mengangkut bahan bakar ke
-            pelabuhan dan pulau-pulau utama Indonesia, sekaligus mengoperasikan lintasan
-            penyeberangan yang menghubungkan Jawa, Bali, Lombok, dan Kalimantan Tengah.
+            {copy.intro2}
           </p>
         </div>
       </div>

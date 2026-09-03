@@ -3,6 +3,7 @@
 import type { Office } from "@/content/types";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { revealBatch } from "@/lib/motion/reveal-batch";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 /**
  * Kantor DML dan kantor grup ditampilkan di satu kisi tetapi DIBEDAKAN lewat
@@ -15,17 +16,19 @@ import { revealBatch } from "@/lib/motion/reveal-batch";
 export function OfficesSection({
   offices: dmlOffices,
   groupOffices,
+  copy = ABOUT_PAGE_DEFAULTS.offices,
 }: {
   offices: Office[];
   groupOffices: Office[];
+  copy?: AboutPageData["offices"];
 }) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     revealBatch(scope);
   });
 
   const offices = [
-    ...dmlOffices.map((office) => ({ ...office, owner: "Kantor DML", isDml: true })),
-    ...groupOffices.map((office) => ({ ...office, owner: "Kantor grup", isDml: false })),
+    ...dmlOffices.map((office) => ({ ...office, owner: copy.dmlOwnerLabel, isDml: true })),
+    ...groupOffices.map((office) => ({ ...office, owner: copy.groupOwnerLabel, isDml: false })),
   ];
 
   return (
@@ -46,11 +49,10 @@ export function OfficesSection({
           data-reveal="clip"
           className="m-0 text-center font-display text-[clamp(1.9rem,3.2vw,2.85rem)] leading-[1.05] font-bold tracking-[-0.02em] text-ink"
         >
-          Kantor
+          {copy.heading}
         </h2>
         <p data-reveal="" className="mx-auto mt-4.5 mb-0 max-w-[54ch] text-center text-base leading-[1.7] text-ink-muted">
-          Dipisah dengan sengaja: kartu bergaris navy adalah kantor DML sendiri, kartu bergaris abu
-          adalah kantor Sinar Alam Corporation.
+          {copy.intro}
         </p>
 
         <div className="mt-13 grid grid-cols-[repeat(auto-fit,minmax(290px,1fr))] gap-6.5">

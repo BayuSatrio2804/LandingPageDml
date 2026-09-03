@@ -4,6 +4,7 @@ import { gsap } from "@/lib/motion/gsap";
 import type { CoreValue } from "@/content/types";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { revealBatch } from "@/lib/motion/reveal-batch";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 /**
  * Susunan radial: dua kartu mengapit medali DML, satu kartu di bawahnya.
@@ -13,7 +14,13 @@ import { revealBatch } from "@/lib/motion/reveal-batch";
 const SIDES = ["kiri", "kanan", "bawah"] as const;
 const HEAD_TONE = ["bg-accent", "bg-line", "bg-accent-lift"] as const;
 
-export function CoreValues({ values }: { values: CoreValue[] }) {
+export function CoreValues({
+  values,
+  copy = ABOUT_PAGE_DEFAULTS.coreValues,
+}: {
+  values: CoreValue[];
+  copy?: AboutPageData["coreValues"];
+}) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     revealBatch(scope);
   });
@@ -60,11 +67,10 @@ export function CoreValues({ values }: { values: CoreValue[] }) {
           data-reveal="clip"
           className="m-0 text-center font-display text-[clamp(1.9rem,3.2vw,2.85rem)] leading-[1.05] font-bold tracking-[-0.02em] text-ink"
         >
-          Nilai Inti
+          {copy.heading}
         </h2>
         <p data-reveal="" className="mx-auto mt-4.5 mb-0 max-w-[52ch] text-center text-base leading-[1.7] text-ink-muted">
-          Nama perusahaan disingkat DML, dan ketiga hurufnya dipakai sebagai ukuran kerja seluruh
-          awak kapal dan staf kantor.
+          {copy.intro}
         </p>
 
         <div className="mt-16 grid grid-cols-[1fr_300px_1fr] items-center gap-9 max-lg:grid-cols-1 max-lg:gap-6">
@@ -79,7 +85,7 @@ export function CoreValues({ values }: { values: CoreValue[] }) {
                   DML
                 </p>
                 <p className="mt-3 mb-0 font-mono text-[10px] tracking-[0.24em] text-surface-3 uppercase">
-                  Nilai inti
+                  {copy.medallionCaption}
                 </p>
               </div>
             </div>

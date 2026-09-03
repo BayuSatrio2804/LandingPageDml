@@ -4,6 +4,7 @@ import { gsap } from "@/lib/motion/gsap";
 import type { GroupUnit } from "@/content/types";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
 import { revealBatch } from "@/lib/motion/reveal-batch";
+import { ABOUT_PAGE_DEFAULTS, type AboutPageData } from "./about-defaults";
 
 const ROW_SIZE = 3;
 const GAP_PX = 28;
@@ -24,9 +25,11 @@ const GAP_PX = 28;
 export function GroupChart({
   groupUnits,
   dmlLegalName,
+  copy = ABOUT_PAGE_DEFAULTS.groupChart,
 }: {
   groupUnits: GroupUnit[];
   dmlLegalName: string;
+  copy?: AboutPageData["groupChart"];
 }) {
   const rows = Array.from({ length: Math.ceil(groupUnits.length / ROW_SIZE) }, (_, i) =>
     groupUnits.slice(i * ROW_SIZE, i * ROW_SIZE + ROW_SIZE),
@@ -112,11 +115,10 @@ export function GroupChart({
           data-reveal="clip"
           className="m-0 text-center font-display text-[clamp(1.9rem,3.2vw,2.85rem)] leading-[1.05] font-bold tracking-[-0.02em] text-ink"
         >
-          Struktur Grup
+          {copy.heading}
         </h2>
         <p data-reveal="" className="mx-auto mt-4.5 mb-0 max-w-[56ch] text-center text-base leading-[1.7] text-ink-muted">
-          DML duduk di sektor transportir. Lima sektor lain dijalankan perusahaan grup yang berbeda
-          dan tidak dioperasikan DML.
+          {copy.intro}
         </p>
 
         <div className="mt-14 flex justify-center">
@@ -124,9 +126,9 @@ export function GroupChart({
             data-node=""
             className="rounded-xl bg-accent px-10 py-5 text-center shadow-[0_22px_44px_-32px_rgb(15_27_46/0.7)]"
           >
-            <p className="m-0 font-display text-lg font-bold text-on-accent">Sinar Alam Corporation</p>
+            <p className="m-0 font-display text-lg font-bold text-on-accent">{copy.parentName}</p>
             <p className="mt-1.75 mb-0 font-mono text-[11px] tracking-[0.16em] text-surface-3 uppercase">
-              Perusahaan induk
+              {copy.parentCaption}
             </p>
           </div>
         </div>
