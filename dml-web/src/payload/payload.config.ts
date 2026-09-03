@@ -21,6 +21,7 @@ import { HomeHero } from "./globals/HomeHero";
 import { HomeSections } from "./globals/HomeSections";
 import { AboutPage } from "./globals/AboutPage";
 import { BusinessPage } from "./globals/BusinessPage";
+import { BusinessSubpages } from "./globals/BusinessSubpages";
 import { CompanyProfile } from "./globals/CompanyProfile";
 import { SiteNavigation } from "./globals/SiteNavigation";
 import { migrations } from "../migrations";
@@ -87,6 +88,7 @@ export default buildConfig({
     HomeSections,
     AboutPage,
     BusinessPage,
+    BusinessSubpages,
     ArticlesPage,
     CompanyProfile,
     SiteNavigation,

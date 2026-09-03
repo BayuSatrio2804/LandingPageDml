@@ -110,6 +110,7 @@ export interface Config {
     'home-sections': HomeSection;
     'about-page': AboutPage;
     'business-page': BusinessPage;
+    'business-subpages': BusinessSubpage;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
@@ -119,6 +120,7 @@ export interface Config {
     'home-sections': HomeSectionsSelect<false> | HomeSectionsSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'business-page': BusinessPageSelect<false> | BusinessPageSelect<true>;
+    'business-subpages': BusinessSubpagesSelect<false> | BusinessSubpagesSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -1184,6 +1186,62 @@ export interface BusinessPage {
   createdAt?: string | null;
 }
 /**
+ * Judul bagian dan paragraf di /bisnis/transportasi-bbm, /bisnis/penumpang-roro, dan halaman form permintaan informasi.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-subpages".
+ */
+export interface BusinessSubpage {
+  id: number;
+  bbm: {
+    eyebrow: string;
+    title: string;
+    kelasArmadaHeading: string;
+    kelasArmadaDesc: string;
+    /**
+     * Catatan kecil di bawah tabel kelas.
+     */
+    sumberNote: string;
+    daftarKapalHeading: string;
+    daftarKapalDesc: string;
+    alurHeading: string;
+    alurDesc: string;
+    steps?:
+      | {
+          title: string;
+          body: string;
+          id?: string | null;
+        }[]
+      | null;
+    standarHeading: string;
+    /**
+     * Teks tombol ke form permintaan informasi.
+     */
+    ctaLabel: string;
+  };
+  roro: {
+    eyebrow: string;
+    title: string;
+    lintasanHeading: string;
+    lintasanDesc: string;
+    armadaHeading: string;
+    armadaDesc: string;
+    lengthLabel: string;
+    lengthUnit: string;
+    capacityLabel: string;
+    tiketHeading: string;
+    tiketDesc: string;
+    tiketButtonLabel: string;
+  };
+  inquiry: {
+    title: string;
+    intro: string;
+    directContactLabel: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1568,6 +1626,60 @@ export interface BusinessPageSelect<T extends boolean = true> {
         secondaryButtonLabel?: T;
       };
   sectionIndexLabels?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-subpages_select".
+ */
+export interface BusinessSubpagesSelect<T extends boolean = true> {
+  bbm?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        kelasArmadaHeading?: T;
+        kelasArmadaDesc?: T;
+        sumberNote?: T;
+        daftarKapalHeading?: T;
+        daftarKapalDesc?: T;
+        alurHeading?: T;
+        alurDesc?: T;
+        steps?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        standarHeading?: T;
+        ctaLabel?: T;
+      };
+  roro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        lintasanHeading?: T;
+        lintasanDesc?: T;
+        armadaHeading?: T;
+        armadaDesc?: T;
+        lengthLabel?: T;
+        lengthUnit?: T;
+        capacityLabel?: T;
+        tiketHeading?: T;
+        tiketDesc?: T;
+        tiketButtonLabel?: T;
+      };
+  inquiry?:
+    | T
+    | {
+        title?: T;
+        intro?: T;
+        directContactLabel?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

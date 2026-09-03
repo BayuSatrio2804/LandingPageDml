@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCompanyProfile } from "@/lib/cms/company";
+import { getBusinessSubpages } from "@/lib/cms/business-subpages";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { BusinessInquiryForm } from "@/features/inquiry/business-inquiry-form";
@@ -34,7 +35,8 @@ export default async function PermintaanInformasiPage({
 }) {
   const params = await searchParams;
   const defaultService = resolveService(params.layanan);
-  const COMPANY = await getCompanyProfile();
+  const [COMPANY, sub] = await Promise.all([getCompanyProfile(), getBusinessSubpages()]);
+  const inquiry = sub.inquiry;
 
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
@@ -49,13 +51,9 @@ export default async function PermintaanInformasiPage({
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
       <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">
-        Permintaan Informasi Bisnis
+        {inquiry.title}
       </h1>
-      <p className="mt-4 max-w-[60ch] text-ink-muted">
-        Isi form di bawah untuk kebutuhan pengangkutan atau kerja sama. Tim kami akan
-        menghubungi lewat WhatsApp. Tiga field terakhir opsional, kirim saja meski
-        volumenya belum pasti.
-      </p>
+      <p className="mt-4 max-w-[60ch] text-ink-muted">{inquiry.intro}</p>
 
       <div className="mt-12 grid gap-12 md:grid-cols-[3fr_2fr]">
         <BusinessInquiryForm
@@ -64,7 +62,7 @@ export default async function PermintaanInformasiPage({
         />
         <aside className="space-y-6 text-sm text-ink-muted">
           <div>
-            <p className="font-display font-bold text-ink">Kontak langsung</p>
+            <p className="font-display font-bold text-ink">{inquiry.directContactLabel}</p>
             <p className="mt-1">{COMPANY.phone}</p>
           </div>
           {COMPANY.offices.map((office) => (
