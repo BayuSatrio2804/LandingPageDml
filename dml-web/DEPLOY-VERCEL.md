@@ -93,6 +93,12 @@ diganti runtime).
 
 ## Catatan
 
+- **Build pakai Webpack, bukan Turbopack** (`vercel.json` → `buildCommand`).
+  Turbopack production build (default Next 16) menghasilkan chunk admin
+  Payload yang rusak: `/admin` layar hitam, console `ReferenceError: R is
+  not defined`. Webpack build normal. Jangan hapus `--webpack` itu.
+
+
 - **Migrasi saat runtime**: `prodMigrations` di `payload.config.ts` juga
   jalan otomatis saat cold start. Karena langkah 3 sudah menerapkannya, itu
   jadi no-op. Untuk migrasi baru nanti, jalankan `bun run migrate` ke Neon
