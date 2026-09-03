@@ -13,6 +13,7 @@ import { getCertifications } from "@/lib/cms/certifications";
 import { getBusinessLines } from "@/lib/cms/business-lines";
 import { getFleetClasses } from "@/lib/cms/fleet-classes";
 import { getHomeHero } from "@/lib/cms/home-hero";
+import { getHomeSections } from "@/lib/cms/home-sections";
 
 /**
  * Urutan seksi juga urutan ritme visual, dan itu disengaja. Hero adalah bidang
@@ -38,26 +39,27 @@ import { getHomeHero } from "@/lib/cms/home-hero";
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [company, certifications, { mainLines, affiliates }, fleetClasses, homeHero] =
+  const [company, certifications, { mainLines, affiliates }, fleetClasses, homeHero, sections] =
     await Promise.all([
       getCompanyProfile(),
       getCertifications(),
       getBusinessLines(),
       getFleetClasses(),
       getHomeHero(),
+      getHomeSections(),
     ]);
   return (
     <>
       <Hero certifications={certifications} hero={homeHero} />
-      <DayCut />
+      <DayCut copy={sections.dayCut} />
       <BusinessLines mainLines={mainLines} />
-      <Affiliates affiliates={affiliates} />
-      <FleetComparator fleetClasses={fleetClasses} />
-      <RouteMap />
-      <Since1988 company={company} />
-      <Certifications company={company} />
+      <Affiliates affiliates={affiliates} copy={sections.affiliates} />
+      <FleetComparator fleetClasses={fleetClasses} copy={sections.fleetComparator} />
+      <RouteMap copy={sections.routeMap} />
+      <Since1988 company={company} copy={sections.since1988} />
+      <Certifications company={company} stats={sections.stats} />
       <LatestArticles />
-      <CtaSection />
+      <CtaSection cta={sections.cta} />
     </>
   );
 }

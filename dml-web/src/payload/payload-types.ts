@@ -107,12 +107,14 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'home-hero': HomeHero;
+    'home-sections': HomeSection;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
   };
   globalsSelect: {
     'home-hero': HomeHeroSelect<false> | HomeHeroSelect<true>;
+    'home-sections': HomeSectionsSelect<false> | HomeSectionsSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -926,6 +928,77 @@ export interface HomeHero {
   createdAt?: string | null;
 }
 /**
+ * Judul dan paragraf tiap bagian Beranda di bawah hero: Ship-to-ship, Afiliasi, Perbandingan Armada, Rute Ro-Ro, Sejak 1988, deret angka, dan ajakan penutup.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-sections".
+ */
+export interface HomeSection {
+  id: number;
+  dayCut: {
+    heading: string;
+    body: string;
+  };
+  affiliates: {
+    heading: string;
+    subtext: string;
+  };
+  fleetComparator: {
+    heading: string;
+    /**
+     * Deskripsi versi 3D (layar lebar).
+     */
+    description: string;
+    /**
+     * Deskripsi versi sederhana (mobile / hemat gerak).
+     */
+    descriptionStatic: string;
+    /**
+     * Mis. "Seret untuk memutar".
+     */
+    dragHint: string;
+    /**
+     * Mis. "1 kotak grid = 10 m".
+     */
+    gridHint: string;
+  };
+  routeMap: {
+    heading: string;
+    description: string;
+  };
+  since1988: {
+    heading: string;
+    /**
+     * Kalimat di bawah angka tahun beroperasi.
+     */
+    counterCaption: string;
+    /**
+     * Kalimat pendirian. Tulis lengkap — tidak otomatis ambil dari Company Profile.
+     */
+    foundingSentence: string;
+    genealogyLinkLabel: string;
+  };
+  /**
+   * Label di bawah tiap angka. Angkanya dihitung otomatis.
+   */
+  stats: {
+    shipsLabel: string;
+    peopleLabel: string;
+    yearsLabel: string;
+    portsLabel: string;
+    membershipsHeading: string;
+  };
+  cta: {
+    heading: string;
+    /**
+     * Teks tombol. Tautannya tetap ke /kontak.
+     */
+    buttonLabel: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1098,6 +1171,65 @@ export interface HomeHeroSelect<T extends boolean = true> {
         description?: T;
         ctaLabel?: T;
         ctaHref?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-sections_select".
+ */
+export interface HomeSectionsSelect<T extends boolean = true> {
+  dayCut?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+      };
+  affiliates?:
+    | T
+    | {
+        heading?: T;
+        subtext?: T;
+      };
+  fleetComparator?:
+    | T
+    | {
+        heading?: T;
+        description?: T;
+        descriptionStatic?: T;
+        dragHint?: T;
+        gridHint?: T;
+      };
+  routeMap?:
+    | T
+    | {
+        heading?: T;
+        description?: T;
+      };
+  since1988?:
+    | T
+    | {
+        heading?: T;
+        counterCaption?: T;
+        foundingSentence?: T;
+        genealogyLinkLabel?: T;
+      };
+  stats?:
+    | T
+    | {
+        shipsLabel?: T;
+        peopleLabel?: T;
+        yearsLabel?: T;
+        portsLabel?: T;
+        membershipsHeading?: T;
+      };
+  cta?:
+    | T
+    | {
+        heading?: T;
+        buttonLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;

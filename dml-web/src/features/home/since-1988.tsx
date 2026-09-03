@@ -8,6 +8,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { useCounter } from "@/lib/motion/use-counter";
 import { yearsOperating } from "@/lib/company/years-operating";
 import { Reveal } from "@/components/motion/reveal";
+import { HOME_SECTIONS_DEFAULTS, type HomeSectionsData } from "./home-sections-defaults";
 
 function YearCounter({ target }: { target: number }) {
   const { ref, value } = useCounter(target);
@@ -31,7 +32,13 @@ function YearCounter({ target }: { target: number }) {
  * itu terbaca sebagai bagian dari cerita, bukan sebagai daftar nilai generik
  * yang bisa ditempel di perusahaan mana pun.
  */
-export function Since1988({ company }: { company: CompanyProfileData }) {
+export function Since1988({
+  company,
+  copy = HOME_SECTIONS_DEFAULTS.since1988,
+}: {
+  company: CompanyProfileData;
+  copy?: HomeSectionsData["since1988"];
+}) {
   const years = yearsOperating(company.foundedIso, new Date());
   const frame = MEDIA["lini-bisnis"].find((asset) => asset.id === "operasi-sts");
 
@@ -40,22 +47,17 @@ export function Since1988({ company }: { company: CompanyProfileData }) {
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-12 md:col-span-6">
-            <SectionHeader title="Sejak 1988" />
+            <SectionHeader title={copy.heading} />
             <div className="mt-12">
               <YearCounter target={years} />
-              <p className="mt-4 max-w-[34ch] text-ink-muted">
-                tahun mengangkut bahan bakar dan orang di perairan Indonesia.
-              </p>
+              <p className="mt-4 max-w-[34ch] text-ink-muted">{copy.counterCaption}</p>
             </div>
-            <p className="mt-10 max-w-[42ch] text-ink">
-              {company.legalName} didirikan {company.founder} di Banjarmasin pada 30 November 1988,
-              dan kini bagian dari {company.parent}.
-            </p>
+            <p className="mt-10 max-w-[42ch] text-ink">{copy.foundingSentence}</p>
             <Link
               href="/tentang-kami#jati-diri"
               className="mt-6 inline-block text-sm font-medium text-accent hover:text-accent-hover"
             >
-              Lihat silsilah lengkap
+              {copy.genealogyLinkLabel}
             </Link>
           </div>
 

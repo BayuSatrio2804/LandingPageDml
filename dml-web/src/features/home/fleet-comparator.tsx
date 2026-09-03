@@ -10,6 +10,9 @@ import type { FleetClass } from "@/content/types";
 import { BlueprintSvg } from "@/features/fleet/blueprint-svg";
 import { FleetSpecTable } from "@/features/fleet/spec-table";
 import { SectionHeader } from "@/components/ui/section-header";
+import { HOME_SECTIONS_DEFAULTS, type HomeSectionsData } from "./home-sections-defaults";
+
+type FleetCopy = HomeSectionsData["fleetComparator"];
 
 const FleetCanvas = dynamic(() => import("./fleet-3d/fleet-canvas").then((mod) => mod.FleetCanvas), {
   ssr: false,
@@ -40,14 +43,17 @@ function SpecBlock({ fleetClasses }: { fleetClasses: FleetClass[] }) {
 }
 
 /** Jalur tanpa 3D: blueprint dua kolom, tidak ada yang dipaku. */
-function StaticFleet({ fleetClasses }: { fleetClasses: FleetClass[] }) {
+function StaticFleet({
+  fleetClasses,
+  copy,
+}: {
+  fleetClasses: FleetClass[];
+  copy: FleetCopy;
+}) {
   return (
     <section className="bg-surface-wash py-20 md:py-28">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <SectionHeader
-          title="Perbandingan Armada"
-          description="Lima kelas kapal, dari SPOB terkecil sampai motor tanker terbesar, dalam satu skala."
-        />
+        <SectionHeader title={copy.heading} description={copy.descriptionStatic} />
         <div className="mt-12">
           <BlueprintSvg fleetClasses={fleetClasses} />
         </div>
@@ -56,7 +62,13 @@ function StaticFleet({ fleetClasses }: { fleetClasses: FleetClass[] }) {
   );
 }
 
-export function FleetComparator({ fleetClasses }: { fleetClasses: FleetClass[] }) {
+export function FleetComparator({
+  fleetClasses,
+  copy = HOME_SECTIONS_DEFAULTS.fleetComparator,
+}: {
+  fleetClasses: FleetClass[];
+  copy?: FleetCopy;
+}) {
   const [stageNode, attachStage, stageRef] = useElementHandle<HTMLDivElement>();
   const reduced = usePrefersReducedMotion();
   const isDesktop = useIsDesktop();
@@ -77,7 +89,7 @@ export function FleetComparator({ fleetClasses }: { fleetClasses: FleetClass[] }
   if (!canvasEnabled) {
     return (
       <>
-        <StaticFleet fleetClasses={fleetClasses} />
+        <StaticFleet fleetClasses={fleetClasses} copy={copy} />
         <SpecBlock fleetClasses={fleetClasses} />
       </>
     );
@@ -99,10 +111,7 @@ export function FleetComparator({ fleetClasses }: { fleetClasses: FleetClass[] }
         <div ref={attachStage} data-testid="panggung-armada" className="relative h-[100dvh] overflow-hidden">
           <div className="mx-auto grid h-full max-w-[1400px] grid-cols-12 items-center gap-8 px-4 md:px-8">
             <div className="col-span-4">
-              <SectionHeader
-                title="Perbandingan Armada"
-                description="Lima kelas kapal dalam satu skala tetap. Grid di bawah lambung tidak pernah berubah ukuran."
-              />
+              <SectionHeader title={copy.heading} description={copy.description} />
 
               {/* Rel kelas. Alasannya satu kalimat: tanpa penanda posisi,
                   pergantian kapal terbaca sebagai halaman yang berubah
@@ -175,12 +184,12 @@ export function FleetComparator({ fleetClasses }: { fleetClasses: FleetClass[] }
                 />
               )}
               <p className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between font-mono text-[11px] text-ink-muted">
-                <span>Seret untuk memutar</span>
+                <span>{copy.dragHint}</span>
                 {/* Kamera mendekat mengikuti ukuran kelas, jadi kotak grid ikut
                     membesar di layar. Ukuran dunianya tetap 10 m, dan menulisnya
                     di sini yang membuat grid tetap berfungsi sebagai patokan
                     skala alih-alih sekadar tekstur latar. */}
-                <span>1 kotak grid = 10 m</span>
+                <span>{copy.gridHint}</span>
               </p>
             </div>
           </div>
