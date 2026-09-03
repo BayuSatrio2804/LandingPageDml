@@ -111,6 +111,7 @@ export interface Config {
     'about-page': AboutPage;
     'business-page': BusinessPage;
     'business-subpages': BusinessSubpage;
+    'contact-career': ContactCareer;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
@@ -121,6 +122,7 @@ export interface Config {
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'business-page': BusinessPageSelect<false> | BusinessPageSelect<true>;
     'business-subpages': BusinessSubpagesSelect<false> | BusinessSubpagesSelect<true>;
+    'contact-career': ContactCareerSelect<false> | ContactCareerSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -1242,6 +1244,39 @@ export interface BusinessSubpage {
   createdAt?: string | null;
 }
 /**
+ * Judul dan paragraf di halaman Karier dan halaman Kontak.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-career".
+ */
+export interface ContactCareer {
+  id: number;
+  career: {
+    title: string;
+    /**
+     * Kalimat status lowongan.
+     */
+    noOpeningsText: string;
+    spontaneousText: string;
+    whatsappButtonLabel: string;
+    /**
+     * Teks yang otomatis terisi di WhatsApp saat tombol diklik.
+     */
+    whatsappMessage: string;
+  };
+  contact: {
+    title: string;
+    intro: string;
+    phoneLabel: string;
+    mapsLinkLabel: string;
+    perLineHeading: string;
+    perLineIntro: string;
+    perLineLinkLabel: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1679,6 +1714,35 @@ export interface BusinessSubpagesSelect<T extends boolean = true> {
         title?: T;
         intro?: T;
         directContactLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-career_select".
+ */
+export interface ContactCareerSelect<T extends boolean = true> {
+  career?:
+    | T
+    | {
+        title?: T;
+        noOpeningsText?: T;
+        spontaneousText?: T;
+        whatsappButtonLabel?: T;
+        whatsappMessage?: T;
+      };
+  contact?:
+    | T
+    | {
+        title?: T;
+        intro?: T;
+        phoneLabel?: T;
+        mapsLinkLabel?: T;
+        perLineHeading?: T;
+        perLineIntro?: T;
+        perLineLinkLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;

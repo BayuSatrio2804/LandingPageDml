@@ -13,6 +13,7 @@ import { HOME_SECTIONS_DEFAULTS } from "../src/features/home/home-sections-defau
 import { ABOUT_PAGE_DEFAULTS } from "../src/features/about/about-defaults";
 import { BISNIS_PAGE_DEFAULTS } from "../src/features/bisnis/bisnis-defaults";
 import { BISNIS_SUBPAGES_DEFAULTS } from "../src/features/bisnis/subpages-defaults";
+import { CONTACT_CAREER_DEFAULTS } from "../src/features/contact/contact-career-defaults";
 
 /**
  * `bun run seed` (lihat package.json) menjalankan berkas ini lewat `bun
@@ -326,6 +327,14 @@ async function main() {
     console.log("business-subpages: dibuat");
   } else {
     console.log("business-subpages: sudah ada");
+  }
+
+  const contactCareer = await payload.findGlobal({ slug: "contact-career" });
+  if (!contactCareer.createdAt) {
+    await payload.updateGlobal({ slug: "contact-career", data: CONTACT_CAREER_DEFAULTS });
+    console.log("contact-career: dibuat");
+  } else {
+    console.log("contact-career: sudah ada");
   }
 
   for (const client of CLIENTS_SEED) {
