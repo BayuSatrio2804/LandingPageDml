@@ -9,7 +9,8 @@ import { revalidateAllGlobalHooks } from "../revalidate-all";
 export const SiteNavigation: GlobalConfig = {
   slug: "site-navigation",
   admin: {
-    group: "Perusahaan",
+    group: "Situs",
+    description: "Menu di header dan grup tautan di footer. Berlaku di semua halaman.",
   },
   hooks: revalidateAllGlobalHooks,
   fields: [

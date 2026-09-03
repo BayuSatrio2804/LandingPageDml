@@ -20,7 +20,9 @@ export const FleetClasses: CollectionConfig = {
   admin: {
     useAsTitle: "name",
     defaultColumns: ["order", "name", "category", "lengthMeters"],
-    group: "Perusahaan",
+    group: "Armada",
+    description:
+      "5 kelas kapal di komparator 3D Beranda dan di halaman /bisnis/transportasi-bbm & /bisnis/penumpang-roro. Jumlah kapal per kelas dihitung otomatis dari koleksi Vessels.",
   },
   defaultSort: "order",
   access: {

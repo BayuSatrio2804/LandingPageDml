@@ -27,6 +27,9 @@ export const Categories: CollectionConfig = {
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "slug"],
+    group: "Artikel",
+    description:
+      "Kategori filter di /artikel. Namanya juga tampil di tiap kartu artikel dan halaman detail.",
   },
   access: {
     read: () => true,

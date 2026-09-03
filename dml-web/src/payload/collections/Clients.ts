@@ -14,7 +14,8 @@ export const Clients: CollectionConfig = {
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "sector", "order"],
-    group: "Perusahaan",
+    group: "Bisnis",
+    description: "Logo klien di marquee halaman /bisnis. Urutan diatur field order.",
   },
   access: {
     read: () => true,

@@ -2,7 +2,13 @@ import type { CollectionConfig } from "payload";
 
 export const Inquiries: CollectionConfig = {
   slug: "inquiries",
-  admin: { useAsTitle: "name", defaultColumns: ["name", "phone", "service", "createdAt"] },
+  admin: {
+    useAsTitle: "name",
+    defaultColumns: ["name", "phone", "service", "createdAt"],
+    group: "Sistem",
+    description:
+      "Lead yang masuk dari form /kontak dan /bisnis/transportasi-bbm/permintaan-informasi. Hanya untuk dibaca — jangan buat entri manual di sini.",
+  },
   access: {
     read: ({ req: { user } }) => Boolean(user),
     // Nol tulis dari mana pun kecuali submitInquiry. Local API

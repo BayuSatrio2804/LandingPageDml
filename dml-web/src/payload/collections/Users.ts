@@ -10,7 +10,11 @@ export const Users: CollectionConfig = {
    * daftar alamat email, dan alamat itu juga yang berpotensi terbawa ke
    * byline artikel yang tayang publik.
    */
-  admin: { useAsTitle: "name" },
+  admin: {
+    useAsTitle: "name",
+    group: "Sistem",
+    description: "Akun yang bisa login ke /admin. Nama dipakai sebagai penulis artikel.",
+  },
   fields: [
     {
       name: "name",
