@@ -4,8 +4,15 @@ import { gsap } from "@/lib/motion/gsap";
 import type { BusinessLine } from "@/content/types";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
+import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "./bisnis-defaults";
 
-export function AfiliasiRows({ affiliates }: { affiliates: BusinessLine[] }) {
+export function AfiliasiRows({
+  affiliates,
+  copy = BISNIS_PAGE_DEFAULTS.afiliasi,
+}: {
+  affiliates: BusinessLine[];
+  copy?: BisnisPageData["afiliasi"];
+}) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);
 
@@ -82,18 +89,18 @@ export function AfiliasiRows({ affiliates }: { affiliates: BusinessLine[] }) {
         <div className="flex flex-wrap items-end justify-between gap-8">
           <div>
             <p className="m-0 font-mono text-[11px] tracking-[0.2em] text-ink-muted uppercase">
-              03 · Sinar Alam Corporation
+              {copy.kicker}
             </p>
             <h2
               id="afiliasi-title"
               data-reveal-clip=""
               className="mt-3.5 mb-0 font-display text-[clamp(2rem,3.6vw,3.25rem)] leading-[1.03] font-bold tracking-[-0.02em] text-ink text-pretty"
             >
-              Perusahaan afiliasi
+              {copy.heading}
             </h2>
           </div>
           <p className="m-0 max-w-[40ch] text-[15px] leading-relaxed text-ink-muted">
-            Tiga perusahaan yang berdiri sendiri di dalam grup, tidak dijalankan DML.
+            {copy.subtext}
           </p>
         </div>
 

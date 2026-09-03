@@ -5,10 +5,17 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import type { Client } from "@/content/types";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
+import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "./bisnis-defaults";
 
 const PX_PER_SECOND = 38;
 
-export function KlienMarquee({ clients }: { clients: Client[] }) {
+export function KlienMarquee({
+  clients,
+  copy = BISNIS_PAGE_DEFAULTS.klien,
+}: {
+  clients: Client[];
+  copy?: BisnisPageData["klien"];
+}) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);
 
@@ -86,14 +93,14 @@ export function KlienMarquee({ clients }: { clients: Client[] }) {
       <div className="mx-auto grid max-w-350 grid-cols-2 items-end gap-14 px-8 max-lg:grid-cols-1 max-lg:gap-8">
         <div>
           <p className="m-0 font-mono text-[11px] tracking-[0.2em] text-surface-3 uppercase">
-            04 · Klien korporat
+            {copy.kicker}
           </p>
           <h2
             id="klien-title"
             data-reveal-clip=""
             className="mt-3.5 mb-0 max-w-[22ch] font-display text-[clamp(2rem,3.6vw,3.25rem)] leading-[1.03] font-bold tracking-[-0.02em] text-on-accent text-pretty"
           >
-            Dipercaya oleh perusahaan terkemuka
+            {copy.heading}
           </h2>
         </div>
 
@@ -108,28 +115,28 @@ export function KlienMarquee({ clients }: { clients: Client[] }) {
                 {clients.length}
               </span>
               <span className="font-mono text-[11px] tracking-[0.16em] text-surface-3 uppercase">
-                klien
+                {copy.stat1Unit}
               </span>
             </dd>
             <p className="mt-2 mb-0 max-w-[22ch] text-[13px] text-on-accent/72">
-              Energi, tambang, dan pelayaran
+              {copy.stat1Caption}
             </p>
           </div>
           <div>
             <dt className="sr-only">Lama beroperasi</dt>
             <dd className="m-0 flex items-baseline gap-2">
               <span
-                data-count="37"
+                data-count={copy.stat2Value}
                 className="font-display text-[clamp(2rem,3vw,2.75rem)] leading-none font-bold text-on-accent"
               >
-                37
+                {copy.stat2Value}
               </span>
               <span className="font-mono text-[11px] tracking-[0.16em] text-surface-3 uppercase">
-                tahun
+                {copy.stat2Unit}
               </span>
             </dd>
             <p className="mt-2 mb-0 max-w-[22ch] text-[13px] text-on-accent/72">
-              Mengangkut sejak 1988
+              {copy.stat2Caption}
             </p>
           </div>
         </dl>
@@ -177,9 +184,7 @@ export function KlienMarquee({ clients }: { clients: Client[] }) {
       </div>
 
       <div className="mx-auto max-w-350 px-8 pt-5">
-        <p className="m-0 text-[11px] text-on-accent/50">
-          AKR Corporindo masih placeholder tipografi — belum ada berkas logo resminya.
-        </p>
+        <p className="m-0 text-[11px] text-on-accent/50">{copy.placeholderNote}</p>
       </div>
     </section>
   );

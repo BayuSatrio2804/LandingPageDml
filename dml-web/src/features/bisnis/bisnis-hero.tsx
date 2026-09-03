@@ -6,17 +6,17 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
+import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "./bisnis-defaults";
 
 const HERO = MEDIA.bisnis.find((asset) => asset.id === "hub-bisnis")!;
 
-const METRICS = [
-  { id: "bbm", value: 55, unit: "kapal", label: "Armada transportasi BBM" },
-  { id: "roro", value: 9, unit: "kapal", label: "Armada penyeberangan Ro-Ro" },
-  // unverified: 64 adalah angka ringkasan company profile, 66 kapal terdaftar.
-  { id: "total", value: 64, unit: "total", label: "Seluruh armada DML" },
-];
-
-export function BisnisHero() {
+export function BisnisHero({
+  copy = BISNIS_PAGE_DEFAULTS.hero,
+}: {
+  copy?: BisnisPageData["hero"];
+}) {
+  const titleWords = copy.title.split(/\s+/).filter(Boolean);
+  const metrics = copy.metrics;
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);
 
@@ -123,8 +123,8 @@ export function BisnisHero() {
           id="bisnis-hero-title"
           className="m-0 flex max-w-[20ch] flex-wrap gap-x-[0.28em] font-display text-[clamp(2.75rem,6.4vw,6rem)] leading-[0.98] font-bold tracking-[-0.03em] text-on-accent"
         >
-          {["Bisnis", "Kami"].map((word) => (
-            <span key={word} className="block overflow-hidden pb-[0.06em]">
+          {titleWords.map((word, i) => (
+            <span key={`${word}-${i}`} className="block overflow-hidden pb-[0.06em]">
               <span data-hero-word="" className="block">
                 {word}
               </span>
@@ -133,13 +133,12 @@ export function BisnisHero() {
         </h1>
 
         <p data-hero-meta="" className="m-0 max-w-[52ch] text-lg leading-relaxed text-on-accent/80">
-          Dua lini dijalankan sendiri, tiga afiliasi di sekitarnya. Satu operator dari Banjarmasin
-          sejak 1988.
+          {copy.intro}
         </p>
 
         <div className="flex flex-wrap items-end gap-12 border-t border-on-accent/20 pt-7">
-          {METRICS.map((metric) => (
-            <div key={metric.id} data-hero-meta="">
+          {metrics.map((metric, i) => (
+            <div key={`${metric.label}-${i}`} data-hero-meta="">
               <p className="m-0 flex items-baseline gap-2">
                 <span
                   data-count={metric.value}

@@ -11,6 +11,7 @@ import * as migration_20260831_024641_legal_documents from './20260831_024641_le
 import * as migration_20260903_034511_tambah_home_hero from './20260903_034511_tambah_home_hero';
 import * as migration_20260903_052445_tambah_home_sections from './20260903_052445_tambah_home_sections';
 import * as migration_20260903_054622_tambah_about_page from './20260903_054622_tambah_about_page';
+import * as migration_20260903_055715_tambah_business_page from './20260903_055715_tambah_business_page';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20260903_054622_tambah_about_page.up,
     down: migration_20260903_054622_tambah_about_page.down,
-    name: '20260903_054622_tambah_about_page'
+    name: '20260903_054622_tambah_about_page',
+  },
+  {
+    up: migration_20260903_055715_tambah_business_page.up,
+    down: migration_20260903_055715_tambah_business_page.down,
+    name: '20260903_055715_tambah_business_page'
   },
 ];

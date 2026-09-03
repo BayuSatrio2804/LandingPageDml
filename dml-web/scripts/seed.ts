@@ -11,6 +11,7 @@ import { LEGAL_DOCUMENTS_SEED } from "../src/lib/cms/legal-documents-seed";
 import { HOME_HERO_DEFAULTS } from "../src/features/home/hero-defaults";
 import { HOME_SECTIONS_DEFAULTS } from "../src/features/home/home-sections-defaults";
 import { ABOUT_PAGE_DEFAULTS } from "../src/features/about/about-defaults";
+import { BISNIS_PAGE_DEFAULTS } from "../src/features/bisnis/bisnis-defaults";
 
 /**
  * `bun run seed` (lihat package.json) menjalankan berkas ini lewat `bun
@@ -308,6 +309,14 @@ async function main() {
     console.log("about-page: dibuat");
   } else {
     console.log("about-page: sudah ada");
+  }
+
+  const businessPage = await payload.findGlobal({ slug: "business-page" });
+  if (!businessPage.createdAt) {
+    await payload.updateGlobal({ slug: "business-page", data: BISNIS_PAGE_DEFAULTS });
+    console.log("business-page: dibuat");
+  } else {
+    console.log("business-page: sudah ada");
   }
 
   for (const client of CLIENTS_SEED) {
