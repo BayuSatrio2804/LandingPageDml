@@ -5,7 +5,6 @@ import { gsap, registerGsap } from "@/lib/motion/gsap";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
 import { useMounted } from "@/lib/motion/use-mounted";
 import { TOKENS } from "@/lib/tokens";
-import { DOORS } from "./hero-doors";
 
 export type HeroRefs = {
   sectionRef: React.RefObject<HTMLElement | null>;
@@ -15,6 +14,8 @@ export type HeroRefs = {
   kbRefs: React.RefObject<(HTMLDivElement | null)[]>;
   ruleRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   countRefs: React.RefObject<(HTMLSpanElement | null)[]>;
+  /** Nilai akhir angka berhitung tiap pintu (dari global home-hero). */
+  doorCounts: number[];
 };
 
 /**
@@ -28,7 +29,9 @@ export type HeroRefs = {
 export function useHeroChoreography(refs: HeroRefs): { mounted: boolean; reduced: boolean } {
   const reduced = usePrefersReducedMotion();
   const mounted = useMounted();
-  const { sectionRef, stageRef, mediaRef, contentRef, kbRefs, ruleRefs, countRefs } = refs;
+  const { sectionRef, stageRef, mediaRef, contentRef, kbRefs, ruleRefs, countRefs, doorCounts } =
+    refs;
+  const [bbmCount = 0, roroCount = 0] = doorCounts;
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -105,7 +108,7 @@ export function useHeroChoreography(refs: HeroRefs): { mounted: boolean; reduced
       // akhirnya, jadi tidak pernah ada "0" yang terbaca sebagai data rusak.
       countRefs.current.forEach((el, i) => {
         if (!el) return;
-        const to = DOORS[i]?.value ?? 0;
+        const to = (i === 0 ? bbmCount : roroCount) ?? 0;
         const proxy = { v: Math.round(to * 0.45) };
         gsap.to(proxy, {
           v: to,
@@ -201,7 +204,7 @@ export function useHeroChoreography(refs: HeroRefs): { mounted: boolean; reduced
     // render di Hero(), jadi itu justru membuat efek ini jalan ulang tiap
     // render — mengubah perilaku, bukan cuma membungkam linter.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced, mounted]);
+  }, [reduced, mounted, bbmCount, roroCount]);
 
   // Magnetic CTA. Dipisah karena mendaftar listener per tombol dan tidak ikut
   // timeline mana pun.

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import type { CertBadge } from "@/content/types";
 import { HeroDoors } from "./hero-doors";
 import { HeroCopy } from "./hero-copy";
+import { HOME_HERO_DEFAULTS, type HomeHeroData } from "./hero-defaults";
 import { useHeroChoreography } from "./use-hero-choreography";
 
 /*
@@ -51,7 +52,13 @@ import { useHeroChoreography } from "./use-hero-choreography";
  * (+=260%) yang datang setelahnya di page.tsx.
  */
 
-export function Hero({ certifications }: { certifications: CertBadge[] }) {
+export function Hero({
+  certifications,
+  hero = HOME_HERO_DEFAULTS,
+}: {
+  certifications: CertBadge[];
+  hero?: HomeHeroData;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
@@ -68,6 +75,7 @@ export function Hero({ certifications }: { certifications: CertBadge[] }) {
     kbRefs,
     ruleRefs,
     countRefs,
+    doorCounts: [hero.bbm.value, hero.roro.value],
   });
 
   return (
@@ -101,6 +109,7 @@ export function Hero({ certifications }: { certifications: CertBadge[] }) {
           ruleRefs={ruleRefs}
           countRefs={countRefs}
           certifications={certifications}
+          hero={hero}
         />
       </div>
     </section>

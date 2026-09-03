@@ -8,6 +8,7 @@ import { BUSINESS_LINES_SEED } from "../src/lib/cms/business-lines-seed";
 import { VESSELS_SEED } from "../src/lib/cms/vessels-seed";
 import { FLEET_CLASSES_SEED } from "../src/lib/cms/fleet-classes-seed";
 import { LEGAL_DOCUMENTS_SEED } from "../src/lib/cms/legal-documents-seed";
+import { HOME_HERO_DEFAULTS } from "../src/features/home/hero-defaults";
 
 /**
  * `bun run seed` (lihat package.json) menjalankan berkas ini lewat `bun
@@ -281,6 +282,14 @@ async function main() {
     console.log("site-navigation: dibuat");
   } else {
     console.log("site-navigation: sudah ada");
+  }
+
+  const homeHero = await payload.findGlobal({ slug: "home-hero" });
+  if (!homeHero.createdAt) {
+    await payload.updateGlobal({ slug: "home-hero", data: HOME_HERO_DEFAULTS });
+    console.log("home-hero: dibuat");
+  } else {
+    console.log("home-hero: sudah ada");
   }
 
   for (const client of CLIENTS_SEED) {
