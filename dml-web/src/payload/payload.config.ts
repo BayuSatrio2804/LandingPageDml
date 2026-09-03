@@ -8,6 +8,16 @@ import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Inquiries } from "./collections/Inquiries";
 import { Posts } from "./collections/Posts";
+import { Categories } from "./collections/Categories";
+import { Clients } from "./collections/Clients";
+import { Certifications } from "./collections/Certifications";
+import { BusinessLines } from "./collections/BusinessLines";
+import { Vessels } from "./collections/Vessels";
+import { FleetClasses } from "./collections/FleetClasses";
+import { LegalDocuments } from "./collections/LegalDocuments";
+import { ArticlesPage } from "./globals/ArticlesPage";
+import { CompanyProfile } from "./globals/CompanyProfile";
+import { SiteNavigation } from "./globals/SiteNavigation";
 import { migrations } from "../migrations";
 
 const filename = fileURLToPath(import.meta.url);
@@ -33,7 +43,8 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   sharp,
-  collections: [Users, Media, Inquiries, Posts],
+  collections: [Users, Media, Inquiries, Posts, Categories, Clients, Certifications, BusinessLines, Vessels, FleetClasses, LegalDocuments],
+  globals: [ArticlesPage, CompanyProfile, SiteNavigation],
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },

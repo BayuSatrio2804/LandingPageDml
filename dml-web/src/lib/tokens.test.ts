@@ -82,4 +82,11 @@ describe("kontras token Navy Selat", () => {
   it("teks putih lolos AAA di atas bidang gelap hero", () => {
     expect(contrastRatio(TOKENS.onAccent, TOKENS.heroGround)).toBeGreaterThanOrEqual(7);
   });
+
+  // section-index-rail mengambang tetap di kanan layar dan melintasi seksi
+  // gelap (klien, CTA) yang memakai darkField sebagai latar. surface3 dipakai
+  // sebagai warna default penanda seksi non-aktif di situ.
+  it("surface3 sebagai teks di atas darkField lolos AA", () => {
+    expect(contrastRatio(TOKENS.surface3, TOKENS.darkField)).toBeGreaterThanOrEqual(4.5);
+  });
 });

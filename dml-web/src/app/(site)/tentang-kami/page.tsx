@@ -1,101 +1,55 @@
 import type { Metadata } from "next";
-import { COMPANY } from "@/content/company";
-import { TIMELINE } from "@/content/timeline";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
-import { AnchorNav } from "@/components/layout/anchor-nav";
-import { Reveal } from "@/components/motion/reveal";
-import { SectionHeader } from "@/components/ui/section-header";
-import { GroupStructure } from "@/features/about/group-structure";
-import { LegalTable } from "@/features/about/legal-table";
+import { AboutHero } from "@/features/about/about-hero";
+import { StatStrip } from "@/features/about/stat-strip";
+import { IdentitySection } from "@/features/about/identity-section";
+import { CoreValues } from "@/features/about/core-values";
+import { GroupChart } from "@/features/about/group-chart";
+import { LegalSection } from "@/features/about/legal-section";
+import { OfficesSection } from "@/features/about/offices-section";
+import { AboutCta } from "@/features/about/about-cta";
+import { getCompanyProfile } from "@/lib/cms/company";
+import { getLegalDocuments } from "@/lib/cms/legal-documents";
 
 export const metadata: Metadata = buildMetadata({
   title: "Tentang Kami | PT Dutabahari Menara Line",
-  description: "Silsilah dan profil perusahaan PT Dutabahari Menara Line, bagian dari Sinar Alam Corporation.",
+  description:
+    "PT Dutabahari Menara Line, perusahaan pelayaran Banjarmasin sejak 1988: lini kerja, nilai inti, struktur Sinar Alam Corporation, legalitas, dan alamat kantor.",
   path: "/tentang-kami",
 });
 
-export default function TentangKamiPage() {
+export default async function TentangKamiPage() {
+  const [company, legalDocuments] = await Promise.all([getCompanyProfile(), getLegalDocuments()]);
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Tentang Kami", path: "/tentang-kami" },
   ]);
 
   return (
-    <div>
-      <div className="mx-auto max-w-[1400px] px-4 py-16 md:px-8 md:py-24">
-        <h1 className="font-display text-pretty text-4xl font-bold tracking-tight md:text-5xl">Tentang Kami</h1>
-
-        <AnchorNav
-          items={[
-            { id: "silsilah", label: "Silsilah" },
-            { id: "profil", label: "Profil" },
-            { id: "grup", label: "Grup" },
-          ]}
-        />
-      </div>
-
-      <section id="silsilah" className="scroll-mt-24 bg-surface-wash py-20 md:py-28">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader title="Silsilah" />
-          <Reveal className="mt-8 space-y-8 border-l border-surface-3 pl-6">
-            {TIMELINE.map((entry) => (
-              <div key={entry.year}>
-                <p className="font-display font-bold text-accent">{entry.year}</p>
-                <p className="mt-1 max-w-[60ch] text-ink-muted">{entry.label}</p>
-              </div>
-            ))}
-          </Reveal>
-        </div>
-      </section>
-
-      <section id="profil" className="scroll-mt-24 bg-surface-2-wash py-20 md:py-28">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-          <SectionHeader title="Profil Perusahaan" />
-          <Reveal className="mt-8 grid gap-10 md:grid-cols-2">
-            <div>
-              {/* draft: visi-misi belum direview klien, konfirmasi sebelum situs live */}
-              <h3 className="font-display font-bold text-ink">Visi</h3>
-              <p className="mt-2 max-w-[50ch] text-ink-muted">
-                Menjadi mitra pelayaran terpercaya di perairan Kalimantan, menghubungkan energi
-                dan orang dengan aman dan andal.
-              </p>
-              <h3 className="mt-6 font-display font-bold text-ink">Misi</h3>
-              <p className="mt-2 max-w-[50ch] text-ink-muted">
-                Mengoperasikan armada transportasi BBM dan penyeberangan ro-ro dengan
-                standar keselamatan dan kualitas tertinggi.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-display font-bold text-ink">Legalitas dan Sertifikasi</h3>
-              <p className="mt-2 text-ink-muted">{COMPANY.legalName}, bagian dari {COMPANY.parent}.</p>
-              {COMPANY.standards.map((cluster) => (
-                <div key={cluster.label} className="mt-4">
-                  <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
-                  <ul className="mt-2 flex flex-wrap gap-2">
-                    {cluster.items.map((item) => (
-                      <li
-                        key={item.name}
-                        className="rounded-full bg-accent-soft px-3 py-1 text-xs text-accent"
-                      >
-                        {item.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-          <LegalTable />
-        </div>
-      </section>
-
-      <GroupStructure />
+    <>
+      <AboutHero />
+      <StatStrip
+        foundedIso={company.foundedIso}
+        vessels={company.fleetSummary.vessels}
+        people={company.fleetSummary.people}
+        sektorCount={company.groupUnits.length}
+      />
+      <IdentitySection />
+      <CoreValues values={company.values} />
+      <GroupChart groupUnits={company.groupUnits} dmlLegalName={company.legalName} />
+      <LegalSection
+        legalDocuments={legalDocuments}
+        standards={company.standards}
+        memberships={company.memberships}
+      />
+      <OfficesSection offices={company.offices} groupOffices={company.groupOffices} />
+      <AboutCta />
 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLdString(trail) }}
       />
-    </div>
+    </>
   );
 }

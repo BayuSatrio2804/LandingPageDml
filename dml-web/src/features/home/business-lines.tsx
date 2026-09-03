@@ -8,7 +8,6 @@ import { segmentAt } from "@/lib/motion/segments";
 import { usePrefersReducedMotion } from "@/lib/motion/use-prefers-reduced-motion";
 import { useIsDesktop } from "@/lib/motion/use-is-desktop";
 import { MEDIA, avifSrc } from "@/lib/media/manifest";
-import { MAIN_LINES } from "@/content/business-lines";
 import type { BusinessLine } from "@/content/types";
 
 /**
@@ -81,10 +80,10 @@ function LineMedia({ line, priority }: { line: BusinessLine; priority: boolean }
 }
 
 /** Jalur tanpa animasi: dua blok biasa, berurutan, tidak ada yang ditumpuk. */
-function StaticBusinessLines() {
+function StaticBusinessLines({ mainLines }: { mainLines: BusinessLine[] }) {
   return (
     <section className="bg-surface-wash">
-      {MAIN_LINES.map((line) => (
+      {mainLines.map((line) => (
         <div
           key={line.id}
           data-testid="bab-lini-bisnis"
@@ -102,7 +101,7 @@ function StaticBusinessLines() {
   );
 }
 
-export function BusinessLines() {
+export function BusinessLines({ mainLines }: { mainLines: BusinessLine[] }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const mediaRefs = useRef<(HTMLDivElement | null)[]>([]);
   const copyRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -122,7 +121,7 @@ export function BusinessLines() {
       let lastIndex = -1;
 
       const apply = (progress: number) => {
-        const { index, blend } = segmentAt(progress, MAIN_LINES.length, TRANSITION);
+        const { index, blend } = segmentAt(progress, mainLines.length, TRANSITION);
 
         media.forEach((layer, i) => {
           if (!layer) return;
@@ -170,7 +169,7 @@ export function BusinessLines() {
     }, stageRef);
 
     return () => ctx.revert();
-  }, [animated]);
+  }, [animated, mainLines]);
 
   /**
    * Di bawah 768 px jalur statis yang dipakai, sama seperti dua seksi dipaku
@@ -181,7 +180,7 @@ export function BusinessLines() {
    * butir membungkus. Itu persis kombinasi kontras yang gagal di audit Plan 3
    * dan yang sejak itu diwajibkan memakai panel scrim, bukan gradien.
    */
-  if (!animated) return <StaticBusinessLines />;
+  if (!animated) return <StaticBusinessLines mainLines={mainLines} />;
 
   return (
     <section className="bg-surface-wash relative">
@@ -194,7 +193,7 @@ export function BusinessLines() {
       */}
       <div ref={stageRef} data-testid="panggung-lini-bisnis" className="relative h-[100dvh] overflow-hidden">
         <div className="absolute inset-0 md:left-[38%]">
-          {MAIN_LINES.map((line, index) => (
+          {mainLines.map((line, index) => (
             <div
               key={line.id}
               data-testid="lapisan-lini-bisnis"
@@ -213,13 +212,13 @@ export function BusinessLines() {
           <div
             aria-hidden
             className="absolute inset-0 z-10 bg-gradient-to-r from-surface from-0% via-surface/25 via-28% to-transparent to-58%"
-            style={{ zIndex: MAIN_LINES.length }}
+            style={{ zIndex: mainLines.length }}
           />
         </div>
 
         <div className="relative z-20 mx-auto grid h-full max-w-[1400px] grid-cols-12 content-center px-4 md:px-8">
           <div className="col-span-12 grid md:col-span-5">
-            {MAIN_LINES.map((line, index) => (
+            {mainLines.map((line, index) => (
               <div
                 key={line.id}
                 data-testid="bab-lini-bisnis"

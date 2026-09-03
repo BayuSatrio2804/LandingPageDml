@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { COMPANY } from "@/content/company";
+import { getCompanyProfile } from "@/lib/cms/company";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { BusinessInquiryForm } from "@/features/inquiry/business-inquiry-form";
@@ -34,6 +34,7 @@ export default async function PermintaanInformasiPage({
 }) {
   const params = await searchParams;
   const defaultService = resolveService(params.layanan);
+  const COMPANY = await getCompanyProfile();
 
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },

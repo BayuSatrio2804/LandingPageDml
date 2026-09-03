@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { buildHullShape } from "./hull-geometry";
-import { FLEET_CLASSES } from "@/content/fleet";
+import { FLEET_CLASSES_SEED } from "@/lib/cms/fleet-classes-seed";
+
+const FLEET_CLASSES = FLEET_CLASSES_SEED.map((fleetClass) => ({ ...fleetClass, vesselCount: 0 }));
 
 describe("buildHullShape", () => {
   it("menghasilkan THREE.Shape untuk setiap kelas armada", () => {

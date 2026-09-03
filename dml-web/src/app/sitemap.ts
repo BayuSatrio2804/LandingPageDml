@@ -9,7 +9,7 @@ import { listPublishedPosts } from "@/features/articles/queries";
  *
  * /bisnis/galangan-kapal dicoret permanen: PT Dutabahari Menara Line Dockyard
  * adalah perusahaan terpisah di dalam Sinar Alam Corporation, bukan lini DML.
- * Lihat docblock di src/content/navigation.ts.
+ * Lihat docblock di src/lib/cms/company-seed.ts.
  *
  * /artikel kembali sejak Plan 9, bersama slug artikel published yang
  * ditambahkan secara dinamis di bawah.

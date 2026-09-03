@@ -11,6 +11,24 @@
  */
 export type SourceTag = "cp-pdf" | "riset-publik" | "belum-terverifikasi";
 
+export type Client = {
+  id: string;
+  name: string;
+  /** Bidang usaha perusahaan, bukan jenis kontraknya dengan DML. */
+  sector: string;
+  /** null berarti belum ada berkas logo resmi; komponen merender namanya. */
+  logo: string | null;
+  source: SourceTag;
+};
+
+export type CertBadge = {
+  /** Wajib sama persis dengan entri di company-profile.standards kalau source-nya cp-pdf. */
+  name: string;
+  assetPath: string;
+  alt: string;
+  source: SourceTag;
+};
+
 export type Office = {
   label: string;
   street: string;
@@ -67,6 +85,8 @@ export type Company = {
   parent: string;
   phone: string;
   whatsapp: string;
+  /** URL pemesanan tiket ro-ro. */
+  bookingUrl: string;
   /** Kantor milik DML sendiri. Kantor induk grup ada di GROUP_OFFICES. */
   offices: Office[];
   values: CoreValue[];

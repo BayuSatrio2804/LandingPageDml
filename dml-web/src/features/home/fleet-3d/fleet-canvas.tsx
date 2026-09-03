@@ -4,7 +4,6 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { FLEET_CLASSES } from "@/content/fleet";
 import { FLEET_MODEL_BY_SLUG } from "@/content/model-credits";
 import type { FleetClass } from "@/content/types";
 import { Stage } from "../three/stage";
@@ -115,8 +114,7 @@ function buildUpperDeckGeometry(fleetClass: FleetClass): THREE.BoxGeometry {
  * khas Indonesia dan tidak ada di sumber manapun, jadi keduanya dibangun dari
  * primitif dan diberi material yang sama persis dengan model di atas.
  */
-function BuiltHull({ index }: { index: number }) {
-  const fleetClass = FLEET_CLASSES[index];
+function BuiltHull({ fleetClass }: { fleetClass: FleetClass | undefined }) {
   const hullGeometry = useMemo(() => (fleetClass ? buildHullGeometry(fleetClass) : null), [fleetClass]);
   const superGeometry = useMemo(
     () => (fleetClass ? buildSuperstructureGeometry(fleetClass) : null),
@@ -173,16 +171,17 @@ function BuiltHull({ index }: { index: number }) {
 }
 
 function ClassGroup({
+  fleetClass,
   index,
   opacityRef,
   sizesRef,
 }: {
+  fleetClass: FleetClass | undefined;
   index: number;
   opacityRef: React.RefObject<number[]>;
   sizesRef: React.RefObject<THREE.Vector3[]>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const fleetClass = FLEET_CLASSES[index];
   const modelUrl = fleetClass ? FLEET_MODEL_BY_SLUG[fleetClass.slug] : null;
 
   /**
@@ -227,7 +226,7 @@ function ClassGroup({
       {modelUrl ? (
         <ModelHull url={modelUrl} lengthMeters={fleetClass.lengthMeters} />
       ) : (
-        <BuiltHull index={index} />
+        <BuiltHull fleetClass={fleetClass} />
       )}
     </group>
   );
@@ -251,13 +250,15 @@ function ScaleGrid() {
 type OrbitTarget = { target: THREE.Vector3 };
 
 function Rig({
+  fleetClasses,
   progressRef,
   onActiveIndexChange,
 }: {
+  fleetClasses: FleetClass[];
   progressRef: React.RefObject<number>;
   onActiveIndexChange: (index: number) => void;
 }) {
-  const initialOpacity = useMemo(() => FLEET_CLASSES.map(() => 0), []);
+  const initialOpacity = useMemo(() => fleetClasses.map(() => 0), [fleetClasses]);
   const opacityRef = useRef<number[]>(initialOpacity);
   // Cadangan sebelum pengukuran selesai: dimensi dari data kelas, dalam satuan
   // dunia yang sama dengan hull-geometry.ts (meter dibagi sepuluh).
@@ -267,11 +268,11 @@ function Rig({
   // mengkonstruksi satu Vector3 per kelas armada di setiap render.
   const initialSizes = useMemo(
     () =>
-      FLEET_CLASSES.map(
+      fleetClasses.map(
         (entry) =>
           new THREE.Vector3(entry.lengthMeters / 10, entry.beamMeters / 25, entry.beamMeters / 10),
       ),
-    [],
+    [fleetClasses],
   );
   const sizesRef = useRef<THREE.Vector3[]>(initialSizes);
   const lastIndexRef = useRef(-1);
@@ -288,8 +289,8 @@ function Rig({
     const controls = state.controls as OrbitTarget | null;
     if (groupRef.current) groupRef.current.rotation.y += delta * 0.12;
 
-    const segment = segmentAt(progressRef.current ?? 0, FLEET_CLASSES.length, TRANSITION);
-    opacityRef.current = segmentOpacities(segment, FLEET_CLASSES.length);
+    const segment = segmentAt(progressRef.current ?? 0, fleetClasses.length, TRANSITION);
+    opacityRef.current = segmentOpacities(segment, fleetClasses.length);
 
     /**
      * Ukuran ikut di-lerp lintas pasangan kelas, bukan meloncat di batas
@@ -337,9 +338,10 @@ function Rig({
 
   return (
     <group ref={groupRef}>
-      {FLEET_CLASSES.map((fleetClass, index) => (
+      {fleetClasses.map((fleetClass, index) => (
         <ClassGroup
           key={fleetClass.slug}
+          fleetClass={fleetClass}
           index={index}
           opacityRef={opacityRef}
           sizesRef={sizesRef}
@@ -350,10 +352,12 @@ function Rig({
 }
 
 export function FleetCanvas({
+  fleetClasses,
   progressRef,
   onActiveIndexChange,
   active,
 }: {
+  fleetClasses: FleetClass[];
   progressRef: React.RefObject<number>;
   onActiveIndexChange: (index: number) => void;
   /** Panggung sedang di dekat viewport. Di luar itu render loop dimatikan. */
@@ -368,7 +372,7 @@ export function FleetCanvas({
     >
       <Stage />
       <ScaleGrid />
-      <Rig progressRef={progressRef} onActiveIndexChange={onActiveIndexChange} />
+      <Rig fleetClasses={fleetClasses} progressRef={progressRef} onActiveIndexChange={onActiveIndexChange} />
       <OrbitControls
         makeDefault
         enableZoom={false}

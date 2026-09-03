@@ -1,4 +1,4 @@
-import { AFFILIATES } from "@/content/business-lines";
+import type { BusinessLine } from "@/content/types";
 import { Reveal } from "@/components/motion/reveal";
 
 /**
@@ -9,7 +9,7 @@ import { Reveal } from "@/components/motion/reveal";
  * Baris berpembatas tipis menyampaikan itu; tiga kartu sejajar justru akan
  * membuatnya terbaca setara dengan lini yang dijalankan DML sendiri.
  */
-export function Affiliates() {
+export function Affiliates({ affiliates }: { affiliates: BusinessLine[] }) {
   return (
     <section className="bg-surface-2-wash py-20 md:py-28">
       <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-8 px-4 md:px-8">
@@ -23,7 +23,7 @@ export function Affiliates() {
         </div>
 
         <Reveal className="col-span-12 md:col-span-8" stagger={0.08}>
-          {AFFILIATES.map((line) => (
+          {affiliates.map((line) => (
             <div
               key={line.id}
               data-testid="baris-afiliasi"

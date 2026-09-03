@@ -35,7 +35,7 @@ describe("sitemap", () => {
 
   it("tidak lagi mengiklankan /bisnis/galangan-kapal", () => {
     // DMLD adalah perusahaan terpisah di Sinar Alam Corporation, bukan lini
-    // DML. Lihat docblock di src/content/navigation.ts.
+    // DML. Lihat docblock di src/lib/cms/company-seed.ts.
     expect(STATIC_PATHS).not.toContain("/bisnis/galangan-kapal");
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { COMPANY } from "@/content/company";
+import type { CompanyProfileData } from "@/lib/cms/company";
 import { DML_SERVED_PORT_IDS } from "@/features/route-map/ports";
 import { useCounter } from "@/lib/motion/use-counter";
 import { yearsOperating } from "@/lib/company/years-operating";
@@ -45,21 +45,21 @@ function Metric({
  * tetap ditampilkan karena berasal dari riset Plan 1 yang tercatat di master
  * spec, tapi ditandai supaya klien bisa mencoretnya tanpa menebak.
  */
-export function Certifications() {
-  const years = yearsOperating(COMPANY.foundedIso, new Date());
+export function Certifications({ company }: { company: CompanyProfileData }) {
+  const years = yearsOperating(company.foundedIso, new Date());
 
   return (
     <section className="bg-surface-2-wash py-24 md:py-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <div className="grid grid-cols-2 border-y border-surface-3 md:grid-cols-4">
-          <Metric value={COMPANY.fleetSummary.vessels} label="Kapal" />
-          <Metric value={COMPANY.fleetSummary.people} label="Orang" prefix="&gt;" />
+          <Metric value={company.fleetSummary.vessels} label="Kapal" />
+          <Metric value={company.fleetSummary.people} label="Orang" prefix="&gt;" />
           <Metric value={years} label="Tahun beroperasi" />
           <Metric value={DML_SERVED_PORT_IDS.length} label="Pelabuhan dilayani" />
         </div>
 
         <Reveal className="mt-16 grid gap-10 md:grid-cols-3" stagger={0.08}>
-          {COMPANY.standards.map((cluster) => (
+          {company.standards.map((cluster) => (
             <div key={cluster.label} data-testid="klaster-standar">
               <p className="font-mono text-xs text-ink-muted">{cluster.label}</p>
               <ul className="mt-4 flex flex-wrap gap-3">
@@ -84,7 +84,7 @@ export function Certifications() {
         <div className="mt-14 border-t border-surface-3 pt-8">
           <p className="font-mono text-xs text-ink-muted">Keanggotaan</p>
           <ul className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-            {COMPANY.memberships.map((membership) => (
+            {company.memberships.map((membership) => (
               <li key={membership.name} data-testid="keanggotaan" className="text-sm text-ink">
                 {membership.name}
                 {membership.expansion ? (

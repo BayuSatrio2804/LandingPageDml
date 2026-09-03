@@ -28,3 +28,23 @@ reference-jeskojets/
 # arsip font mentah, hanya turunannya yang dipakai
 fonts/*.zip
 .superpowers/
+
+# Arsip mentah dari klien/lapangan: foto drone, render kapal, dokumen internal.
+# Puluhan GB, bukan artefak build, sebagian rahasia. Dibagi lewat kanal terpisah.
+/Aset 1/
+/Aset 2/
+/Aset 3/
+/Aset 4/
+/DML Vessel/
+/DRONE/
+/File Dari Nazhir/
+
+# konfigurasi lokal Claude Code
+.claude/
+
+# log dev sekali pakai
+dml-web/dev-stdout.log
+dml-web/dev-stderr.log
+
+# turunan upload Payload dev; di produksi dilayani lewat volume
+dml-web/media/
