@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { s3Storage } from "@payloadcms/storage-s3";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { Users } from "./collections/Users";
@@ -23,6 +24,48 @@ import { migrations } from "../migrations";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+/**
+ * Penyimpanan berkas upload Payload.
+ *
+ * Default: disk lokal lewat MEDIA_STATIC_DIR (lihat Media.ts) -- itu yang
+ * dipakai `bun run dev`, test, dan image Docker dengan volume.
+ *
+ * Kalau R2_BUCKET diisi (target Vercel), koleksi `media` dialihkan ke
+ * bucket S3-compatible Cloudflare R2. Vercel punya filesystem ephemeral,
+ * jadi tanpa ini setiap upload admin hilang di redeploy berikutnya.
+ *
+ * disablePayloadAccessControl + generateFileURL: berkasnya publik dan
+ * dilayani langsung dari domain publik R2, BUKAN diproksi lewat route
+ * /api/media/file/* (tiap gambar = satu invokasi function di Vercel, dan
+ * opengraph-image.tsx yang berjalan saat build tidak punya server untuk
+ * dituju).
+ */
+const r2Bucket = process.env.R2_BUCKET;
+const r2PublicUrl = process.env.R2_PUBLIC_URL?.replace(/\/+$/, "");
+
+const storagePlugins = r2Bucket
+  ? [
+      s3Storage({
+        collections: {
+          media: {
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename: name }) => `${r2PublicUrl}/${name}`,
+          },
+        },
+        bucket: r2Bucket,
+        config: {
+          endpoint: process.env.R2_ENDPOINT,
+          region: "auto",
+          forcePathStyle: true,
+          credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+          },
+        },
+      }),
+    ]
+  : [];
+
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET ?? "",
   db: postgresAdapter({
@@ -43,6 +86,7 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   sharp,
+  plugins: storagePlugins,
   collections: [Users, Media, Inquiries, Posts, Categories, Clients, Certifications, BusinessLines, Vessels, FleetClasses, LegalDocuments],
   globals: [ArticlesPage, CompanyProfile, SiteNavigation],
   typescript: {

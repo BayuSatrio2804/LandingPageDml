@@ -11,6 +11,31 @@ export const contentType = OG_CONTENT_TYPE;
 export const alt = "Artikel PT Dutabahari Menara Line";
 
 /**
+ * Byte cover untuk kartu OG.
+ *
+ * Penyimpanan disk (dev, Docker + volume): dibaca langsung lewat
+ * MEDIA_STATIC_DIR (Task 18). generateStaticParams artikel berjalan saat
+ * next build, sebelum ada server HTTP yang bisa dituju, jadi fetch ke diri
+ * sendiri tidak bisa diandalkan.
+ *
+ * Penyimpanan R2 (Vercel): tidak ada berkas di disk build. `url` sudah
+ * berupa URL publik absolut R2, jadi byte-nya diambil lewat fetch ke sana.
+ *
+ * Satori tidak bisa mendekode WebP (lihat og-template.tsx), jadi byte-nya
+ * tetap harus lewat toOgSafeImageDataUri apa pun sumbernya.
+ */
+async function readCoverBytes(filename: string, url?: string | null) {
+  if (url && /^https?:\/\//.test(url)) {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Gagal ambil cover OG (${res.status}): ${url}`);
+    }
+    return Buffer.from(await res.arrayBuffer());
+  }
+  return readFile(path.join(MEDIA_STATIC_DIR, filename));
+}
+
+/**
  * Berkas ini duduk di segmen yang sama dengan page.tsx artikel, jadi
  * menurut dokumentasi Next ia menang atas objek metadata biasa yang
  * dikembalikan generateMetadata di segmen itu -- termasuk default
@@ -23,19 +48,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const [post, font] = await Promise.all([findPublishedPost(slug), loadOgFont()]);
 
   const cover = post ? resolveMedia(post.coverImage) : null;
-  /**
-   * Dibaca langsung dari disk lewat MEDIA_STATIC_DIR (Task 18), bukan path
-   * ditulis ulang di sini atau lewat fetch ke /api/media/file/<nama>.
-   * generateStaticParams artikel berjalan saat next build, sebelum ada
-   * server HTTP yang bisa dituju; fetch ke diri sendiri saat itu tidak bisa
-   * diandalkan. Satori juga tidak bisa mendekode WebP (lihat
-   * og-template.tsx), jadi byte-nya tetap harus lewat toOgSafeImageDataUri
-   * apa pun sumbernya.
-   */
   const imageUrl = cover?.filename
-    ? await toOgSafeImageDataUri(
-        await readFile(path.join(MEDIA_STATIC_DIR, cover.filename)),
-      )
+    ? await toOgSafeImageDataUri(await readCoverBytes(cover.filename, cover.url))
     : undefined;
 
   return new ImageResponse(
