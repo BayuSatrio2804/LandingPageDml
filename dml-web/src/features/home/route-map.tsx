@@ -10,6 +10,9 @@ import { VIEWBOX, project } from "@/features/route-map/projection";
 import { SectionHeader } from "@/components/ui/section-header";
 import coastline from "@/features/route-map/coastline.json";
 import { TOKENS } from "@/lib/tokens";
+import { HOME_SECTIONS_DEFAULTS, type HomeSectionsData } from "./home-sections-defaults";
+
+type RouteMapCopy = HomeSectionsData["routeMap"];
 
 const PORT_BY_ID = new Map(PORTS.map((port) => [port.id, port]));
 
@@ -253,14 +256,11 @@ function LegList({ activeIndex }: { activeIndex: number }) {
 }
 
 /** Jalur tanpa pin: peta di atas, daftar lintasan di bawah, semua leg tergambar. */
-function StaticRouteMap() {
+function StaticRouteMap({ copy }: { copy: RouteMapCopy }) {
   return (
     <section className="bg-surface-2-wash py-20 md:py-28">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <SectionHeader
-          title="Rute Penyeberangan Ro-Ro"
-          description="Lima lintasan yang menghubungkan Sumatera, Jawa, Bali, Lombok, dan Kalimantan Tengah."
-        />
+        <SectionHeader title={copy.heading} description={copy.description} />
         <div className="mt-10 aspect-3/2 w-full overflow-hidden rounded-card bg-accent-soft">
           <RouteSvg activeIndex={-1} drawn markerScale={2.3} />
         </div>
@@ -270,7 +270,11 @@ function StaticRouteMap() {
   );
 }
 
-export function RouteMap() {
+export function RouteMap({
+  copy = HOME_SECTIONS_DEFAULTS.routeMap,
+}: {
+  copy?: RouteMapCopy;
+}) {
   const stageRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<SVGSVGElement | null>(null);
   const legRefs = useRef<(SVGPathElement | null)[]>([]);
@@ -353,7 +357,7 @@ export function RouteMap() {
     return () => ctx.revert();
   }, [animated]);
 
-  if (!animated) return <StaticRouteMap />;
+  if (!animated) return <StaticRouteMap copy={copy} />;
 
   return (
     <section className="bg-surface-2-wash relative">
@@ -370,10 +374,7 @@ export function RouteMap() {
 
         <div className="relative z-10 mx-auto grid h-full max-w-[1400px] grid-cols-12 content-center px-4 md:px-8">
           <div className="col-span-12 rounded-card border border-surface-3 bg-surface-2/90 p-6 backdrop-blur-sm md:col-span-4 md:p-8">
-            <SectionHeader
-              title="Rute Penyeberangan Ro-Ro"
-              description="Lima lintasan yang menghubungkan Sumatera, Jawa, Bali, Lombok, dan Kalimantan Tengah."
-            />
+            <SectionHeader title={copy.heading} description={copy.description} />
             <LegList activeIndex={activeIndex} />
           </div>
         </div>

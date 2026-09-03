@@ -1,5 +1,6 @@
 import type { BusinessLine } from "@/content/types";
 import { Reveal } from "@/components/motion/reveal";
+import { HOME_SECTIONS_DEFAULTS } from "./home-sections-defaults";
 
 /**
  * Tiga perusahaan afiliasi, bukan tiga kartu fitur yang sama besar.
@@ -9,17 +10,21 @@ import { Reveal } from "@/components/motion/reveal";
  * Baris berpembatas tipis menyampaikan itu; tiga kartu sejajar justru akan
  * membuatnya terbaca setara dengan lini yang dijalankan DML sendiri.
  */
-export function Affiliates({ affiliates }: { affiliates: BusinessLine[] }) {
+export function Affiliates({
+  affiliates,
+  copy = HOME_SECTIONS_DEFAULTS.affiliates,
+}: {
+  affiliates: BusinessLine[];
+  copy?: { heading: string; subtext: string };
+}) {
   return (
     <section className="bg-surface-2-wash py-20 md:py-28">
       <div className="mx-auto grid max-w-[1400px] grid-cols-12 gap-8 px-4 md:px-8">
         <div className="col-span-12 md:col-span-4">
           <h2 className="font-display text-pretty text-2xl font-bold text-ink md:text-3xl">
-            Perusahaan afiliasi
+            {copy.heading}
           </h2>
-          <p className="mt-4 max-w-[32ch] text-sm text-ink-muted">
-            Tiga perusahaan yang bekerja berdampingan dengan armada DML.
-          </p>
+          <p className="mt-4 max-w-[32ch] text-sm text-ink-muted">{copy.subtext}</p>
         </div>
 
         <Reveal className="col-span-12 md:col-span-8" stagger={0.08}>

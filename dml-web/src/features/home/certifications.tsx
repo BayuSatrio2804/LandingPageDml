@@ -5,6 +5,7 @@ import { DML_SERVED_PORT_IDS } from "@/features/route-map/ports";
 import { useCounter } from "@/lib/motion/use-counter";
 import { yearsOperating } from "@/lib/company/years-operating";
 import { Reveal } from "@/components/motion/reveal";
+import { HOME_SECTIONS_DEFAULTS, type HomeSectionsData } from "./home-sections-defaults";
 
 function Metric({
   value,
@@ -45,17 +46,23 @@ function Metric({
  * tetap ditampilkan karena berasal dari riset Plan 1 yang tercatat di master
  * spec, tapi ditandai supaya klien bisa mencoretnya tanpa menebak.
  */
-export function Certifications({ company }: { company: CompanyProfileData }) {
+export function Certifications({
+  company,
+  stats = HOME_SECTIONS_DEFAULTS.stats,
+}: {
+  company: CompanyProfileData;
+  stats?: HomeSectionsData["stats"];
+}) {
   const years = yearsOperating(company.foundedIso, new Date());
 
   return (
     <section className="bg-surface-2-wash py-24 md:py-32">
       <div className="mx-auto max-w-[1400px] px-4 md:px-8">
         <div className="grid grid-cols-2 border-y border-surface-3 md:grid-cols-4">
-          <Metric value={company.fleetSummary.vessels} label="Kapal" />
-          <Metric value={company.fleetSummary.people} label="Orang" prefix="&gt;" />
-          <Metric value={years} label="Tahun beroperasi" />
-          <Metric value={DML_SERVED_PORT_IDS.length} label="Pelabuhan dilayani" />
+          <Metric value={company.fleetSummary.vessels} label={stats.shipsLabel} />
+          <Metric value={company.fleetSummary.people} label={stats.peopleLabel} prefix="&gt;" />
+          <Metric value={years} label={stats.yearsLabel} />
+          <Metric value={DML_SERVED_PORT_IDS.length} label={stats.portsLabel} />
         </div>
 
         <Reveal className="mt-16 grid gap-10 md:grid-cols-3" stagger={0.08}>
@@ -82,7 +89,7 @@ export function Certifications({ company }: { company: CompanyProfileData }) {
         </Reveal>
 
         <div className="mt-14 border-t border-surface-3 pt-8">
-          <p className="font-mono text-xs text-ink-muted">Keanggotaan</p>
+          <p className="font-mono text-xs text-ink-muted">{stats.membershipsHeading}</p>
           <ul className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
             {company.memberships.map((membership) => (
               <li key={membership.name} data-testid="keanggotaan" className="text-sm text-ink">

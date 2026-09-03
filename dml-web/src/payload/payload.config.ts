@@ -18,6 +18,7 @@ import { FleetClasses } from "./collections/FleetClasses";
 import { LegalDocuments } from "./collections/LegalDocuments";
 import { ArticlesPage } from "./globals/ArticlesPage";
 import { HomeHero } from "./globals/HomeHero";
+import { HomeSections } from "./globals/HomeSections";
 import { CompanyProfile } from "./globals/CompanyProfile";
 import { SiteNavigation } from "./globals/SiteNavigation";
 import { migrations } from "../migrations";
@@ -79,7 +80,7 @@ export default buildConfig({
   sharp,
   plugins: storagePlugins,
   collections: [Users, Media, Inquiries, Posts, Categories, Clients, Certifications, BusinessLines, Vessels, FleetClasses, LegalDocuments],
-  globals: [HomeHero, ArticlesPage, CompanyProfile, SiteNavigation],
+  globals: [HomeHero, HomeSections, ArticlesPage, CompanyProfile, SiteNavigation],
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
