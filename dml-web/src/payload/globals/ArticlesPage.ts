@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { revalidateAllGlobalHooks } from "../revalidate-all";
 
 /**
  * Copy admin-editable untuk kepala halaman /artikel. Sebelumnya teks ini
@@ -10,6 +11,7 @@ export const ArticlesPage: GlobalConfig = {
   admin: {
     group: "Halaman",
   },
+  hooks: revalidateAllGlobalHooks,
   fields: [
     {
       name: "heading",

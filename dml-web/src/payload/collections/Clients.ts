@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidateAllCollectionHooks } from "../revalidate-all";
 
 /**
  * Daftar klien "Trusted by Leading Companies" (company profile hal. 06),
@@ -21,6 +22,7 @@ export const Clients: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
+  hooks: revalidateAllCollectionHooks,
   fields: [
     { name: "name", type: "text", required: true },
     { name: "sector", type: "text", required: true },

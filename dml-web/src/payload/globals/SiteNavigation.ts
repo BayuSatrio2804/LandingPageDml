@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { revalidateAllGlobalHooks } from "../revalidate-all";
 
 /**
  * Menu header dan grup footer, admin-editable. Dulu hardcode di
@@ -10,6 +11,7 @@ export const SiteNavigation: GlobalConfig = {
   admin: {
     group: "Perusahaan",
   },
+  hooks: revalidateAllGlobalHooks,
   fields: [
     {
       name: "navItems",

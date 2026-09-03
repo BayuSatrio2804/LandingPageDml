@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { revalidateAllCollectionHooks } from "../revalidate-all";
 
 /**
  * Lencana sertifikasi yang tampil di hero beranda, admin-editable. Dulu
@@ -21,6 +22,7 @@ export const Certifications: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
+  hooks: revalidateAllCollectionHooks,
   fields: [
     { name: "name", type: "text", required: true },
     { name: "badge", type: "upload", relationTo: "media", required: true },

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { slugify } from "./Posts";
+import { revalidateAll } from "../revalidate-all";
 
 /**
  * Lini bisnis (dijalankan DML sendiri) dan afiliasi (di dalam Sinar Alam
@@ -33,6 +34,8 @@ export const BusinessLines: CollectionConfig = {
         return data;
       },
     ],
+    afterChange: [() => revalidateAll()],
+    afterDelete: [() => revalidateAll()],
   },
   fields: [
     {
