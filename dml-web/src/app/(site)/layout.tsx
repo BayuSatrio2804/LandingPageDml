@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { localBusinessJsonLd, organizationJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
 import { getCompanyProfile } from "@/lib/cms/company";
-import { getThemePreset } from "@/lib/cms/appearance";
+import { getAccentRamp } from "@/lib/cms/appearance";
 import { themeStyleBlock } from "@/lib/theme-presets";
 import "../globals.css";
 
@@ -19,8 +19,8 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
-  const [company, theme] = await Promise.all([getCompanyProfile(), getThemePreset()]);
-  const themeCss = themeStyleBlock(theme);
+  const [company, accentRamp] = await Promise.all([getCompanyProfile(), getAccentRamp()]);
+  const themeCss = themeStyleBlock(accentRamp);
   return (
     <html lang="id" className={`${fontVariables} h-full antialiased`}>
       {/*

@@ -1,15 +1,17 @@
 import { cache } from "react";
 import { getPayload } from "payload";
 import config from "@payload-config";
-import { THEME_PRESETS, type ThemePreset } from "@/lib/theme-presets";
+import { resolveAccentRamp, type AccentRamp } from "@/lib/theme-presets";
 
 /**
- * Global Payload `appearance` → preset tema. Server-only. Jatuh ke "navy"
- * kalau global belum diseed atau nilainya tidak dikenali.
+ * Global Payload `appearance` → ramp aksen final (sudah divalidasi kontras;
+ * nilai kustom yang tidak lolos otomatis jatuh ke navy). Server-only.
  */
-export const getThemePreset = cache(async (): Promise<ThemePreset> => {
+export const getAccentRamp = cache(async (): Promise<AccentRamp> => {
   const payload = await getPayload({ config });
   const doc = await payload.findGlobal({ slug: "appearance" });
-  const value = doc?.theme as string | undefined;
-  return value && value in THEME_PRESETS ? (value as ThemePreset) : "navy";
+  return resolveAccentRamp(
+    (doc?.theme as string | undefined) ?? "navy",
+    (doc?.customAccent as string | null | undefined) ?? null,
+  );
 });

@@ -1279,17 +1279,31 @@ export interface ContactCareer {
   createdAt?: string | null;
 }
 /**
- * Preset warna aksen situs. Hanya warna tautan/tombol/aksen yang berubah — latar dan teks tetap. Scene 3D di Beranda tetap navy.
+ * Warna aksen situs. Pilih preset, atau 'Kustom' untuk hex sendiri. Latar & teks tetap. Perubahan langsung terlihat setelah Save.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "appearance".
  */
 export interface Appearance {
   id: number;
+  theme:
+    | 'navy'
+    | 'ocean'
+    | 'teal'
+    | 'pine'
+    | 'forest'
+    | 'indigo'
+    | 'aubergine'
+    | 'plum'
+    | 'wine'
+    | 'espresso'
+    | 'slate'
+    | 'charcoal'
+    | 'custom';
   /**
-   * Perubahan langsung terlihat setelah Save.
+   * Hex warna aksen, mis. #3A1F5C. Harus cukup gelap (kontras cukup dengan latar terang, kaki, dan teks putih); kalau tidak, situs otomatis pakai navy.
    */
-  theme: 'navy' | 'teal' | 'forest' | 'plum';
+  customAccent?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1771,6 +1785,7 @@ export interface ContactCareerSelect<T extends boolean = true> {
  */
 export interface AppearanceSelect<T extends boolean = true> {
   theme?: T;
+  customAccent?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -15,6 +15,7 @@ import * as migration_20260903_055715_tambah_business_page from './20260903_0557
 import * as migration_20260903_060744_tambah_business_subpages from './20260903_060744_tambah_business_subpages';
 import * as migration_20260903_061458_tambah_contact_career from './20260903_061458_tambah_contact_career';
 import * as migration_20260903_062138_tambah_appearance from './20260903_062138_tambah_appearance';
+import * as migration_20260903_064541_tambah_custom_accent from './20260903_064541_tambah_custom_accent';
 
 export const migrations = [
   {
@@ -100,6 +101,11 @@ export const migrations = [
   {
     up: migration_20260903_062138_tambah_appearance.up,
     down: migration_20260903_062138_tambah_appearance.down,
-    name: '20260903_062138_tambah_appearance'
+    name: '20260903_062138_tambah_appearance',
+  },
+  {
+    up: migration_20260903_064541_tambah_custom_accent.up,
+    down: migration_20260903_064541_tambah_custom_accent.down,
+    name: '20260903_064541_tambah_custom_accent'
   },
 ];
