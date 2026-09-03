@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+  import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import { OgCard, OG_SIZE, OG_CONTENT_TYPE, loadOgFont, toOgSafeImageDataUri } from "@/lib/seo/og-template";
@@ -18,8 +18,8 @@ export const alt = "Artikel PT Dutabahari Menara Line";
  * next build, sebelum ada server HTTP yang bisa dituju, jadi fetch ke diri
  * sendiri tidak bisa diandalkan.
  *
- * Penyimpanan R2 (Vercel): tidak ada berkas di disk build. `url` sudah
- * berupa URL publik absolut R2, jadi byte-nya diambil lewat fetch ke sana.
+ * Penyimpanan Vercel Blob: tidak ada berkas di disk build. `url` sudah
+ * berupa URL publik absolut Blob, jadi byte-nya diambil lewat fetch ke sana.
  *
  * Satori tidak bisa mendekode WebP (lihat og-template.tsx), jadi byte-nya
  * tetap harus lewat toOgSafeImageDataUri apa pun sumbernya.

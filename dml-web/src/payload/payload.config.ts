@@ -2,7 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import { s3Storage } from "@payloadcms/storage-s3";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { Users } from "./collections/Users";
@@ -30,41 +30,23 @@ const dirname = path.dirname(filename);
  * Default: disk lokal lewat MEDIA_STATIC_DIR (lihat Media.ts) -- itu yang
  * dipakai `bun run dev`, test, dan image Docker dengan volume.
  *
- * Kalau R2_BUCKET diisi (target Vercel), koleksi `media` dialihkan ke
- * bucket S3-compatible Cloudflare R2. Vercel punya filesystem ephemeral,
- * jadi tanpa ini setiap upload admin hilang di redeploy berikutnya.
+ * Kalau BLOB_READ_WRITE_TOKEN ada (otomatis di-inject Vercel begitu Blob
+ * store terhubung ke project), koleksi `media` dialihkan ke Vercel Blob.
+ * Filesystem Vercel ephemeral, jadi tanpa ini tiap upload admin hilang di
+ * redeploy berikutnya. Adapter-nya sendiri sudah balik ke disk lokal kalau
+ * token-nya kosong, jadi tidak ada cabang env manual di sini.
  *
- * disablePayloadAccessControl + generateFileURL: berkasnya publik dan
- * dilayani langsung dari domain publik R2, BUKAN diproksi lewat route
- * /api/media/file/* (tiap gambar = satu invokasi function di Vercel, dan
- * opengraph-image.tsx yang berjalan saat build tidak punya server untuk
- * dituju).
+ * Berkas Blob selalu publik dan punya URL absolut sendiri
+ * (`<store>.public.blob.vercel-storage.com/...`), jadi `media.url` bisa
+ * langsung dipakai next/image dan opengraph-image.tsx tanpa proksi lewat
+ * route /api/media/file/*.
  */
-const r2Bucket = process.env.R2_BUCKET;
-const r2PublicUrl = process.env.R2_PUBLIC_URL?.replace(/\/+$/, "");
-
-const storagePlugins = r2Bucket
-  ? [
-      s3Storage({
-        collections: {
-          media: {
-            disablePayloadAccessControl: true,
-            generateFileURL: ({ filename: name }) => `${r2PublicUrl}/${name}`,
-          },
-        },
-        bucket: r2Bucket,
-        config: {
-          endpoint: process.env.R2_ENDPOINT,
-          region: "auto",
-          forcePathStyle: true,
-          credentials: {
-            accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
-            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
-          },
-        },
-      }),
-    ]
-  : [];
+const storagePlugins = [
+  vercelBlobStorage({
+    collections: { media: true },
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+  }),
+];
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET ?? "",
