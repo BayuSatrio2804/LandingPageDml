@@ -36,6 +36,25 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "**/*": ["./node_modules/jose/**"],
   },
+  /**
+   * Saat penyimpanan media dialihkan ke Cloudflare R2 (lihat R2_BUCKET di
+   * payload.config.ts), `media.url` jadi URL absolut ke domain publik R2.
+   * next/image menolak host eksternal yang tidak terdaftar di sini.
+   * Tanpa R2, media dilayani same-origin dari /media atau /api, jadi blok
+   * ini tidak diperlukan.
+   */
+  ...(process.env.R2_PUBLIC_URL
+    ? {
+        images: {
+          remotePatterns: [
+            {
+              protocol: "https" as const,
+              hostname: new URL(process.env.R2_PUBLIC_URL).hostname,
+            },
+          ],
+        },
+      }
+    : {}),
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
