@@ -3,11 +3,10 @@
 import Image from "next/image";
 import { CtaLink } from "@/components/ui/cta-link";
 import type { CertBadge } from "@/content/types";
-import { DOORS } from "./hero-doors";
+import { HOME_HERO_DEFAULTS, type HomeHeroData } from "./hero-defaults";
 
-// Halaman tujuan dibangun Plan 8. Label CTA-nya sudah "Permintaan Informasi
-// BBM" sejak awal, jadi ini bukan perubahan desain, melainkan penutupan TODO
-// yang menunggu halamannya ada.
+// Halaman tujuan dibangun Plan 8. Tautan CTA BBM tetap ke halaman ini —
+// yang bisa diubah admin lewat global home-hero cuma teks tombolnya.
 const CTA_BBM_HREF = "/bisnis/transportasi-bbm/permintaan-informasi";
 
 export function HeroCopy({
@@ -16,13 +15,36 @@ export function HeroCopy({
   ruleRefs,
   countRefs,
   certifications,
+  hero = HOME_HERO_DEFAULTS,
 }: {
   mounted: boolean;
   contentRef: React.RefObject<HTMLDivElement | null>;
   ruleRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   countRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   certifications: CertBadge[];
+  hero?: HomeHeroData;
 }) {
+  const doors = [
+    {
+      label: hero.bbm.label,
+      value: hero.bbm.value,
+      unit: hero.bbm.unit,
+      desc: hero.bbm.description,
+      ctaLabel: hero.bbm.ctaLabel,
+      ctaHref: CTA_BBM_HREF,
+      ctaExternal: false,
+    },
+    {
+      label: hero.roro.label,
+      value: hero.roro.value,
+      unit: hero.roro.unit,
+      desc: hero.roro.description,
+      ctaLabel: hero.roro.ctaLabel,
+      ctaHref: hero.roro.ctaHref,
+      ctaExternal: true,
+    },
+  ];
+
   return (
     <>
       <div
@@ -34,7 +56,7 @@ export function HeroCopy({
             data-hero-eyebrow
             className="font-mono text-[11px] tracking-[0.18em] text-white/62 uppercase"
           >
-            PT Dutabahari Menara Line · 64 kapal · Banjarmasin · Sejak 1988
+            {hero.eyebrow}
           </p>
           {/* Logo sertifikasi butuh ~58px agar segel ISO dan gerigi HSSE
               terbaca. Di layar sempit atau pendek barisnya disembunyikan,
@@ -66,19 +88,19 @@ export function HeroCopy({
             data-hero-h1
             className="font-display max-w-[22ch] text-[clamp(2.25rem,4.8vw,4.5rem)] leading-none tracking-[-0.02em] text-pretty text-white"
           >
-            Mitra Andal Distribusi Energi dan Penyeberangan Laut
+            {hero.headline}
           </h1>
           <p
             data-hero-sub
             data-testid="hero-subteks"
             className="max-w-[52ch] text-lg leading-relaxed text-white/78"
           >
-            Satu operator, dua lintasan. Dioperasikan dari Banjarmasin sejak 1988.
+            {hero.subheadline}
           </p>
         </div>
 
         <div className="grid grid-cols-1 items-end gap-5.5 min-[900px]:grid-cols-2 min-[900px]:gap-12">
-          {DOORS.map((door, index) => {
+          {doors.map((door, index) => {
             const isRoro = index === 1;
             const rule = (
               <span
@@ -91,7 +113,7 @@ export function HeroCopy({
             );
             return (
               <div
-                key={door.key}
+                key={door.label}
                 data-hero-door
                 className={`flex flex-col gap-4 ${
                   isRoro ? "min-[900px]:items-end min-[900px]:text-right" : ""
@@ -125,12 +147,12 @@ export function HeroCopy({
 
                 <div>
                   <span data-hero-cta className="inline-flex">
-                    {isRoro ? (
-                      <CtaLink href="https://dutabahari.id" variant="ghost">
-                        Pesan Tiket Ro-Ro
+                    {door.ctaExternal ? (
+                      <CtaLink href={door.ctaHref} variant="ghost">
+                        {door.ctaLabel}
                       </CtaLink>
                     ) : (
-                      <CtaLink href={CTA_BBM_HREF}>Permintaan Informasi BBM</CtaLink>
+                      <CtaLink href={door.ctaHref}>{door.ctaLabel}</CtaLink>
                     )}
                   </span>
                 </div>
@@ -148,7 +170,7 @@ export function HeroCopy({
           <span className="animate-hero-scroll block h-px w-7 bg-white" />
         </span>
         <span className="font-mono text-[10px] tracking-[0.24em] text-white/56 uppercase">
-          Gulir
+          {hero.scrollLabel}
         </span>
       </div>
     </>

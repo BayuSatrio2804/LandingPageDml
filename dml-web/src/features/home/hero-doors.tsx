@@ -3,23 +3,14 @@
 import Image from "next/image";
 import { MEDIA, avifSrc, type MediaAsset } from "@/lib/media/manifest";
 
-export const DOORS = [
-  {
-    key: "bbm",
-    label: "Transportasi BBM",
-    value: 55,
-    unit: "Tanker",
-    desc: "Pengangkutan bahan bakar dan transfer ship-to-ship untuk klien korporat.",
-    mediaId: "operasi-sts",
-  },
-  {
-    key: "roro",
-    label: "Penyeberangan Ro-Ro",
-    value: 9,
-    unit: "Kapal",
-    desc: "Penyeberangan untuk penumpang dan kendaraan, dengan tiket daring.",
-    mediaId: "penumpang-roro",
-  },
+/**
+ * Cuma pemetaan pintu → foto panel. Teks pintu (label/angka/deskripsi)
+ * datang dari global `home-hero` lewat props, bukan dari sini. mediaId
+ * tetap hardcode karena fotonya dari pipeline AVIF build-time.
+ */
+export const HERO_PANELS = [
+  { key: "bbm", mediaId: "operasi-sts" },
+  { key: "roro", mediaId: "penumpang-roro" },
 ] as const;
 
 /**
@@ -52,7 +43,7 @@ export function HeroDoors({
   return (
     <>
       {mounted
-        ? DOORS.map((door, index) => (
+        ? HERO_PANELS.map((door, index) => (
             <div
               key={door.key}
               data-hero-panel

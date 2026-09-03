@@ -12,6 +12,7 @@ import { getCompanyProfile } from "@/lib/cms/company";
 import { getCertifications } from "@/lib/cms/certifications";
 import { getBusinessLines } from "@/lib/cms/business-lines";
 import { getFleetClasses } from "@/lib/cms/fleet-classes";
+import { getHomeHero } from "@/lib/cms/home-hero";
 
 /**
  * Urutan seksi juga urutan ritme visual, dan itu disengaja. Hero adalah bidang
@@ -37,15 +38,17 @@ import { getFleetClasses } from "@/lib/cms/fleet-classes";
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [company, certifications, { mainLines, affiliates }, fleetClasses] = await Promise.all([
-    getCompanyProfile(),
-    getCertifications(),
-    getBusinessLines(),
-    getFleetClasses(),
-  ]);
+  const [company, certifications, { mainLines, affiliates }, fleetClasses, homeHero] =
+    await Promise.all([
+      getCompanyProfile(),
+      getCertifications(),
+      getBusinessLines(),
+      getFleetClasses(),
+      getHomeHero(),
+    ]);
   return (
     <>
-      <Hero certifications={certifications} />
+      <Hero certifications={certifications} hero={homeHero} />
       <DayCut />
       <BusinessLines mainLines={mainLines} />
       <Affiliates affiliates={affiliates} />

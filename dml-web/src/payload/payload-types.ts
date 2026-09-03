@@ -106,11 +106,13 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    'home-hero': HomeHero;
     'articles-page': ArticlesPage;
     'company-profile': CompanyProfile;
     'site-navigation': SiteNavigation;
   };
   globalsSelect: {
+    'home-hero': HomeHeroSelect<false> | HomeHeroSelect<true>;
     'articles-page': ArticlesPageSelect<false> | ArticlesPageSelect<true>;
     'company-profile': CompanyProfileSelect<false> | CompanyProfileSelect<true>;
     'site-navigation': SiteNavigationSelect<false> | SiteNavigationSelect<true>;
@@ -144,6 +146,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Akun yang bisa login ke /admin. Nama dipakai sebagai penulis artikel.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -173,6 +177,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Semua gambar yang diunggah lewat admin (cover artikel, logo klien, badge sertifikasi). Disimpan di Vercel Blob, bukan di repo.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -213,6 +219,8 @@ export interface Media {
   };
 }
 /**
+ * Lead yang masuk dari form /kontak dan /bisnis/transportasi-bbm/permintaan-informasi. Hanya untuk dibaca — jangan buat entri manual di sini.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "inquiries".
  */
@@ -229,6 +237,8 @@ export interface Inquiry {
   createdAt: string;
 }
 /**
+ * Artikel di halaman /artikel dan blok "Artikel terbaru" di Beranda. Status Published wajib supaya tampil.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
@@ -312,6 +322,8 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Kategori filter di /artikel. Namanya juga tampil di tiap kartu artikel dan halaman detail.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
@@ -326,6 +338,8 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * Logo klien di marquee halaman /bisnis. Urutan diatur field order.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "clients".
  */
@@ -346,6 +360,8 @@ export interface Client {
   createdAt: string;
 }
 /**
+ * Badge sertifikasi (ISO 9001, ISM Code, HSSE) di blok sertifikasi Beranda.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "certifications".
  */
@@ -363,6 +379,8 @@ export interface Certification {
   createdAt: string;
 }
 /**
+ * Lini bisnis utama dan afiliasi. Tampil di Beranda dan halaman /bisnis, plus dipakai /bisnis/transportasi-bbm & /bisnis/penumpang-roro. Field "kind" memisahkan Lini utama vs Afiliasi.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "business-lines".
  */
@@ -397,6 +415,8 @@ export interface BusinessLine {
   createdAt: string;
 }
 /**
+ * Daftar kapal per kelas. Tidak tampil satu per satu di situs, tapi jumlahnya per kelas muncul di Beranda dan halaman /bisnis/*. classSlug harus cocok dengan slug di Fleet Classes.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "vessels".
  */
@@ -413,6 +433,8 @@ export interface Vessel {
   createdAt: string;
 }
 /**
+ * 5 kelas kapal di komparator 3D Beranda dan di halaman /bisnis/transportasi-bbm & /bisnis/penumpang-roro. Jumlah kapal per kelas dihitung otomatis dari koleksi Vessels.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "fleet-classes".
  */
@@ -441,6 +463,8 @@ export interface FleetClass {
   createdAt: string;
 }
 /**
+ * Tabel dokumen legal dan perizinan di halaman /tentang-kami.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal-documents".
  */
@@ -848,6 +872,62 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Teks paling atas Beranda: baris kecil, judul besar, sub-teks, label gulir, dan dua kartu lini bisnis (kiri BBM, kanan Ro-Ro).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-hero".
+ */
+export interface HomeHero {
+  id: number;
+  /**
+   * Baris kecil huruf kapital di atas judul.
+   */
+  eyebrow: string;
+  /**
+   * Judul utama. Usahakan maksimal 7 kata supaya tetap dua baris di layar lebar.
+   */
+  headline: string;
+  /**
+   * Satu kalimat di bawah judul. Maksimal sekitar 20 kata.
+   */
+  subheadline: string;
+  /**
+   * Kata di indikator gulir bawah, mis. "Gulir".
+   */
+  scrollLabel: string;
+  bbm: {
+    label: string;
+    /**
+     * Angka besar di kartu, mis. jumlah tanker.
+     */
+    value: number;
+    /**
+     * Satuan, mis. "Tanker".
+     */
+    unit: string;
+    description: string;
+    /**
+     * Teks tombol. Tautannya tetap ke halaman permintaan informasi BBM.
+     */
+    ctaLabel: string;
+  };
+  roro: {
+    label: string;
+    value: number;
+    unit: string;
+    description: string;
+    ctaLabel: string;
+    /**
+     * Tautan tombol Ro-Ro, mis. situs pemesanan tiket.
+     */
+    ctaHref: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Heading dan intro di kepala halaman /artikel, plus daftar kanal share.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles-page".
  */
@@ -872,6 +952,8 @@ export interface ArticlesPage {
   createdAt?: string | null;
 }
 /**
+ * Data inti perusahaan: nama, alamat, kantor, nilai, standar, ringkasan armada, struktur grup. Dipakai hampir semua halaman — Beranda, /tentang-kami, /bisnis/*, /kontak, /karier, dan footer.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "company-profile".
  */
@@ -957,6 +1039,8 @@ export interface CompanyProfile {
   createdAt?: string | null;
 }
 /**
+ * Menu di header dan grup tautan di footer. Berlaku di semua halaman.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-navigation".
  */
@@ -986,6 +1070,38 @@ export interface SiteNavigation {
   }[];
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-hero_select".
+ */
+export interface HomeHeroSelect<T extends boolean = true> {
+  eyebrow?: T;
+  headline?: T;
+  subheadline?: T;
+  scrollLabel?: T;
+  bbm?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        unit?: T;
+        description?: T;
+        ctaLabel?: T;
+      };
+  roro?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        unit?: T;
+        description?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
