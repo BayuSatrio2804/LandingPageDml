@@ -9,6 +9,9 @@ const PX_PER_SECOND = 46;
 /**
  * Bilah nama kapal antar seksi. Isinya 66 nama dari company profile hal. 04,
  * jadi ini konten nyata yang dipakai sebagai tekstur, bukan dekorasi karangan.
+ *
+ * Dipindah dari src/features/bisnis/ ke sini: satu-satunya pemakainya sekarang
+ * adalah /tentang-kami, sejak halaman hub /bisnis dihapus.
  */
 export function VesselTicker({ vessels }: { vessels: Vessel[] }) {
   const root = useSectionMotion<HTMLElement>((scope) => {

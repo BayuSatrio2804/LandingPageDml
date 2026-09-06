@@ -11,7 +11,7 @@ import { LEGAL_DOCUMENTS_SEED } from "../src/lib/cms/legal-documents-seed";
 import { HOME_HERO_DEFAULTS } from "../src/features/home/hero-defaults";
 import { HOME_SECTIONS_DEFAULTS } from "../src/features/home/home-sections-defaults";
 import { ABOUT_PAGE_DEFAULTS } from "../src/features/about/about-defaults";
-import { BISNIS_PAGE_DEFAULTS } from "../src/features/bisnis/bisnis-defaults";
+import { AFILIASI_KLIEN_DEFAULTS } from "../src/features/about/afiliasi-klien-defaults";
 import { BISNIS_SUBPAGES_DEFAULTS } from "../src/features/bisnis/subpages-defaults";
 import { CONTACT_CAREER_DEFAULTS } from "../src/features/contact/contact-career-defaults";
 
@@ -303,12 +303,12 @@ async function main() {
     console.log("about-page: sudah ada");
   }
 
-  const businessPage = await payload.findGlobal({ slug: "business-page" });
-  if (!businessPage.createdAt) {
-    await payload.updateGlobal({ slug: "business-page", data: BISNIS_PAGE_DEFAULTS });
-    console.log("business-page: dibuat");
+  const afiliasiKlien = await payload.findGlobal({ slug: "afiliasi-klien" });
+  if (!afiliasiKlien.createdAt) {
+    await payload.updateGlobal({ slug: "afiliasi-klien", data: AFILIASI_KLIEN_DEFAULTS });
+    console.log("afiliasi-klien: dibuat");
   } else {
-    console.log("business-page: sudah ada");
+    console.log("afiliasi-klien: sudah ada");
   }
 
   const businessSubpages = await payload.findGlobal({ slug: "business-subpages" });

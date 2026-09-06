@@ -109,7 +109,7 @@ export interface Config {
     'home-hero': HomeHero;
     'home-sections': HomeSection;
     'about-page': AboutPage;
-    'business-page': BusinessPage;
+    'afiliasi-klien': AfiliasiKlien;
     'business-subpages': BusinessSubpage;
     'contact-career': ContactCareer;
     appearance: Appearance;
@@ -121,7 +121,7 @@ export interface Config {
     'home-hero': HomeHeroSelect<false> | HomeHeroSelect<true>;
     'home-sections': HomeSectionsSelect<false> | HomeSectionsSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
-    'business-page': BusinessPageSelect<false> | BusinessPageSelect<true>;
+    'afiliasi-klien': AfiliasiKlienSelect<false> | AfiliasiKlienSelect<true>;
     'business-subpages': BusinessSubpagesSelect<false> | BusinessSubpagesSelect<true>;
     'contact-career': ContactCareerSelect<false> | ContactCareerSelect<true>;
     appearance: AppearanceSelect<false> | AppearanceSelect<true>;
@@ -1106,9 +1106,9 @@ export interface AboutPage {
  * Teks dua blok di halaman Tentang Kami yang berasal dari sini: bagian afiliasi & bagian klien.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "business-page".
+ * via the `definition` "afiliasi-klien".
  */
-export interface BusinessPage {
+export interface AfiliasiKlien {
   id: number;
   afiliasi: {
     kicker: string;
@@ -1564,9 +1564,9 @@ export interface AboutPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "business-page_select".
+ * via the `definition` "afiliasi-klien_select".
  */
-export interface BusinessPageSelect<T extends boolean = true> {
+export interface AfiliasiKlienSelect<T extends boolean = true> {
   afiliasi?:
     | T
     | {

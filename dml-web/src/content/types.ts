@@ -106,11 +106,6 @@ export type FooterGroup = {
   items: NavItem[];
 };
 
-export type TimelineEntry = {
-  year: number;
-  label: string;
-};
-
 export type FleetClass = {
   slug: string;
   name: string;

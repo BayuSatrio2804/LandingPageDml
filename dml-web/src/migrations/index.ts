@@ -19,6 +19,7 @@ import * as migration_20260903_064541_tambah_custom_accent from './20260903_0645
 import * as migration_20260904_033854_fleet_comparator_cta from './20260904_033854_fleet_comparator_cta';
 import * as migration_20260905_154945_about_hero_intro2_optional from './20260905_154945_about_hero_intro2_optional';
 import * as migration_20260906_222909_trim_business_page from './20260906_222909_trim_business_page';
+import * as migration_20260906_232318_rename_business_page_to_afiliasi_klien from './20260906_232318_rename_business_page_to_afiliasi_klien';
 
 export const migrations = [
   {
@@ -125,5 +126,10 @@ export const migrations = [
     up: migration_20260906_222909_trim_business_page.up,
     down: migration_20260906_222909_trim_business_page.down,
     name: '20260906_222909_trim_business_page'
+  },
+  {
+    up: migration_20260906_232318_rename_business_page_to_afiliasi_klien.up,
+    down: migration_20260906_232318_rename_business_page_to_afiliasi_klien.down,
+    name: '20260906_232318_rename_business_page_to_afiliasi_klien'
   },
 ];

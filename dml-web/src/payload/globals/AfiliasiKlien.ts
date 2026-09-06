@@ -3,14 +3,17 @@ import { revalidateAllGlobalHooks } from "../revalidate-all";
 
 /**
  * Teks dua blok yang dirender di /tentang-kami: kartu afiliasi (AfiliasiCards)
- * dan pita klien (KlienMarquee). Dulu global ini menyimpan seluruh teks
- * halaman hub /bisnis (hero, panel lini utama, alur ship-to-ship, ajakan
- * penutup, label indeks samping) -- field-field itu dihapus bersamaan dengan
- * halaman hub-nya sendiri, yang sudah tidak ditautkan dari navigasi mana pun
- * dan sekarang di-redirect ke /tentang-kami (lihat next.config.ts).
+ * dan pita klien (KlienMarquee).
+ *
+ * Riwayat: dulu global ini bernama `business-page` dan menyimpan seluruh
+ * teks halaman hub /bisnis (hero, panel lini utama, alur ship-to-ship,
+ * ajakan penutup, label indeks samping). Halaman hub itu sudah dihapus --
+ * sudah tidak ditautkan dari navigasi mana pun dan sekarang di-redirect ke
+ * /tentang-kami (lihat next.config.ts) -- jadi field-field itu dihapus dan
+ * globalnya di-rename supaya tidak lagi menyebut halaman yang tidak ada.
  */
-export const BusinessPage: GlobalConfig = {
-  slug: "business-page",
+export const AfiliasiKlien: GlobalConfig = {
+  slug: "afiliasi-klien",
   admin: {
     group: "Halaman: Tentang Kami",
     description:

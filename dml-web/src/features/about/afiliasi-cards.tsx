@@ -4,7 +4,7 @@ import { gsap } from "@/lib/motion/gsap";
 import type { BusinessLine } from "@/content/types";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
-import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "@/features/bisnis/bisnis-defaults";
+import { AFILIASI_KLIEN_DEFAULTS, type AfiliasiKlienData } from "./afiliasi-klien-defaults";
 
 /**
  * Kartu afiliasi untuk halaman Tentang Kami — pengganti AfiliasiRows (daftar
@@ -31,10 +31,10 @@ const CATEGORY: Record<string, string> = {
 
 export function AfiliasiCards({
   affiliates,
-  copy = BISNIS_PAGE_DEFAULTS.afiliasi,
+  copy = AFILIASI_KLIEN_DEFAULTS.afiliasi,
 }: {
   affiliates: BusinessLine[];
-  copy?: BisnisPageData["afiliasi"];
+  copy?: AfiliasiKlienData["afiliasi"];
 }) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);

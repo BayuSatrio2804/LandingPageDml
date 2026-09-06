@@ -5,16 +5,20 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import type { Client } from "@/content/types";
 import { MOTION } from "@/lib/motion/tokens";
 import { useSectionMotion } from "@/lib/motion/use-section-motion";
-import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "./bisnis-defaults";
+import { AFILIASI_KLIEN_DEFAULTS, type AfiliasiKlienData } from "./afiliasi-klien-defaults";
 
 const PX_PER_SECOND = 38;
 
+/**
+ * Dipindah dari src/features/bisnis/ ke sini: satu-satunya pemakainya
+ * sekarang adalah /tentang-kami, sejak halaman hub /bisnis dihapus.
+ */
 export function KlienMarquee({
   clients,
-  copy = BISNIS_PAGE_DEFAULTS.klien,
+  copy = AFILIASI_KLIEN_DEFAULTS.klien,
 }: {
   clients: Client[];
-  copy?: BisnisPageData["klien"];
+  copy?: AfiliasiKlienData["klien"];
 }) {
   const root = useSectionMotion<HTMLElement>((scope) => {
     const q = gsap.utils.selector(scope);

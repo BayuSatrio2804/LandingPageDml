@@ -5,19 +5,19 @@ import { AboutHero } from "@/features/about/about-hero";
 import { StatStrip } from "@/features/about/stat-strip";
 import { CoreValues } from "@/features/about/core-values";
 import { AfiliasiCards } from "@/features/about/afiliasi-cards";
-import { VesselTicker } from "@/features/bisnis/vessel-ticker";
-import { KlienMarquee } from "@/features/bisnis/klien-marquee";
+import { VesselTicker } from "@/features/about/vessel-ticker";
+import { KlienMarquee } from "@/features/about/klien-marquee";
 import { LegalSection } from "@/features/about/legal-section";
 import { AboutCta } from "@/features/about/about-cta";
 // IdentitySection, GroupChart, dan OfficesSection tetap nonaktif (bukan
-// dihapus). AfiliasiCards / VesselTicker / KlienMarquee dipindah KE SINI dari
-// /bisnis atas permintaan klien: halaman /bisnis disembunyikan, tiga blok itu
-// yang tetap dipakai.
+// dihapus). AfiliasiCards / VesselTicker / KlienMarquee dulu bagian dari
+// halaman hub /bisnis yang sudah dihapus (redirect ke halaman ini, lihat
+// next.config.ts) -- ketiganya sudah dipindah ke src/features/about/.
 import { getCompanyProfile } from "@/lib/cms/company";
 import { getLegalDocuments } from "@/lib/cms/legal-documents";
 import { getAboutPage } from "@/lib/cms/about-page";
 import { getBusinessLines } from "@/lib/cms/business-lines";
-import { getBusinessPage } from "@/lib/cms/business-page";
+import { getAfiliasiKlien } from "@/lib/cms/afiliasi-klien";
 import { getVessels } from "@/lib/cms/vessels";
 import { getClients } from "@/lib/cms/clients";
 
@@ -29,13 +29,13 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function TentangKamiPage() {
-  const [company, legalDocuments, about, { affiliates }, businessPage, vessels, clients] =
+  const [company, legalDocuments, about, { affiliates }, afiliasiKlien, vessels, clients] =
     await Promise.all([
       getCompanyProfile(),
       getLegalDocuments(),
       getAboutPage(),
       getBusinessLines(),
-      getBusinessPage(),
+      getAfiliasiKlien(),
       getVessels(),
       getClients(),
     ]);
@@ -55,9 +55,9 @@ export default async function TentangKamiPage() {
         labels={about.statLabels}
       />
       <CoreValues values={company.values} copy={about.coreValues} />
-      <AfiliasiCards affiliates={affiliates} copy={businessPage.afiliasi} />
+      <AfiliasiCards affiliates={affiliates} copy={afiliasiKlien.afiliasi} />
       <VesselTicker vessels={vessels} />
-      <KlienMarquee clients={clients} copy={businessPage.klien} />
+      <KlienMarquee clients={clients} copy={afiliasiKlien.klien} />
       <LegalSection
         legalDocuments={legalDocuments}
         standards={company.standards}

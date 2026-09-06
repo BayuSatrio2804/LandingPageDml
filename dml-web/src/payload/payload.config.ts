@@ -20,7 +20,7 @@ import { ArticlesPage } from "./globals/ArticlesPage";
 import { HomeHero } from "./globals/HomeHero";
 import { HomeSections } from "./globals/HomeSections";
 import { AboutPage } from "./globals/AboutPage";
-import { BusinessPage } from "./globals/BusinessPage";
+import { AfiliasiKlien } from "./globals/AfiliasiKlien";
 import { BusinessSubpages } from "./globals/BusinessSubpages";
 import { ContactCareer } from "./globals/ContactCareer";
 import { Appearance } from "./globals/Appearance";
@@ -89,7 +89,7 @@ export default buildConfig({
     HomeHero,
     HomeSections,
     AboutPage,
-    BusinessPage,
+    AfiliasiKlien,
     BusinessSubpages,
     ContactCareer,
     Appearance,

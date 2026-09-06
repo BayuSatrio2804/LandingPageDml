@@ -1,15 +1,19 @@
 /**
- * Teks bawaan dua blok "afiliasi" dan "klien" yang sekarang dirender di
- * halaman /tentang-kami (AfiliasiCards, KlienMarquee) lewat global Payload
- * `business-page`. Angka armada, daftar afiliasi, dan logo klien tetap dari
+ * Teks bawaan dua blok "afiliasi" dan "klien" yang dirender di halaman
+ * /tentang-kami (AfiliasiCards, KlienMarquee) lewat global Payload
+ * `afiliasi-klien`. Angka armada, daftar afiliasi, dan logo klien tetap dari
  * koleksi CMS; di sini cuma judul, kicker, dan prosa.
  *
- * Dulu berkas ini juga menyimpan hero/liniUtama/alurSts/cta/sectionIndexLabels
- * untuk halaman hub /bisnis — dihapus bersamaan dengan halaman itu sendiri
- * (lihat next.config.ts untuk redirect /bisnis -> /tentang-kami), karena
- * halaman itu sudah tidak ditautkan dari navigasi mana pun.
+ * Riwayat: dulu berkas ini ("bisnis-defaults.ts") juga menyimpan
+ * hero/liniUtama/alurSts/cta/sectionIndexLabels untuk halaman hub /bisnis,
+ * dan hidup di src/features/bisnis/. Halaman hub itu sudah dihapus (lihat
+ * next.config.ts untuk redirect /bisnis -> /tentang-kami) karena sudah
+ * tidak ditautkan dari navigasi mana pun, dan berkas ini dipindah + diganti
+ * nama ke sini karena isinya sekarang murni konten Tentang Kami, bukan
+ * Bisnis. `src/features/bisnis/` sekarang cuma menyisakan
+ * `subpages-defaults.ts` untuk dua sub-halaman /bisnis/* yang masih hidup.
  */
-export type BisnisPageData = {
+export type AfiliasiKlienData = {
   afiliasi: { kicker: string; heading: string; subtext: string };
   klien: {
     kicker: string;
@@ -23,7 +27,7 @@ export type BisnisPageData = {
   };
 };
 
-export const BISNIS_PAGE_DEFAULTS: BisnisPageData = {
+export const AFILIASI_KLIEN_DEFAULTS: AfiliasiKlienData = {
   afiliasi: {
     kicker: "Sinar Alam Corporation",
     heading: "Perusahaan afiliasi",
