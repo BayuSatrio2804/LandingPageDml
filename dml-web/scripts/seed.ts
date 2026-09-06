@@ -289,21 +289,11 @@ async function main() {
     console.log("site-navigation: sudah ada");
   }
 
-  const homeHero = await payload.findGlobal({ slug: "home-hero" });
-  if (!homeHero.createdAt) {
-    await payload.updateGlobal({ slug: "home-hero", data: HOME_HERO_DEFAULTS });
-    console.log("home-hero: dibuat");
-  } else {
-    console.log("home-hero: sudah ada");
-  }
+  await payload.updateGlobal({ slug: "home-hero", data: HOME_HERO_DEFAULTS, overrideAccess: true });
+  console.log("home-hero: diperbarui dengan HOME_HERO_DEFAULTS");
 
-  const homeSections = await payload.findGlobal({ slug: "home-sections" });
-  if (!homeSections.createdAt) {
-    await payload.updateGlobal({ slug: "home-sections", data: HOME_SECTIONS_DEFAULTS });
-    console.log("home-sections: dibuat");
-  } else {
-    console.log("home-sections: sudah ada");
-  }
+  await payload.updateGlobal({ slug: "home-sections", data: HOME_SECTIONS_DEFAULTS, overrideAccess: true });
+  console.log("home-sections: diperbarui dengan HOME_SECTIONS_DEFAULTS");
 
   const aboutPage = await payload.findGlobal({ slug: "about-page" });
   if (!aboutPage.createdAt) {
@@ -409,8 +399,15 @@ async function main() {
       where: { slug: { equals: line.slug } },
       limit: 1,
     });
-    if (ada.docs.length > 0) {
-      console.log(`lini bisnis (sudah ada): ${line.slug}`);
+    const doc = ada.docs[0];
+    if (doc) {
+      await payload.update({
+        collection: "business-lines",
+        id: doc.id,
+        data: { title: line.title, summary: line.summary, metric: line.metric ?? undefined },
+        overrideAccess: true,
+      });
+      console.log(`lini bisnis (diperbarui): ${line.slug}`);
       continue;
     }
     await payload.create({

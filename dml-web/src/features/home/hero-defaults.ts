@@ -27,17 +27,17 @@ export type HomeHeroData = {
 };
 
 export const HOME_HERO_DEFAULTS: HomeHeroData = {
-  eyebrow: "PT Dutabahari Menara Line · 64 kapal · Banjarmasin · Sejak 1988",
+  eyebrow: "",
   headline: "Mitra Andal Distribusi Energi dan Penyeberangan Laut",
-  subheadline: "Satu operator, dua lintasan. Dioperasikan dari Banjarmasin sejak 1988.",
+  subheadline: "",
   scrollLabel: "Gulir",
   bbm: {
-    label: "Transportasi BBM",
+    label: "Oil Transportation",
     value: 55,
-    unit: "Tanker",
+    unit: "Kapal",
     description:
-      "Pengangkutan bahan bakar dan transfer ship-to-ship untuk klien korporat.",
-    ctaLabel: "Permintaan Informasi BBM",
+      "Solusi transportasi laut terpercaya untuk berbagai jenis kargo cair dan bahan bakar.",
+    ctaLabel: "Oil Transportation Services",
   },
   roro: {
     label: "Penyeberangan Ro-Ro",

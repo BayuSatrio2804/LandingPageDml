@@ -58,7 +58,7 @@ describe("Hero", () => {
     // memang sudah "Permintaan Informasi BBM" sejak Plan 4.
     render(<Hero certifications={CERTIFICATIONS} />);
     expect(
-      screen.getByRole("link", { name: /Permintaan Informasi BBM/i }),
+      screen.getByRole("link", { name: /Oil Transportation Services/i }),
     ).toHaveAttribute("href", "/bisnis/transportasi-bbm/permintaan-informasi");
   });
 
@@ -99,7 +99,7 @@ describe("Hero", () => {
   // meredupkan salah satunya, karena itu mengalikan turun ke tombol.
   it("kedua label lini bisnis ada", () => {
     render(<Hero certifications={CERTIFICATIONS} />);
-    expect(screen.getByText(/transportasi bbm/i)).toBeInTheDocument();
+    expect(screen.getByText("Oil Transportation")).toBeInTheDocument();
     expect(screen.getByText(/penyeberangan ro-ro/i)).toBeInTheDocument();
   });
 });

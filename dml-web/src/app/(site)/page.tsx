@@ -1,14 +1,10 @@
 import { Hero } from "@/features/home/hero";
 import { DayCut } from "@/features/home/day-cut";
 import { BusinessLines } from "@/features/home/business-lines";
-import { Affiliates } from "@/features/home/affiliates";
 import { FleetComparator } from "@/features/home/fleet-comparator";
 import { RouteMap } from "@/features/home/route-map";
-import { Since1988 } from "@/features/home/since-1988";
-import { Certifications } from "@/features/home/certifications";
 import { CtaSection } from "@/features/home/cta-section";
 import { LatestArticles } from "@/features/articles/latest-articles";
-import { getCompanyProfile } from "@/lib/cms/company";
 import { getCertifications } from "@/lib/cms/certifications";
 import { getBusinessLines } from "@/lib/cms/business-lines";
 import { getFleetClasses } from "@/lib/cms/fleet-classes";
@@ -39,9 +35,8 @@ import { getHomeSections } from "@/lib/cms/home-sections";
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [company, certifications, { mainLines, affiliates }, fleetClasses, homeHero, sections] =
+  const [certifications, { mainLines }, fleetClasses, homeHero, sections] =
     await Promise.all([
-      getCompanyProfile(),
       getCertifications(),
       getBusinessLines(),
       getFleetClasses(),
@@ -51,13 +46,10 @@ export default async function HomePage() {
   return (
     <>
       <Hero certifications={certifications} hero={homeHero} />
-      <DayCut copy={sections.dayCut} />
       <BusinessLines mainLines={mainLines} />
-      <Affiliates affiliates={affiliates} copy={sections.affiliates} />
+      <DayCut copy={sections.dayCut} />
       <FleetComparator fleetClasses={fleetClasses} copy={sections.fleetComparator} />
       <RouteMap copy={sections.routeMap} />
-      <Since1988 company={company} copy={sections.since1988} />
-      <Certifications company={company} stats={sections.stats} />
       <LatestArticles />
       <CtaSection cta={sections.cta} />
     </>
