@@ -13,11 +13,14 @@ import { listPublishedPosts } from "@/features/articles/queries";
  *
  * /artikel kembali sejak Plan 9, bersama slug artikel published yang
  * ditambahkan secara dinamis di bawah.
+ *
+ * /bisnis (hub) dicoret: sudah tidak ditautkan dari navigasi mana pun dan
+ * di-redirect ke /tentang-kami (lihat next.config.ts). Kedua sub-halamannya
+ * tetap ada di sini karena masih hidup dan ditautkan dari footer.
  */
 export const STATIC_PATHS = [
   "/",
   "/tentang-kami",
-  "/bisnis",
   "/bisnis/transportasi-bbm",
   "/bisnis/transportasi-bbm/permintaan-informasi",
   "/bisnis/penumpang-roro",

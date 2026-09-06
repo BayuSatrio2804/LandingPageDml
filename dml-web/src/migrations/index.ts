@@ -18,6 +18,7 @@ import * as migration_20260903_062138_tambah_appearance from './20260903_062138_
 import * as migration_20260903_064541_tambah_custom_accent from './20260903_064541_tambah_custom_accent';
 import * as migration_20260904_033854_fleet_comparator_cta from './20260904_033854_fleet_comparator_cta';
 import * as migration_20260905_154945_about_hero_intro2_optional from './20260905_154945_about_hero_intro2_optional';
+import * as migration_20260906_222909_trim_business_page from './20260906_222909_trim_business_page';
 
 export const migrations = [
   {
@@ -118,6 +119,11 @@ export const migrations = [
   {
     up: migration_20260905_154945_about_hero_intro2_optional.up,
     down: migration_20260905_154945_about_hero_intro2_optional.down,
-    name: '20260905_154945_about_hero_intro2_optional'
+    name: '20260905_154945_about_hero_intro2_optional',
+  },
+  {
+    up: migration_20260906_222909_trim_business_page.up,
+    down: migration_20260906_222909_trim_business_page.down,
+    name: '20260906_222909_trim_business_page'
   },
 ];

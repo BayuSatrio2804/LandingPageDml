@@ -32,7 +32,6 @@ export default async function PenumpangRoroPage() {
   const RORO_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Penumpang Ro-Ro");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
-    { name: "Bisnis Kami", path: "/bisnis" },
     { name: "Penyeberangan Ro-Ro", path: "/bisnis/penumpang-roro" },
   ]);
   const line = mainLines.find((entry) => entry.id === "penumpang-roro");

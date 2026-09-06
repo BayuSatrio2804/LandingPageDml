@@ -1103,60 +1103,13 @@ export interface AboutPage {
   createdAt?: string | null;
 }
 /**
- * Teks halaman Bisnis Kami: hero, dua panel lini utama, alur ship-to-ship, judul bagian afiliasi & klien, ajakan penutup, dan label indeks samping.
+ * Teks dua blok di halaman Tentang Kami yang berasal dari sini: bagian afiliasi & bagian klien.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "business-page".
  */
 export interface BusinessPage {
   id: number;
-  hero: {
-    title: string;
-    intro: string;
-    metrics?:
-      | {
-          value: number;
-          unit: string;
-          label: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  liniUtama?: {
-    /**
-     * Urutan penting: panel pertama tautannya ke /bisnis/transportasi-bbm, kedua ke /bisnis/penumpang-roro.
-     */
-    panels?:
-      | {
-          /**
-           * Mis. "01".
-           */
-          num: string;
-          title: string;
-          summary: string;
-          metric: string;
-          metricLabel: string;
-          bullets: string[];
-          /**
-           * Teks tombol.
-           */
-          cta: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  alurSts: {
-    kicker: string;
-    heading: string;
-    intro: string;
-    steps?:
-      | {
-          title: string;
-          desc: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
   afiliasi: {
     kicker: string;
     heading: string;
@@ -1178,22 +1131,6 @@ export interface BusinessPage {
      */
     placeholderNote: string;
   };
-  cta: {
-    kicker: string;
-    heading: string;
-    /**
-     * Tombol ke halaman permintaan informasi.
-     */
-    primaryButtonLabel: string;
-    /**
-     * Tombol ke situs pemesanan tiket.
-     */
-    secondaryButtonLabel: string;
-  };
-  /**
-   * Lima label navigasi mengambang di sisi kanan. Urutan = urutan bagian.
-   */
-  sectionIndexLabels: string[];
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1630,50 +1567,6 @@ export interface AboutPageSelect<T extends boolean = true> {
  * via the `definition` "business-page_select".
  */
 export interface BusinessPageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        title?: T;
-        intro?: T;
-        metrics?:
-          | T
-          | {
-              value?: T;
-              unit?: T;
-              label?: T;
-              id?: T;
-            };
-      };
-  liniUtama?:
-    | T
-    | {
-        panels?:
-          | T
-          | {
-              num?: T;
-              title?: T;
-              summary?: T;
-              metric?: T;
-              metricLabel?: T;
-              bullets?: T;
-              cta?: T;
-              id?: T;
-            };
-      };
-  alurSts?:
-    | T
-    | {
-        kicker?: T;
-        heading?: T;
-        intro?: T;
-        steps?:
-          | T
-          | {
-              title?: T;
-              desc?: T;
-              id?: T;
-            };
-      };
   afiliasi?:
     | T
     | {
@@ -1693,15 +1586,6 @@ export interface BusinessPageSelect<T extends boolean = true> {
         stat2Caption?: T;
         placeholderNote?: T;
       };
-  cta?:
-    | T
-    | {
-        kicker?: T;
-        heading?: T;
-        primaryButtonLabel?: T;
-        secondaryButtonLabel?: T;
-      };
-  sectionIndexLabels?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

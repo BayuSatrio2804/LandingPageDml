@@ -5,9 +5,10 @@ import { BISNIS_PAGE_DEFAULTS, type BisnisPageData } from "@/features/bisnis/bis
 
 /**
  * Global Payload `business-page` → BisnisPageData. Server-only. Global yang
- * belum pernah disimpan jatuh ke BISNIS_PAGE_DEFAULTS. Tiap grup juga
- * di-fallback sendiri: field group di bawah collapsible bisa undefined di
- * tipe hasil generate kalau belum pernah diisi.
+ * belum pernah disimpan jatuh ke BISNIS_PAGE_DEFAULTS.
+ *
+ * Sejak halaman hub /bisnis dihapus, global ini cuma menyimpan dua blok
+ * (afiliasi, klien) yang sekarang dirender di /tentang-kami.
  */
 export const getBusinessPage = cache(async (): Promise<BisnisPageData> => {
   const payload = await getPayload({ config });
@@ -15,40 +16,10 @@ export const getBusinessPage = cache(async (): Promise<BisnisPageData> => {
   if (!doc?.createdAt) return BISNIS_PAGE_DEFAULTS;
 
   const d = BISNIS_PAGE_DEFAULTS;
-  const hero = doc.hero ?? d.hero;
-  const liniUtama = doc.liniUtama ?? d.liniUtama;
-  const alurSts = doc.alurSts ?? d.alurSts;
   const afiliasi = doc.afiliasi ?? d.afiliasi;
   const klien = doc.klien ?? d.klien;
-  const cta = doc.cta ?? d.cta;
 
   return {
-    hero: {
-      title: hero.title,
-      intro: hero.intro,
-      metrics: (hero.metrics ?? []).map((m) => ({
-        value: m.value,
-        unit: m.unit,
-        label: m.label,
-      })),
-    },
-    liniUtama: {
-      panels: (liniUtama.panels ?? []).map((p) => ({
-        num: p.num,
-        title: p.title,
-        summary: p.summary,
-        metric: p.metric,
-        metricLabel: p.metricLabel,
-        bullets: p.bullets ?? [],
-        cta: p.cta,
-      })),
-    },
-    alurSts: {
-      kicker: alurSts.kicker,
-      heading: alurSts.heading,
-      intro: alurSts.intro,
-      steps: (alurSts.steps ?? []).map((s) => ({ title: s.title, desc: s.desc })),
-    },
     afiliasi: {
       kicker: afiliasi.kicker,
       heading: afiliasi.heading,
@@ -64,12 +35,5 @@ export const getBusinessPage = cache(async (): Promise<BisnisPageData> => {
       stat2Caption: klien.stat2Caption,
       placeholderNote: klien.placeholderNote,
     },
-    cta: {
-      kicker: cta.kicker,
-      heading: cta.heading,
-      primaryButtonLabel: cta.primaryButtonLabel,
-      secondaryButtonLabel: cta.secondaryButtonLabel,
-    },
-    sectionIndexLabels: doc.sectionIndexLabels ?? d.sectionIndexLabels,
   };
 });

@@ -43,8 +43,8 @@ describe("sitemap", () => {
     expect(STATIC_PATHS).toContain("/artikel");
   });
 
-  it("memuat keempat route bisnis", () => {
-    expect(STATIC_PATHS).toContain("/bisnis");
+  it("memuat ketiga sub-halaman bisnis, tapi tidak lagi hub /bisnis", () => {
+    expect(STATIC_PATHS).not.toContain("/bisnis");
     expect(STATIC_PATHS).toContain("/bisnis/transportasi-bbm");
     expect(STATIC_PATHS).toContain("/bisnis/penumpang-roro");
     expect(STATIC_PATHS).toContain("/bisnis/transportasi-bbm/permintaan-informasi");

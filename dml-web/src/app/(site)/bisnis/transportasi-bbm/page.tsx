@@ -34,7 +34,6 @@ export default async function TransportasiBbmPage() {
   const BBM_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Transportasi Minyak");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
-    { name: "Bisnis Kami", path: "/bisnis" },
     { name: "Transportasi Minyak", path: "/bisnis/transportasi-bbm" },
   ]);
   const line = mainLines.find((entry) => entry.id === "transportasi-bbm");

@@ -61,6 +61,17 @@ const nextConfig: NextConfig = {
         },
       }
     : {}),
+  /**
+   * Halaman hub /bisnis dihapus: sudah tidak ditautkan dari navigasi mana
+   * pun (nav utama maupun footer), dan seluruh isinya yang masih relevan
+   * (kartu afiliasi, pita klien) sudah pindah ke /tentang-kami. Redirect ini
+   * mencegah URL lama yang mungkin sudah terindeks mesin pencari atau
+   * ditandai bookmark berakhir di 404. Sub-halaman /bisnis/transportasi-bbm
+   * dan /bisnis/penumpang-roro TIDAK terpengaruh, keduanya tetap hidup.
+   */
+  async redirects() {
+    return [{ source: "/bisnis", destination: "/tentang-kami", permanent: true }];
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
