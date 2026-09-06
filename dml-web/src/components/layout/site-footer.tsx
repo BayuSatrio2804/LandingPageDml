@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MapPin } from "@phosphor-icons/react/dist/ssr";
 import type { CompanyProfileData, SiteNavigationData } from "@/lib/cms/company";
 import { getCompanyProfile, getSiteNavigation } from "@/lib/cms/company";
 import { MODEL_CREDITS } from "@/content/model-credits";
@@ -39,12 +40,15 @@ export function SiteFooterView({
           </p>
           <address className="mt-6 space-y-4 not-italic text-sm text-surface-3">
             {company.offices.map((office) => (
-              <div key={office.street}>
-                <p className="text-on-accent">{office.label}</p>
-                <p>{office.street}</p>
-                <p>
-                  {office.city} {office.postalCode}, {office.province}
-                </p>
+              <div key={office.street} className="flex gap-2.5">
+                <MapPin size={18} weight="regular" className="mt-0.5 shrink-0 text-surface-3" aria-hidden />
+                <div>
+                  <p className="text-on-accent">{office.label}</p>
+                  <p>{office.street}</p>
+                  <p>
+                    {office.city} {office.postalCode}, {office.province}
+                  </p>
+                </div>
               </div>
             ))}
           </address>
