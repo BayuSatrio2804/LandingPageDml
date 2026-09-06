@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getCompanyProfile, getSiteNavigation } from "@/lib/cms/company";
 import { ExternalLink } from "./external-link";
 import { MobileMenu } from "./mobile-menu";
@@ -23,8 +24,16 @@ export async function SiteHeader() {
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-4 md:px-8">
         <Link
           href="/"
-          className="font-display text-lg font-bold tracking-tight"
+          className="inline-flex items-center gap-2.5 font-display text-lg font-bold tracking-tight"
         >
+          <Image
+            src="/assets/brand/dml-logo.png"
+            alt=""
+            aria-hidden="true"
+            width={44}
+            height={44}
+            className="h-9 w-9 shrink-0 object-contain"
+          />
           {company.shortName}
         </Link>
 
