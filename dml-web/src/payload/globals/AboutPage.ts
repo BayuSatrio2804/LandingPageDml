@@ -28,7 +28,11 @@ export const AboutPage: GlobalConfig = {
           fields: [
             { name: "title", type: "text", required: true },
             { name: "intro1", type: "textarea", required: true },
-            { name: "intro2", type: "textarea", required: true },
+            {
+              name: "intro2",
+              type: "textarea",
+              admin: { description: "Opsional. Kosongkan untuk hero satu paragraf." },
+            },
           ],
         },
       ],

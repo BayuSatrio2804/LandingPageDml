@@ -894,7 +894,7 @@ export interface HomeHero {
   /**
    * Baris kecil huruf kapital di atas judul.
    */
-  eyebrow: string;
+  eyebrow?: string | null;
   /**
    * Judul utama. Usahakan maksimal 7 kata supaya tetap dua baris di layar lebar.
    */
@@ -902,7 +902,7 @@ export interface HomeHero {
   /**
    * Satu kalimat di bawah judul. Maksimal sekitar 20 kata.
    */
-  subheadline: string;
+  subheadline?: string | null;
   /**
    * Kata di indikator gulir bawah, mis. "Gulir".
    */
@@ -971,6 +971,11 @@ export interface HomeSection {
      * Mis. "1 kotak grid = 10 m".
      */
     gridHint: string;
+    /**
+     * Ajakan singkat di ruang kosong sebelah kanan panggung 3D. Tautan tombolnya tetap ke /kontak.
+     */
+    ctaHeading: string;
+    ctaButtonLabel: string;
   };
   routeMap: {
     heading: string;
@@ -1019,7 +1024,10 @@ export interface AboutPage {
   hero: {
     title: string;
     intro1: string;
-    intro2: string;
+    /**
+     * Opsional. Kosongkan untuk hero satu paragraf.
+     */
+    intro2?: string | null;
   };
   /**
    * Kalimat kecil di bawah tiap angka. Angkanya dihitung otomatis.
@@ -1510,6 +1518,8 @@ export interface HomeSectionsSelect<T extends boolean = true> {
         descriptionStatic?: T;
         dragHint?: T;
         gridHint?: T;
+        ctaHeading?: T;
+        ctaButtonLabel?: T;
       };
   routeMap?:
     | T

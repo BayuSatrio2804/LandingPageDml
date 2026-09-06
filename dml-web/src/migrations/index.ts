@@ -16,6 +16,8 @@ import * as migration_20260903_060744_tambah_business_subpages from './20260903_
 import * as migration_20260903_061458_tambah_contact_career from './20260903_061458_tambah_contact_career';
 import * as migration_20260903_062138_tambah_appearance from './20260903_062138_tambah_appearance';
 import * as migration_20260903_064541_tambah_custom_accent from './20260903_064541_tambah_custom_accent';
+import * as migration_20260904_033854_fleet_comparator_cta from './20260904_033854_fleet_comparator_cta';
+import * as migration_20260905_154945_about_hero_intro2_optional from './20260905_154945_about_hero_intro2_optional';
 
 export const migrations = [
   {
@@ -106,6 +108,16 @@ export const migrations = [
   {
     up: migration_20260903_064541_tambah_custom_accent.up,
     down: migration_20260903_064541_tambah_custom_accent.down,
-    name: '20260903_064541_tambah_custom_accent'
+    name: '20260903_064541_tambah_custom_accent',
+  },
+  {
+    up: migration_20260904_033854_fleet_comparator_cta.up,
+    down: migration_20260904_033854_fleet_comparator_cta.down,
+    name: '20260904_033854_fleet_comparator_cta',
+  },
+  {
+    up: migration_20260905_154945_about_hero_intro2_optional.up,
+    down: migration_20260905_154945_about_hero_intro2_optional.down,
+    name: '20260905_154945_about_hero_intro2_optional'
   },
 ];

@@ -73,6 +73,16 @@ export const HomeSections: GlobalConfig = {
             },
             { name: "dragHint", type: "text", required: true, admin: { description: 'Mis. "Seret untuk memutar".' } },
             { name: "gridHint", type: "text", required: true, admin: { description: 'Mis. "1 kotak grid = 10 m".' } },
+            {
+              name: "ctaHeading",
+              type: "text",
+              required: true,
+              admin: {
+                description:
+                  "Ajakan singkat di ruang kosong sebelah kanan panggung 3D. Tautan tombolnya tetap ke /kontak.",
+              },
+            },
+            { name: "ctaButtonLabel", type: "text", required: true },
           ],
         },
       ],
