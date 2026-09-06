@@ -16,6 +16,8 @@ export type HomeSectionsData = {
     descriptionStatic: string;
     dragHint: string;
     gridHint: string;
+    ctaHeading: string;
+    ctaButtonLabel: string;
   };
   routeMap: { heading: string; description: string };
   since1988: {
@@ -44,13 +46,15 @@ export const HOME_SECTIONS_DEFAULTS: HomeSectionsData = {
     subtext: "Tiga perusahaan yang bekerja berdampingan dengan armada DML.",
   },
   fleetComparator: {
-    heading: "Perbandingan Armada",
+    heading: "Tipe Armada",
     description:
       "Lima kelas kapal dalam satu skala tetap. Grid di bawah lambung tidak pernah berubah ukuran.",
     descriptionStatic:
       "Lima kelas kapal, dari SPOB terkecil sampai motor tanker terbesar, dalam satu skala.",
     dragHint: "Seret untuk memutar",
     gridHint: "1 kotak grid = 10 m",
+    ctaHeading: "Butuh armada untuk transportasi minyak atau penyeberangan Anda?",
+    ctaButtonLabel: "Hubungi Kami",
   },
   routeMap: {
     heading: "Rute Penyeberangan Ro-Ro",

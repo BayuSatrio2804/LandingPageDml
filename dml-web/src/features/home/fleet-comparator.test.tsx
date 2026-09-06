@@ -20,12 +20,7 @@ beforeEach(() => {
 describe("FleetComparator", () => {
   it("render heading seksi", () => {
     render(<FleetComparator fleetClasses={FLEET_CLASSES} />);
-    expect(screen.getByRole("heading", { level: 2, name: "Perbandingan Armada" })).toBeInTheDocument();
-  });
-
-  it("render tabel spesifikasi untuk pembaca layar di semua kondisi", () => {
-    render(<FleetComparator fleetClasses={FLEET_CLASSES} />);
-    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Tipe Armada" })).toBeInTheDocument();
   });
 
   // matchMedia distub matches: true, artinya reduced motion. Kontraknya:

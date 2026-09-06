@@ -25,6 +25,8 @@ export const getHomeSections = cache(async (): Promise<HomeSectionsData> => {
       descriptionStatic: doc.fleetComparator.descriptionStatic,
       dragHint: doc.fleetComparator.dragHint,
       gridHint: doc.fleetComparator.gridHint,
+      ctaHeading: doc.fleetComparator.ctaHeading,
+      ctaButtonLabel: doc.fleetComparator.ctaButtonLabel,
     },
     routeMap: { heading: doc.routeMap.heading, description: doc.routeMap.description },
     since1988: {

@@ -8,8 +8,8 @@ import { useElementHandle, useInViewport } from "@/lib/motion/use-in-viewport";
 import { useScrollProgress } from "@/lib/motion/use-scroll-progress";
 import type { FleetClass } from "@/content/types";
 import { BlueprintSvg } from "@/features/fleet/blueprint-svg";
-import { FleetSpecTable } from "@/features/fleet/spec-table";
 import { SectionHeader } from "@/components/ui/section-header";
+import { CtaLink } from "@/components/ui/cta-link";
 import { HOME_SECTIONS_DEFAULTS, type HomeSectionsData } from "./home-sections-defaults";
 
 type FleetCopy = HomeSectionsData["fleetComparator"];
@@ -26,21 +26,6 @@ const FleetCanvas = dynamic(() => import("./fleet-3d/fleet-canvas").then((mod) =
  * pin dilepas.
  */
 const PIN_LENGTH = "+=340%";
-
-function SpecBlock({ fleetClasses }: { fleetClasses: FleetClass[] }) {
-  return (
-    <section className="bg-surface-wash pb-24 md:pb-32">
-      <div className="mx-auto max-w-[1400px] px-4 md:px-8">
-        <h3 className="font-display text-pretty text-xl font-bold text-ink">Spesifikasi per kelas</h3>
-        <FleetSpecTable fleetClasses={fleetClasses} />
-        <p className="mt-6 max-w-[70ch] text-xs text-ink-muted">
-          Panjang, DWT, dan kapasitas per kelas adalah estimasi proporsional dan masih menunggu
-          konfirmasi data teknis dari klien.
-        </p>
-      </div>
-    </section>
-  );
-}
 
 /** Jalur tanpa 3D: blueprint dua kolom, tidak ada yang dipaku. */
 function StaticFleet({
@@ -87,20 +72,14 @@ export function FleetComparator({
   }, []);
 
   if (!canvasEnabled) {
-    return (
-      <>
-        <StaticFleet fleetClasses={fleetClasses} copy={copy} />
-        <SpecBlock fleetClasses={fleetClasses} />
-      </>
-    );
+    return <StaticFleet fleetClasses={fleetClasses} copy={copy} />;
   }
 
   const active = fleetClasses[activeIndex] ?? fleetClasses[0];
 
   return (
-    <>
-      <section className="bg-surface-wash relative">
-        {/*
+    <section className="bg-surface-wash relative">
+      {/*
           Yang dipaku adalah panggung setinggi tepat satu viewport. Sebelumnya
           seluruh <section> yang dipaku, dan section itu memuat tabel
           spesifikasi di bawah kanvas, jadi tinggi totalnya melebihi viewport:
@@ -147,28 +126,32 @@ export function FleetComparator({
               </ol>
 
               {active ? (
-                <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-5 font-mono text-sm">
-                  <div className="col-span-2">
-                    <dt className="text-ink-muted">Kelas</dt>
-                    <dd className="mt-1 font-display text-2xl font-bold text-ink">{active.name}</dd>
+                // Baris "Kelas" dihapus di sini: rel kelas tepat di atasnya
+                // sudah menandai kelas aktif lewat garis aksen + nama, jadi
+                // mengulanginya sebagai dt/dd cuma menduplikasi info yang
+                // sama. Nilai sisanya dibesarkan (font-display text-2xl,
+                // dari sebelumnya text-sm polos) supaya blok ini tidak
+                // terasa kosong setelah kehilangan satu baris.
+                <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 font-mono">
+                  <div>
+                    <dt className="text-sm text-ink-muted">Panjang</dt>
+                    <dd className="mt-1 font-display text-2xl font-bold text-ink">
+                      {active.lengthMeters} <span className="text-base font-normal text-ink-muted">m</span>
+                    </dd>
                   </div>
                   <div>
-                    <dt className="text-ink-muted">Panjang</dt>
-                    <dd className="mt-1 text-ink">{active.lengthMeters} m</dd>
+                    <dt className="text-sm text-ink-muted">Jumlah kapal</dt>
+                    <dd className="mt-1 font-display text-2xl font-bold text-ink">{active.vesselCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-ink-muted">Jumlah kapal</dt>
-                    <dd className="mt-1 text-ink">{active.vesselCount}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-ink-muted">DWT</dt>
-                    <dd className="mt-1 text-ink">
+                    <dt className="text-sm text-ink-muted">DWT</dt>
+                    <dd className="mt-1 font-display text-2xl font-bold text-ink">
                       {active.dwt === null ? "-" : active.dwt.toLocaleString("id-ID")}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-ink-muted">Kapasitas</dt>
-                    <dd className="mt-1 text-ink">{active.capacityLabel}</dd>
+                    <dt className="text-sm text-ink-muted">Kapasitas</dt>
+                    <dd className="mt-1 font-display text-lg font-bold text-ink">{active.capacityLabel}</dd>
                   </div>
                 </dl>
               ) : null}
@@ -183,6 +166,19 @@ export function FleetComparator({
                   active={inViewport}
                 />
               )}
+              {/* Ruang kanan-atas panggung kosong di sepanjang animasi
+                  (kapal duduk di tengah kanvas), jadi diisi ajakan bisnis
+                  singkat alih-alih dibiarkan hampa. pointer-events-none di
+                  pembungkus supaya area kosong di sekitarnya tetap bisa
+                  diseret untuk memutar kamera; hanya tombolnya yang aktif. */}
+              <div className="pointer-events-none absolute top-0 right-0 max-w-70 text-right">
+                <p className="font-display text-xl leading-tight font-bold text-pretty text-ink md:text-2xl">
+                  {copy.ctaHeading}
+                </p>
+                <div className="pointer-events-auto mt-5 inline-flex">
+                  <CtaLink href="/kontak">{copy.ctaButtonLabel}</CtaLink>
+                </div>
+              </div>
               <p className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between font-mono text-[11px] text-ink-muted">
                 <span>{copy.dragHint}</span>
                 {/* Kamera mendekat mengikuti ukuran kelas, jadi kotak grid ikut
@@ -194,9 +190,6 @@ export function FleetComparator({
             </div>
           </div>
         </div>
-      </section>
-
-      <SpecBlock fleetClasses={fleetClasses} />
-    </>
+    </section>
   );
 }
