@@ -6,7 +6,7 @@ import { VESSELS_SEED } from "@/lib/cms/vessels-seed";
 
 const FLEET_CLASSES = FLEET_CLASSES_SEED.map((fleetClass) => ({ ...fleetClass, vesselCount: 0 }));
 
-const BBM_CLASSES = FLEET_CLASSES.filter((fleetClass) => fleetClass.category === "Transportasi BBM");
+const BBM_CLASSES = FLEET_CLASSES.filter((fleetClass) => fleetClass.category === "Transportasi Minyak");
 
 describe("VesselRoster", () => {
   it("menampilkan judul setiap kelas yang diberikan", () => {

@@ -40,7 +40,7 @@ const COMPANY: CompanyProfileData = {
 const FOOTER_GROUPS = [
   {
     heading: "Bisnis",
-    items: [{ label: "Transportasi BBM", href: "/bisnis/transportasi-bbm" }],
+    items: [{ label: "Transportasi Minyak", href: "/bisnis/transportasi-bbm" }],
   },
 ];
 

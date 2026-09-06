@@ -41,7 +41,7 @@ export default async function PermintaanInformasiPage({
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Bisnis Kami", path: "/bisnis" },
-    { name: "Transportasi BBM", path: "/bisnis/transportasi-bbm" },
+    { name: "Transportasi Minyak", path: "/bisnis/transportasi-bbm" },
     {
       name: "Permintaan Informasi",
       path: "/bisnis/transportasi-bbm/permintaan-informasi",

@@ -18,7 +18,7 @@ export const BusinessSubpages: GlobalConfig = {
   fields: [
     {
       type: "collapsible",
-      label: "Transportasi BBM",
+      label: "Transportasi Minyak",
       fields: [
         {
           name: "bbm",

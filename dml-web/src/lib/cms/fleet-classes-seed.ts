@@ -18,7 +18,7 @@ export const FLEET_CLASSES_SEED = [
   {
     slug: "motor-tanker",
     name: "Motor Tanker",
-    category: "Transportasi BBM",
+    category: "Transportasi Minyak",
     lengthMeters: 95, // unverified: estimasi proporsional dari kapasitas 8 juta liter
     beamMeters: 16, // unverified: estimasi proporsional
     dwt: 9500, // unverified: estimasi proporsional dari total armada
@@ -30,7 +30,7 @@ export const FLEET_CLASSES_SEED = [
   {
     slug: "oil-barge",
     name: "Oil Barge",
-    category: "Transportasi BBM",
+    category: "Transportasi Minyak",
     lengthMeters: 75, // unverified: estimasi proporsional dari kapasitas 4,7 juta liter
     beamMeters: 14, // unverified: estimasi proporsional
     dwt: 5600, // unverified: estimasi proporsional dari total armada
@@ -42,7 +42,7 @@ export const FLEET_CLASSES_SEED = [
   {
     slug: "spob",
     name: "SPOB",
-    category: "Transportasi BBM",
+    category: "Transportasi Minyak",
     lengthMeters: 55, // unverified: estimasi proporsional dari kapasitas 1,6 juta liter
     beamMeters: 11, // unverified: estimasi proporsional
     dwt: 1900, // unverified: estimasi proporsional dari total armada
@@ -54,7 +54,7 @@ export const FLEET_CLASSES_SEED = [
   {
     slug: "tugboat",
     name: "Tugboat",
-    category: "Transportasi BBM",
+    category: "Transportasi Minyak",
     lengthMeters: 32, // unverified: estimasi umum tugboat pendamping oil barge
     beamMeters: 9, // unverified: estimasi umum
     dwt: 450, // unverified: estimasi proporsional dari total armada

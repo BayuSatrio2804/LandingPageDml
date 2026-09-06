@@ -47,7 +47,7 @@ export type BisnisSubpagesData = {
 export const BISNIS_SUBPAGES_DEFAULTS: BisnisSubpagesData = {
   bbm: {
     eyebrow: "Lini utama",
-    title: "Transportasi BBM",
+    title: "Transportasi Minyak",
     kelasArmadaHeading: "Kelas armada",
     kelasArmadaDesc:
       "Empat kelas kapal pengangkut BBM. Panjang, lebar, dan DWT di bawah masih estimasi proporsional, bukan angka dari company profile.",

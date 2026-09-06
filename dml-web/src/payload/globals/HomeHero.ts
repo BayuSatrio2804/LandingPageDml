@@ -25,7 +25,7 @@ export const HomeHero: GlobalConfig = {
     {
       name: "eyebrow",
       type: "text",
-      required: true,
+      required: false,
       admin: { description: "Baris kecil huruf kapital di atas judul." },
     },
     {
@@ -40,7 +40,7 @@ export const HomeHero: GlobalConfig = {
     {
       name: "subheadline",
       type: "text",
-      required: true,
+      required: false,
       admin: { description: "Satu kalimat di bawah judul. Maksimal sekitar 20 kata." },
     },
     {
@@ -53,7 +53,7 @@ export const HomeHero: GlobalConfig = {
     {
       name: "bbm",
       type: "group",
-      label: "Kartu kiri — Transportasi BBM",
+      label: "Kartu kiri — Transportasi Minyak",
       fields: [
         { name: "label", type: "text", required: true },
         {

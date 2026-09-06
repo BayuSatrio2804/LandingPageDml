@@ -33,7 +33,7 @@ describe("BusinessLines", () => {
     expect(container.querySelectorAll("[data-testid='bab-lini-bisnis']")).toHaveLength(
       mainLines.length,
     );
-    expect(screen.getByText("Transportasi BBM")).toBeInTheDocument();
+    expect(screen.getByText("Transportasi Minyak")).toBeInTheDocument();
     expect(screen.getByText("Penyeberangan Ro-Ro")).toBeInTheDocument();
   });
 

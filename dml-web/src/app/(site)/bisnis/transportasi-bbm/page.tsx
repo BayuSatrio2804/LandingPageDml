@@ -15,7 +15,7 @@ import { BlueprintSvg } from "@/features/fleet/blueprint-svg";
 import { VesselRoster } from "@/features/fleet/vessel-roster";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Transportasi BBM | PT Dutabahari Menara Line",
+  title: "Transportasi Minyak | PT Dutabahari Menara Line",
   description:
     "Armada motor tanker, oil barge, SPOB, dan tugboat PT Dutabahari Menara Line untuk distribusi bahan bakar cair ke pelabuhan dan pulau utama Indonesia.",
   path: "/bisnis/transportasi-bbm",
@@ -31,16 +31,16 @@ export default async function TransportasiBbmPage() {
   ]);
   const bbm = sub.bbm;
   const STS_STEPS = bbm.steps;
-  const BBM_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Transportasi BBM");
+  const BBM_CLASSES = fleetClasses.filter((fleetClass) => fleetClass.category === "Transportasi Minyak");
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Bisnis Kami", path: "/bisnis" },
-    { name: "Transportasi BBM", path: "/bisnis/transportasi-bbm" },
+    { name: "Transportasi Minyak", path: "/bisnis/transportasi-bbm" },
   ]);
   const line = mainLines.find((entry) => entry.id === "transportasi-bbm");
   const hero = MEDIA["bisnis"].find((frame) => frame.id === "lini-bbm") ?? null;
   const service = serviceJsonLd(COMPANY, {
-    name: "Transportasi BBM",
+    name: "Transportasi Minyak",
     description: line?.summary ?? "",
     path: "/bisnis/transportasi-bbm",
   });

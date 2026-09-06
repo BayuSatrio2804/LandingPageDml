@@ -14,7 +14,7 @@ import "../globals.css";
 export const metadata: Metadata = buildMetadata({
   title: "PT Dutabahari Menara Line",
   description:
-    "Perusahaan pelayaran Banjarmasin sejak 1988. Transportasi BBM, penyeberangan ro-ro, dan perawatan kapal.",
+    "Perusahaan pelayaran Banjarmasin sejak 1988. Transportasi Minyak, penyeberangan ro-ro, dan perawatan kapal.",
   path: "/",
 });
 

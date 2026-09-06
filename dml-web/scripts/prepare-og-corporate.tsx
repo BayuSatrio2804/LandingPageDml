@@ -35,7 +35,7 @@ async function main() {
     (
       <OgCard
         kicker="Sejak 1988, Banjarmasin"
-        title="Transportasi BBM dan penyeberangan ro-ro"
+        title="Transportasi Minyak dan penyeberangan ro-ro"
         imageUrl={imageUrl}
       />
     ),

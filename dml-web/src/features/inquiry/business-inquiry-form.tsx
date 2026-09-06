@@ -9,7 +9,7 @@ import { TextField } from "@/components/ui/text-field";
 import { SubmitButton } from "@/components/ui/submit-button";
 
 const SERVICE_OPTIONS = [
-  { value: "transportasi-bbm", label: "Transportasi BBM" },
+  { value: "transportasi-bbm", label: "Transportasi Minyak" },
   { value: "penumpang-roro", label: "Penyeberangan Ro-Ro" },
 ] as const;
 
