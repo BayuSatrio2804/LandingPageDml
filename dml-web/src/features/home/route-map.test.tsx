@@ -40,7 +40,7 @@ describe("activeLegIndex", () => {
 });
 
 describe("RouteMap", () => {
-  it("render nama setiap pelabuhan dan kantor", () => {
+  it("render nama setiap pelabuhan", () => {
     render(<RouteMap />);
     for (const port of PORTS) {
       expect(screen.getByText(port.name)).toBeInTheDocument();

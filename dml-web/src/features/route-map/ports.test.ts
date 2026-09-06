@@ -7,9 +7,13 @@ describe("PORTS", () => {
     expect(new Set(PORTS.map((p) => p.id)).size).toBe(PORTS.length);
   });
 
-  it("tepat satu kantor, sisanya pelabuhan", () => {
-    expect(PORTS.filter((p) => p.kind === "kantor")).toHaveLength(1);
-    expect(PORTS.filter((p) => p.kind === "pelabuhan").length).toBe(PORTS.length - 1);
+  // Banjarmasin dulu satu-satunya "kantor" (pin kantor pusat, sengaja bukan
+  // titik singgah rute). Sejak lintasan Surabaya-Banjarmasin menjadikannya
+  // ujung rute sungguhan, tidak ada lagi pelabuhan berperan "kantor" di peta
+  // ini — semuanya "pelabuhan".
+  it("seluruh titik adalah pelabuhan, tidak ada lagi yang berperan kantor", () => {
+    expect(PORTS.filter((p) => p.kind === "kantor")).toHaveLength(0);
+    expect(PORTS.filter((p) => p.kind === "pelabuhan").length).toBe(PORTS.length);
   });
 
   // Bbox peta melebar ke barat di Plan 5 untuk memuat Selat Sunda. Kalau ada
@@ -65,8 +69,8 @@ describe("DML_SERVED_PORT_IDS", () => {
     expect(DML_SERVED_PORT_IDS).toContain("kumai");
   });
 
-  it("tidak memuat kantor, dan tidak ada duplikat", () => {
-    expect(DML_SERVED_PORT_IDS).not.toContain("banjarmasin");
+  it("memuat Banjarmasin (ujung rute Surabaya-Banjarmasin), tidak ada duplikat", () => {
+    expect(DML_SERVED_PORT_IDS).toContain("banjarmasin");
     expect(new Set(DML_SERVED_PORT_IDS).size).toBe(DML_SERVED_PORT_IDS.length);
   });
 });

@@ -56,31 +56,31 @@ export const BISNIS_PAGE_DEFAULTS: BisnisPageData = {
     panels: [
       {
         num: "01",
-        title: "Transportasi BBM",
+        title: "Transportasi Minyak",
         summary:
           "Distribusi bahan bakar cair ke pelabuhan dan pulau-pulau utama Indonesia, dari muat di terminal sampai serah di titik yang tidak terjangkau jetty konvensional.",
         metric: "55",
-        metricLabel: "kapal pengangkut BBM",
+        metricLabel: "kapal pengangkut minyak",
         bullets: [
           "Motor Tanker (MT)",
           "Self Propelled Oil Barge",
           "Oil Barge (OB)",
           "Tugboat pendamping",
         ],
-        cta: "Detail Transportasi BBM",
+        cta: "Detail Transportasi Minyak",
       },
       {
         num: "02",
         title: "Penyeberangan Ro-Ro",
         summary:
-          "Layanan penyeberangan penumpang dan kendaraan dengan jadwal tetap di lintasan yang menghubungkan Jawa, Bali, Lombok, dan Kalimantan Tengah.",
+          "Layanan penyeberangan laut yang aman dan andal untuk mobilitas penumpang serta kendaraan.",
         metric: "9",
         metricLabel: "kapal ro-ro penumpang",
         bullets: [
           "Ketapang - Gilimanuk",
           "Surabaya - Lembar",
           "Surabaya - Kumai",
-          "Jangkar - Lembar",
+          "Surabaya - Banjarmasin",
         ],
         cta: "Detail Penyeberangan Ro-Ro",
       },
@@ -124,7 +124,7 @@ export const BISNIS_PAGE_DEFAULTS: BisnisPageData = {
   },
   cta: {
     kicker: "05 · Langkah berikutnya",
-    heading: "Ada kebutuhan pengangkutan BBM atau penyeberangan?",
+    heading: "Ada kebutuhan pengangkutan minyak atau penyeberangan?",
     primaryButtonLabel: "Ajukan permintaan informasi",
     secondaryButtonLabel: "Pesan tiket Ro-Ro",
   },

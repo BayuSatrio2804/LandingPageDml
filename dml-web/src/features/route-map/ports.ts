@@ -37,18 +37,25 @@ export type RouteLeg = {
  * - Merak-Bakauheni masuk peta, tapi sebagai lintasan PT Tri Sumaja Lines.
  *   Halaman 04 mendaftar KMP BSP 1 dan KMP Salvatore di lintasan itu, halaman
  *   03 menaruh TSL sebagai operatornya, jadi keduanya dicatat apa adanya.
- * - Jangkar-Lembar adalah lintasan baru yang tidak pernah ada di riset publik.
+ * - Lintasan kelima (id `jangkar-lembar`, dipertahankan apa adanya supaya
+ *   `routeId` kapal yang sudah tersimpan di CMS tidak ikut berubah) sekarang
+ *   Surabaya-Banjarmasin, bukan Jangkar-Lembar lagi. Pelabuhan "Jangkar"
+ *   dihapus dari PORTS karena tidak lagi dipakai lintasan mana pun — kalau
+ *   dibiarkan, ia akan tergambar sebagai titik pelabuhan tanpa garis apa pun.
+ *   Banjarmasin sendiri jadi `kind: "pelabuhan"` di sini (dulu "kantor",
+ *   pin kantor pusat yang sengaja tidak dianggap titik singgah rute manapun)
+ *   karena sekarang benar-benar jadi ujung sebuah rute — tidak ada lagi
+ *   pelabuhan yang berperan sebagai "kantor" murni di peta ini.
  */
 export const PORTS: Port[] = [
   { id: "merak", name: "Merak", lat: -5.93, lon: 105.995, kind: "pelabuhan", labelSide: "bawah" }, // unverified: koordinat pelabuhan publik
   { id: "bakauheni", name: "Bakauheni", lat: -5.868, lon: 105.752, kind: "pelabuhan", labelSide: "atas" }, // unverified: koordinat pelabuhan publik
   { id: "tanjung-perak", name: "Surabaya", lat: -7.2, lon: 112.73, kind: "pelabuhan", labelSide: "kiri" }, // unverified: Pelabuhan Tanjung Perak
-  { id: "jangkar", name: "Jangkar", lat: -7.7, lon: 114.19, kind: "pelabuhan", labelSide: "kiri" }, // unverified: koordinat pelabuhan publik
   { id: "ketapang", name: "Ketapang", lat: -8.145, lon: 114.383, kind: "pelabuhan", labelSide: "kiri" }, // unverified: Ketapang, Banyuwangi
   { id: "gilimanuk", name: "Gilimanuk", lat: -8.163, lon: 114.437, kind: "pelabuhan", labelSide: "kanan" }, // unverified: koordinat pelabuhan publik
   { id: "lembar", name: "Lembar", lat: -8.725, lon: 116.07, kind: "pelabuhan", labelSide: "kanan" }, // unverified: koordinat pelabuhan publik
   { id: "kumai", name: "Kumai", lat: -2.74, lon: 111.73, kind: "pelabuhan", labelSide: "kiri" }, // unverified: koordinat pelabuhan publik
-  { id: "banjarmasin", name: "Banjarmasin", lat: -3.32, lon: 114.59, kind: "kantor", labelSide: "kanan" },
+  { id: "banjarmasin", name: "Banjarmasin", lat: -3.32, lon: 114.59, kind: "pelabuhan", labelSide: "kanan" },
 ];
 
 /**
@@ -76,11 +83,11 @@ export const ROUTE_LEGS: RouteLeg[] = [
   },
   {
     id: "jangkar-lembar",
-    fromId: "jangkar",
-    toId: "lembar",
-    label: "Jangkar - Lembar",
+    fromId: "tanjung-perak",
+    toId: "banjarmasin",
+    label: "Surabaya - Banjarmasin",
     operator: "dml",
-    note: "Jawa Timur ke Lombok",
+    note: "Jawa Timur ke Kalimantan Selatan",
   },
   {
     id: "perak-lembar",
@@ -102,8 +109,8 @@ export const ROUTE_LEGS: RouteLeg[] = [
 
 /**
  * Pelabuhan yang benar-benar disinggahi armada DML sendiri. Metrik beranda
- * memakai ini, bukan PORTS.length: kantor pusat ikut hidup di PORTS supaya
- * bisa digambar di peta, dan Merak-Bakauheni dioperasikan afiliasi.
+ * memakai ini, bukan PORTS.length, karena Merak-Bakauheni dioperasikan
+ * afiliasi (PT Tri Sumaja Lines), bukan DML.
  */
 export const DML_SERVED_PORT_IDS: string[] = [
   ...new Set(

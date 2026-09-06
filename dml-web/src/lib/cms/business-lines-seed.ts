@@ -14,7 +14,7 @@ export const BUSINESS_LINES_SEED = [
     slug: "transportasi-bbm",
     kind: "lini-utama" as const,
     number: "01",
-    title: "Transportasi BBM",
+    title: "Transportasi Minyak",
     operator: "Dijalankan langsung oleh PT Dutabahari Menara Line",
     summary:
       "Distribusi bahan bakar cair ke pelabuhan dan pulau-pulau utama Indonesia, dari muat di terminal sampai serah di titik yang tidak terjangkau jetty konvensional.",
@@ -24,7 +24,7 @@ export const BUSINESS_LINES_SEED = [
       "Oil Barge (OB)",
       "Tugboat (TB) pendamping",
     ],
-    metric: { value: "55", label: "kapal pengangkut BBM" },
+    metric: { value: "55", label: "kapal pengangkut minyak" },
     mediaId: "transportasi-bbm",
     order: 0,
   },
@@ -35,8 +35,8 @@ export const BUSINESS_LINES_SEED = [
     title: "Penyeberangan Ro-Ro",
     operator: "Dijalankan langsung oleh PT Dutabahari Menara Line",
     summary:
-      "Layanan penyeberangan penumpang dan kendaraan dengan jadwal tetap di lintasan yang menghubungkan Jawa, Bali, Lombok, dan Kalimantan Tengah.",
-    bullets: ["Ketapang - Gilimanuk", "Surabaya - Lembar", "Surabaya - Kumai", "Jangkar - Lembar"],
+      "Layanan penyeberangan laut yang aman dan andal untuk mobilitas penumpang serta kendaraan.",
+    bullets: ["Ketapang - Gilimanuk", "Surabaya - Lembar", "Surabaya - Kumai", "Surabaya - Banjarmasin"],
     metric: { value: "9", label: "kapal ro-ro penumpang" },
     mediaId: "penumpang-roro",
     order: 1,
