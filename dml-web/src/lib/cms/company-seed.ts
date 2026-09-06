@@ -46,22 +46,30 @@ export const COMPANY_PROFILE_SEED = {
       city: "Banyuwangi",
       province: "Jawa Timur",
     },
+    {
+      label: "Kantor Cabang Surabaya",
+      street: "Jl. Perak Timur No. 512 / A04-A05, Perak Utara, Kec. Pabean Cantian",
+      city: "Surabaya",
+      province: "Jawa Timur",
+    },
   ],
+  // Dikembalikan ke Bahasa Inggris persis kalimat "Fundamental Values" di
+  // assets/CP DML.pdf halaman 01, atas permintaan eksplisit klien.
   values: [
     {
       key: "D" as const,
-      term: "Dinamis",
-      description: "Gesit dan mudah menyesuaikan diri terhadap perubahan dan tantangan yang muncul di lapangan.",
+      term: "Dynamic",
+      description: "Agile and adaptable to changes and challenges.",
     },
     {
       key: "M" as const,
-      term: "Terukur",
-      description: "Menetapkan target pertumbuhan dan kinerja yang jelas, sehingga hasil kerja bisa dinilai dengan angka.",
+      term: "Measurable",
+      description: "Setting clear, measurable targets for growth and performance.",
     },
     {
       key: "L" as const,
-      term: "Setia",
-      description: "Membangun hubungan jangka panjang dengan pelanggan, karyawan, dan mitra usaha.",
+      term: "Loyalty",
+      description: "Building strong relationships with customers, employees, and stakeholders.",
     },
   ],
   standards: [
@@ -160,7 +168,6 @@ export const COMPANY_PROFILE_SEED = {
 export const SITE_NAVIGATION_SEED = {
   navItems: [
     { label: "Tentang Kami", href: "/tentang-kami" },
-    { label: "Bisnis Kami", href: "/bisnis" },
     { label: "Karier", href: "/karier" },
     { label: "Artikel", href: "/artikel" },
     { label: "Kontak", href: "/kontak" },
@@ -170,7 +177,7 @@ export const SITE_NAVIGATION_SEED = {
     {
       heading: "Bisnis",
       items: [
-        { label: "Transportasi BBM", href: "/bisnis/transportasi-bbm" },
+        { label: "Transportasi Minyak", href: "/bisnis/transportasi-bbm" },
         { label: "Penumpang Ro-Ro", href: "/bisnis/penumpang-roro" },
       ],
     },

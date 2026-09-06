@@ -13,7 +13,7 @@ export const getAboutPage = cache(async (): Promise<AboutPageData> => {
   if (!doc?.createdAt) return ABOUT_PAGE_DEFAULTS;
 
   return {
-    hero: { title: doc.hero.title, intro1: doc.hero.intro1, intro2: doc.hero.intro2 },
+    hero: { title: doc.hero.title, intro1: doc.hero.intro1, intro2: doc.hero.intro2 ?? "" },
     statLabels: {
       years: doc.statLabels.years,
       ships: doc.statLabels.ships,

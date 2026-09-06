@@ -13,8 +13,8 @@ describe("COMPANY_PROFILE_SEED", () => {
     expect(new Date(COMPANY_PROFILE_SEED.foundedIso).getFullYear()).toBe(1988);
   });
 
-  it("punya dua kantor DML, terpisah dari kantor grup", () => {
-    expect(COMPANY_PROFILE_SEED.offices).toHaveLength(2);
+  it("punya tiga kantor DML, terpisah dari kantor grup", () => {
+    expect(COMPANY_PROFILE_SEED.offices).toHaveLength(3);
     expect(COMPANY_PROFILE_SEED.groupOffices).toHaveLength(2);
     const dmlStreets = COMPANY_PROFILE_SEED.offices.map((office) => office.street);
     for (const group of COMPANY_PROFILE_SEED.groupOffices) {

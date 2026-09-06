@@ -102,9 +102,11 @@ export function AboutHero({
           <p data-reveal="" className="m-0 text-base leading-[1.78] text-on-accent/80">
             {copy.intro1}
           </p>
-          <p data-reveal="" className="m-0 text-base leading-[1.78] text-on-accent/72">
-            {copy.intro2}
-          </p>
+          {copy.intro2 ? (
+            <p data-reveal="" className="m-0 text-base leading-[1.78] text-on-accent/72">
+              {copy.intro2}
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

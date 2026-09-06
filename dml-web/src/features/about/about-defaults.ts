@@ -31,11 +31,10 @@ export type AboutPageData = {
 
 export const ABOUT_PAGE_DEFAULTS: AboutPageData = {
   hero: {
-    title: "Mengangkut Energi dan Orang di Perairan Indonesia",
+    title: "Keandalan Maritim Sejak 1988",
     intro1:
-      "PT Dutabahari Menara Line adalah perusahaan pelayaran yang bergerak di pengangkutan bahan bakar cair dan penyeberangan penumpang. Didirikan Herman Chandra di Banjarmasin pada 30 November 1988, perusahaan kini menjadi bagian dari Sinar Alam Corporation.",
-    intro2:
-      "Dengan 64 kapal dan lebih dari 300 awak serta staf, DML mengangkut bahan bakar ke pelabuhan dan pulau-pulau utama Indonesia, sekaligus mengoperasikan lintasan penyeberangan yang menghubungkan Jawa, Bali, Lombok, dan Kalimantan Tengah.",
+      "Dirintis oleh Herman Chandra, PT Dutabahari Menara Line (DML) terus melangkah maju sebagai bagian dari Sinar Alam Corporation. Dengan dukungan ratusan tenaga profesional dan armada yang memadai, kami berkomitmen memberikan layanan angkutan kargo dan penyeberangan (Ro-Ro) terbaik untuk pelanggan.",
+    intro2: "",
   },
   statLabels: {
     years: "Beroperasi tanpa putus sejak 1988",
@@ -62,10 +61,10 @@ export const ABOUT_PAGE_DEFAULTS: AboutPageData = {
     },
   ],
   coreValues: {
-    heading: "Nilai Inti",
+    heading: "Core Values",
     intro:
-      "Nama perusahaan disingkat DML, dan ketiga hurufnya dipakai sebagai ukuran kerja seluruh awak kapal dan staf kantor.",
-    medallionCaption: "Nilai inti",
+      "Tiga prinsip landasan yang membentuk budaya kerja dan standar kualitas seluruh tenaga profesional DML, baik di darat maupun di perairan.",
+    medallionCaption: "Core values",
   },
   groupChart: {
     heading: "Struktur Grup",
@@ -90,7 +89,7 @@ export const ABOUT_PAGE_DEFAULTS: AboutPageData = {
   },
   cta: {
     heading: "Ingin tahu lini kerja kami lebih jauh?",
-    primaryButtonLabel: "Lihat Bisnis Kami",
+    primaryButtonLabel: "Transportasi Minyak",
     secondaryButtonLabel: "Hubungi kami",
   },
 };

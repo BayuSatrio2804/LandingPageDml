@@ -106,23 +106,6 @@ export function KlienMarquee({
 
         <dl className="m-0 flex flex-wrap gap-12">
           <div>
-            <dt className="sr-only">Jumlah klien korporat</dt>
-            <dd className="m-0 flex items-baseline gap-2">
-              <span
-                data-count={clients.length}
-                className="font-display text-[clamp(2rem,3vw,2.75rem)] leading-none font-bold text-on-accent"
-              >
-                {clients.length}
-              </span>
-              <span className="font-mono text-[11px] tracking-[0.16em] text-surface-3 uppercase">
-                {copy.stat1Unit}
-              </span>
-            </dd>
-            <p className="mt-2 mb-0 max-w-[22ch] text-[13px] text-on-accent/72">
-              {copy.stat1Caption}
-            </p>
-          </div>
-          <div>
             <dt className="sr-only">Lama beroperasi</dt>
             <dd className="m-0 flex items-baseline gap-2">
               <span

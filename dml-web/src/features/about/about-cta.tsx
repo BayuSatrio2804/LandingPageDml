@@ -30,7 +30,7 @@ export function AboutCta({
         </h2>
         <div className="mt-9 flex flex-wrap justify-center gap-3.5">
           <Link
-            href="/bisnis"
+            href="/bisnis/transportasi-bbm"
             className="inline-flex items-center gap-2.5 rounded-full bg-surface-2 px-7 py-3.5 text-sm font-medium text-accent transition-all hover:gap-4 hover:bg-on-accent hover:text-accent-hover"
           >
             {copy.primaryButtonLabel} <span aria-hidden="true">→</span>
