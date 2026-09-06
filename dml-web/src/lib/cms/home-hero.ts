@@ -18,9 +18,9 @@ export const getHomeHero = cache(async (): Promise<HomeHeroData> => {
   if (!doc?.createdAt) return HOME_HERO_DEFAULTS;
 
   return {
-    eyebrow: doc.eyebrow,
+    eyebrow: doc.eyebrow ?? "",
     headline: doc.headline,
-    subheadline: doc.subheadline,
+    subheadline: doc.subheadline ?? "",
     scrollLabel: doc.scrollLabel,
     bbm: {
       label: doc.bbm.label,
