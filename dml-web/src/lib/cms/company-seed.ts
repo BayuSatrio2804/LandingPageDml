@@ -28,8 +28,8 @@ export const COMPANY_PROFILE_SEED = {
   foundedIso: "1988-11-30", // cp-pdf hal. 01
   founder: "Herman Chandra", // cp-pdf hal. 02
   parent: "Sinar Alam Corporation", // cp-pdf hal. 01
-  phone: "+625116773845", // cp-pdf hal. 06, kantor pusat DML Banjarmasin
-  whatsapp: "625116773845", // format E.164 tanpa tanda plus untuk wa.me
+  phone: "+6281350715917", // nomor kontak utama, diperbarui atas permintaan klien
+  whatsapp: "6281350715917", // format E.164 tanpa tanda plus untuk wa.me
   bookingUrl: "https://dutabahari.id",
   offices: [
     {
