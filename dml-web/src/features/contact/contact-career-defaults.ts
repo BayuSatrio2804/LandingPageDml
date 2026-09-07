@@ -17,9 +17,6 @@ export type ContactCareerData = {
     intro: string;
     phoneLabel: string;
     mapsLinkLabel: string;
-    perLineHeading: string;
-    perLineIntro: string;
-    perLineLinkLabel: string;
   };
 };
 
@@ -38,9 +35,5 @@ export const CONTACT_CAREER_DEFAULTS: ContactCareerData = {
     intro: "Isi form di bawah untuk pertanyaan umum. Tim kami akan menghubungi lewat WhatsApp.",
     phoneLabel: "Telepon",
     mapsLinkLabel: "Buka di Google Maps",
-    perLineHeading: "Kontak per Lini Bisnis",
-    perLineIntro:
-      "Kedua lini bisnis kami saat ini melayani lewat satu nomor kontak yang sama. Detail armada, lintasan, dan standar operasi ada di halaman masing-masing lini.",
-    perLineLinkLabel: "Lihat detail lini",
   },
 };

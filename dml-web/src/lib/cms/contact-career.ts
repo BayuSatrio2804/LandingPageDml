@@ -32,9 +32,6 @@ export const getContactCareer = cache(async (): Promise<ContactCareerData> => {
       intro: contact.intro,
       phoneLabel: contact.phoneLabel,
       mapsLinkLabel: contact.mapsLinkLabel,
-      perLineHeading: contact.perLineHeading,
-      perLineIntro: contact.perLineIntro,
-      perLineLinkLabel: contact.perLineLinkLabel,
     },
   };
 });

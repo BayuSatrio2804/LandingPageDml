@@ -1216,9 +1216,6 @@ export interface ContactCareer {
     intro: string;
     phoneLabel: string;
     mapsLinkLabel: string;
-    perLineHeading: string;
-    perLineIntro: string;
-    perLineLinkLabel: string;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1665,9 +1662,6 @@ export interface ContactCareerSelect<T extends boolean = true> {
         intro?: T;
         phoneLabel?: T;
         mapsLinkLabel?: T;
-        perLineHeading?: T;
-        perLineIntro?: T;
-        perLineLinkLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;

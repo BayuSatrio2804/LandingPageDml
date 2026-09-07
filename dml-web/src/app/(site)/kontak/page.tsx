@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { getCompanyProfile, getSiteNavigation } from "@/lib/cms/company";
+import { getCompanyProfile } from "@/lib/cms/company";
 import { getContactCareer } from "@/lib/cms/contact-career";
 import { buildMetadata } from "@/lib/seo/metadata";
 import { breadcrumbJsonLd, safeJsonLdString } from "@/lib/seo/json-ld";
@@ -14,12 +13,10 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function KontakPage() {
-  const [COMPANY, { footerGroups }, { contact }] = await Promise.all([
+  const [COMPANY, { contact }] = await Promise.all([
     getCompanyProfile(),
-    getSiteNavigation(),
     getContactCareer(),
   ]);
-  const BUSINESS_LINES = footerGroups.find((group) => group.heading === "Bisnis")?.items ?? [];
   const trail = breadcrumbJsonLd([
     { name: "Beranda", path: "/" },
     { name: "Kontak", path: "/kontak" },
@@ -58,25 +55,6 @@ export default async function KontakPage() {
           </div>
         </address>
       </div>
-
-      <section className="mt-16 border-t border-surface-3 pt-10">
-        <h2 className="font-display text-pretty text-xl font-bold">{contact.perLineHeading}</h2>
-        <p className="mt-2 max-w-[60ch] text-sm text-ink-muted">{contact.perLineIntro}</p>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-          {BUSINESS_LINES.map((line) => (
-            <li key={line.label} className="rounded-card border border-surface-3 bg-surface-2 p-5">
-              <p className="font-display font-bold text-ink">{line.label}</p>
-              <p className="mt-2 text-sm text-ink-muted">{COMPANY.phone}</p>
-              <Link
-                href={line.href}
-                className="mt-3 inline-flex text-sm text-accent transition-colors hover:text-accent-hover"
-              >
-                {contact.perLineLinkLabel}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       <script
         type="application/ld+json"

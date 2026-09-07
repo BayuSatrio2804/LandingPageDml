@@ -20,6 +20,7 @@ import * as migration_20260904_033854_fleet_comparator_cta from './20260904_0338
 import * as migration_20260905_154945_about_hero_intro2_optional from './20260905_154945_about_hero_intro2_optional';
 import * as migration_20260906_222909_trim_business_page from './20260906_222909_trim_business_page';
 import * as migration_20260906_232318_rename_business_page_to_afiliasi_klien from './20260906_232318_rename_business_page_to_afiliasi_klien';
+import * as migration_20260907_020628_drop_contact_per_line_fields from './20260907_020628_drop_contact_per_line_fields';
 
 export const migrations = [
   {
@@ -125,11 +126,16 @@ export const migrations = [
   {
     up: migration_20260906_222909_trim_business_page.up,
     down: migration_20260906_222909_trim_business_page.down,
-    name: '20260906_222909_trim_business_page'
+    name: '20260906_222909_trim_business_page',
   },
   {
     up: migration_20260906_232318_rename_business_page_to_afiliasi_klien.up,
     down: migration_20260906_232318_rename_business_page_to_afiliasi_klien.down,
-    name: '20260906_232318_rename_business_page_to_afiliasi_klien'
+    name: '20260906_232318_rename_business_page_to_afiliasi_klien',
+  },
+  {
+    up: migration_20260907_020628_drop_contact_per_line_fields.up,
+    down: migration_20260907_020628_drop_contact_per_line_fields.down,
+    name: '20260907_020628_drop_contact_per_line_fields'
   },
 ];
